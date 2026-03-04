@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lil' & The Big Bear Cafe</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css/menu style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<!-- main -->
+	<div class="main">
+		<!--main navbar-->
+		<div class="main-navbar">
+			<!--menu when appear on mobile version-->
+			<ion-icon class="menu-toggle" name="menu-outline"></ion-icon>
+			<!--search bar-->
+			<div class="search">
+				<input type="text" placeholder="What you want to eat?">
+				<button class="search-btn">Search</button>
+			</div>
+			<!--profile icon on  lefty side of navbar-->
+			<div class="profile">
+				<a class="cart" href="#" onclick="toggleCartPopup()">
+					<ion-icon name="cart-outline"></ion-icon>
+					<span class="cart-count" id="cart-count">0</span>
+				</a>
+				<a class="user" href="home.html"><ion-icon name="home-outline"></ion-icon></a>
+			</div>
+		</div>
+		<!--shopping cart section -->
+		<div id="cart-popup" class="cart-popup">
+			<h4>Shopping Cart</h4>
+			<table id="cart-items">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>#</th>
+						<th>Price(RM)</th>
+						<th>Total(RM)</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+				<button class="add-to-cart-btn" onclick="window.location.href='payment.html'" >Pay now</button>
+			</table>
+			<p>Total(RM)<span id="cart-total">0.00</span></p>
+			<a class="cart-close" onclick="closeCart()"><ion-icon name="close-circle-outline"></ion-icon></a>
+			
+		</div>
+		<!--main highlight-->
+		<div class="main-highlight">
+			<!--titlle section and arrow-->
+			<div class="main-header">
+				<h2 class="main-title">Recommendations</h2>
+				<div class="main-arrow">
+					<ion-icon class="back" name="chevron-back-circle-outline"></ion-icon>
+					<ion-icon class="next" name="chevron-forward-circle-outline"></ion-icon>
+				</div>
+			</div>
+			<!--highlight menu-->
+			<div class="highlight-wrapper">
+				<div class="highlight-card">
+					<img class="highlight-img" src="Lil' Bird & The Big Bear Cafe/Creamy Tuscan Baby Spinach Salmon.jpg">
+					<div class="highlight-desc">
+						<h4>Creamy Tuscan Baby Spinach Salmon</h4>
+						<p>Rating 4.3 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>				
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="Lil' Bird & The Big Bear Cafe/Michael Corleone's Rustica Herbico Beefy Bolo.jpg">
+					<div class="highlight-desc">
+						<h4>Michael Corleone's Rustica Herbico Beefy Bolo</h4>
+						<p>Rating 4.4 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="Lil' Bird & The Big Bear Cafe/Pomodoro.jpg">
+					<div class="highlight-desc">
+						<h4>Pomodoro</h4>
+						<p>Rating 4.6 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		<!-- main menus / order -->
+		<div class="main-menus">
+			
+				<!--list of food menus-->
+				<div class="main-detail">
+					<h2 class="main-title">Choose Order</h2>
+					<div class="detail-wrapper">
+						<div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/Creamy Tuscan Baby Spinach Salmon.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Creamy Tuscan Baby Spinach Salmon</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									 <p>RM29</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Creamy Tuscan Baby Spinach Salmon', 29.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Creamy Tuscan Baby Spinach Salmon', 29.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>					
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/Michael Corleone's Rustica Herbico Beefy Bolo.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Michael Corleone's Rustica Herbico Beefy Bolo</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>									
+									<p>RM35</p>
+									</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Michael Corleone's Rustica Herbico Beefy Bolo', 35.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Michael Corleone's Rustica Herbico Beefy Bolo', 35.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>							
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/Pomodoro.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Pomodoro</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Pomodoro', 25.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Pomodoro', 25.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/Pumpkin spice Latte.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Pumpkin spice Latte</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Pumpkin spice Latte', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Pumpkin spice Latte', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/Spaghetti Alle Vongole.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Spaghetti Alle Vongole</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p> RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Spaghetti Alle Vongole', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Spaghetti Alle Vongole', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/The Caribbean Coconut Pancake.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>The Caribbean Coconut Pancake</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('The Caribbean Coconut Pancake', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('The Caribbean Coconut Pancake', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/The Classic French Croissant Board.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>The Classic French Croissant Board</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM23</p>
+									<button class="add-to-cart-btn" onclick="addToCart('The Classic French Croissant Board', 23.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('The Classic French Croissant Board', 23.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/The Nutty Banana Smoothie.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>The Nutty Banana Smoothie</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('The Nutty Banana Smoothie', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('The Nutty Banana Smoothie', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/The Royal Danish Breakfast.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>The Royal Danish Breakfast</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM55</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Minimalist Pasta', 55.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Minimalist Pasta', 55.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+							</div><div class="detail-card">
+							<img class="detail-img" src="Lil' Bird & The Big Bear Cafe/The Village Crispy Chicken Burger.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>The Village Crispy Chicken Burger</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Mix Berries waffle', 25.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Mix Berries waffle', 25.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>				
+
+</body>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<!-- adding javascript -->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="js/menu app.js"></script>
+</html>

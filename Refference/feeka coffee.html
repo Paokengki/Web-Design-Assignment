@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Feeka coffee roasters</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css/menu style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<!-- main -->
+	<div class="main">
+		<!--main navbar-->
+		<div class="main-navbar">
+			<!--menu when appear on mobile version-->
+			<ion-icon class="menu-toggle" name="menu-outline"></ion-icon>
+			<!--search bar-->
+			<div class="search">
+				<input type="text" placeholder="What you want to eat?">
+				<button class="search-btn">Search</button>
+			</div>
+			<!--profile icon on  lefty side of navbar-->
+			<div class="profile">
+				<a class="cart" href="#" onclick="toggleCartPopup()">
+					<ion-icon name="cart-outline"></ion-icon>
+					<span class="cart-count" id="cart-count">0</span>
+				</a>
+				<a class="user" href="home.html"><ion-icon name="home-outline"></ion-icon></a>
+			</div>
+		</div>
+		<!--shopping cart section -->
+		<div id="cart-popup" class="cart-popup">
+			<h4>Shopping Cart</h4>
+			<table id="cart-items">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>#</th>
+						<th>Price(RM)</th>
+						<th>Total(RM)</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+				<button class="add-to-cart-btn" onclick="window.location.href='home.html'" >Pay now</button>
+			</table>
+			<p>Total(RM)<span id="cart-total">0.00</span></p>
+			<a class="cart-close" onclick="closeCart()"><ion-icon name="close-circle-outline"></ion-icon></a>
+			
+		</div>
+		<!--main highlight-->
+		<div class="main-highlight">
+			<!--titlle section and arrow-->
+			<div class="main-header">
+				<h2 class="main-title">Recommendations</h2>
+				<div class="main-arrow">
+					<ion-icon class="back" name="chevron-back-circle-outline"></ion-icon>
+					<ion-icon class="next" name="chevron-forward-circle-outline"></ion-icon>
+				</div>
+			</div>
+			<!--highlight menu-->
+			<div class="highlight-wrapper">
+				<div class="highlight-card">
+					<img class="highlight-img" src="Feeka coffee roasters/Lamb Shank Briyani.jpg"> 
+					<div class="highlight-desc">
+						<h4>Lamb Shank Briyani</h4>
+						<p>Rating 4.3 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>				
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="Feeka coffee roasters/Half Roasted spring Chicken.jpg">
+					<div class="highlight-desc">
+						<h4>Half Roasted spring Chicken</h4>
+						<p>Rating 4.4 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="Feeka coffee roasters/Ayam Perchik Pasta.jpg">
+					<div class="highlight-desc">
+						<h4>Ayam Perchik Pasta</h4>
+						<p>Rating 4.6 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		<!-- main menus / order -->
+		<div class="main-menus">
+			
+				<!--list of food menus-->
+				<div class="main-detail">
+					<h2 class="main-title">Choose Order</h2>
+					<div class="detail-wrapper">
+						<div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Ayam Perchik Pasta.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Ayam Perchik Pasta</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									 <p>RM26</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Ayam Perchik Pasta', 26.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Ayam Perchik Pasta', 26.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>					
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Cottage Pie.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Cottage Pie</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>									
+									<p>RM32</p>
+									</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Cottage Pie', 32.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Cottage Pie', 32.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>							
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Egg Florentine.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Egg Florentine</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Egg Florentine', 25.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Egg Florentine', 25.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Half Roasted spring Chicken.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Half Roasted spring Chicken</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Half Roasted spring ChickenHalf Roasted spring Chicken', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Half Roasted spring Chicken', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Lamb Shank Briyani.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Lamb Shank Briyani</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p> RM50</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Lamb Shank Briyani', 50.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Lamb Shank Briyani', 50.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Mediterranean Roasted Aubergine.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Mediterranean Roasted Aubergine</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Mediterranean Roasted Aubergine', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Mediterranean Roasted Aubergine', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Orange Iced Cafe or Matcha Latte.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Orange Iced Cafe or Matcha Latte</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM10</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Orange Iced Cafe or Matcha Latte', 10.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Orange Iced Cafe or Matcha Latte', 10.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Pan Mee.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Pan Mee</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Pan Mee', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Pan Mee', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Roasted Chicken Rice.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Roasted Chicken Rice</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Roasted Chicken Rice', 25.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Roasted Chicken Rice', 25.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+							</div><div class="detail-card">
+							<img class="detail-img" src="Feeka coffee roasters/Steak Frites.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Steak Frites</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM62</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Steak Frites', 62.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Steak Frites', 62.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>				
+
+</body>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<!-- adding javascript -->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="js/menu app.js"></script>
+</html>

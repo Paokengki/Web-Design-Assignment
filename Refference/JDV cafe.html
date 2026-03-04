@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JDV Cafe</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css/menu style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<!-- main -->
+	<div class="main">
+		<!--main navbar-->
+		<div class="main-navbar">
+			<!--menu when appear on mobile version-->
+			<ion-icon class="menu-toggle" name="menu-outline"></ion-icon>
+			<!--search bar-->
+			<div class="search">
+				<input type="text" placeholder="What you want to eat?">
+				<button class="search-btn">Search</button>
+			</div>
+			<!--profile icon on  lefty side of navbar-->
+			<div class="profile">
+				<a class="cart" href="#" onclick="toggleCartPopup()">
+					<ion-icon name="cart-outline"></ion-icon>
+					<span class="cart-count" id="cart-count">0</span>
+				</a>
+				<a class="user" href="home.html"><ion-icon name="home-outline"></ion-icon></a>
+			</div>
+		</div>
+		<!--shopping cart section -->
+		<div id="cart-popup" class="cart-popup">
+			<h4>Shopping Cart</h4>
+			<table id="cart-items">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>#</th>
+						<th>Price(RM)</th>
+						<th>Total(RM)</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+				<button class="add-to-cart-btn" onclick="window.location.href='payment.html'" >Pay now</button>
+			</table>
+			<p>Total(RM)<span id="cart-total">0.00</span></p>
+			<a class="cart-close" onclick="closeCart()"><ion-icon name="close-circle-outline"></ion-icon></a>
+			
+		</div>
+		<!--main highlight-->
+		<div class="main-highlight">
+			<!--titlle section and arrow-->
+			<div class="main-header">
+				<h2 class="main-title">Recommendations</h2>
+				<div class="main-arrow">
+					<ion-icon class="back" name="chevron-back-circle-outline"></ion-icon>
+					<ion-icon class="next" name="chevron-forward-circle-outline"></ion-icon>
+				</div>
+			</div>
+			<!--highlight menu-->
+			<div class="highlight-wrapper">
+				<div class="highlight-card">
+					<img class="highlight-img" src="JDV CAFE/Butterfly Pea Latte.jpg">
+					<div class="highlight-desc">
+						<h4>Butterfly Pea Latte</h4>
+						<p>Rating 4.3 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>				
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="JDV CAFE/Cafe con Leche.jpg">
+					<div class="highlight-desc">
+						<h4>Cafe con Leche</h4>
+						<p>Rating 4.4 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="JDV CAFE/CocoaNut.jpg">
+					<div class="highlight-desc">
+						<h4>CocoaNut</h4>
+						<p>Rating 4.6 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		<!-- main menus / order -->
+		<div class="main-menus">
+			
+				<!--list of food menus-->
+				<div class="main-detail">
+					<h2 class="main-title">Choose Order</h2>
+					<div class="detail-wrapper">
+						<div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/Butterfly Pea Latte.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Butterfly Pea Latte</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									 <p>RM9</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Butterfly Pea Latte', 9.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Butterfly Pea Latte', 9.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>					
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/Cafe con Leche.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Cafe con Leche</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>									
+									<p>RM15</p>
+									</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Cafe con Leche', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Cafe con Leche', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>							
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/CocoaNut.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>CocoaNut</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('CocoaNut', 25.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('CocoaNut', 25.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/Egg Benedict Royale.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Egg Benedict Royale</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Egg Benedict Royale', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Egg Benedict Royale', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/French Onion Creamy Pasta.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>French Onion Creamy Pasta</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p> RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('French Onion Creamy Pasta', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('French Onion Creamy Pasta', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/French Toast.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>French Toast</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('French Toast', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('French Toast', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/Italian Meatball.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Italian Meatball</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM23</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Italian Meatball', 23.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Italian Meatball', 23.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/Melaka nyonya nasi lemak.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Melaka nyonya nasi lemak</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Melaka nyonya nasi lemak', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Melaka nyonya nasi lemak', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/Omelette Souffle.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Omelette Souffle</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Omelette Souffle', 25.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Omelette Souffle', 25.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+							</div><div class="detail-card">
+							<img class="detail-img" src="JDV CAFE/Peanut Butter Latte.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Peanut Butter Latte</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Peanut Butter Latte', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Peanut Butter Latte', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>				
+
+</body>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<!-- adding javascript -->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="js/menu app.js"></script>
+</html>

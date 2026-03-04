@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Great Cafe</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css/menu style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<!-- main -->
+	<div class="main">
+		<!--main navbar-->
+		<div class="main-navbar">
+			<!--menu when appear on mobile version-->
+			<ion-icon class="menu-toggle" name="menu-outline"></ion-icon>
+			<!--search bar-->
+			<div class="search">
+				<input type="text" placeholder="What you want to eat?">
+				<button class="search-btn">Search</button>
+			</div>
+			<!--profile icon on  lefty side of navbar-->
+			<div class="profile">
+				<a class="cart" href="#" onclick="toggleCartPopup()">
+					<ion-icon name="cart-outline"></ion-icon>
+					<span class="cart-count" id="cart-count">0</span>
+				</a>
+				<a class="user" href="home.html"><ion-icon name="home-outline"></ion-icon></a>
+			</div>
+		</div>
+		<!--shopping cart section -->
+		<div id="cart-popup" class="cart-popup">
+			<h4>Shopping Cart</h4>
+			<table id="cart-items">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>#</th>
+						<th>Price(RM)</th>
+						<th>Total(RM)</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+				<button class="add-to-cart-btn" onclick="window.location.href='payment.html'" >Pay now</button>
+			</table>
+			<p>Total(RM)<span id="cart-total">0.00</span></p>
+			<a class="cart-close" onclick="closeCart()"><ion-icon name="close-circle-outline"></ion-icon></a>
+			
+		</div>
+		<!--main highlight-->
+		<div class="main-highlight">
+			<!--titlle section and arrow-->
+			<div class="main-header">
+				<h2 class="main-title">Recommendations</h2>
+				<div class="main-arrow">
+					<ion-icon class="back" name="chevron-back-circle-outline"></ion-icon>
+					<ion-icon class="next" name="chevron-forward-circle-outline"></ion-icon>
+				</div>
+			</div>
+			<!--highlight menu-->
+			<div class="highlight-wrapper">
+				<div class="highlight-card">
+					<img class="highlight-img" src="The Great Cafe/fried Ramen.jpg">
+					<div class="highlight-desc">
+						<h4>fried Ramen</h4>
+						<p>Rating 4.3 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>				
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="The Great Cafe/Korean Kimchi Fried Ramen.jpg">
+					<div class="highlight-desc">
+						<h4>Korean Kimchi Fried Ramen</h4>
+						<p>Rating 4.4 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="The Great Cafe/Morning Ramen.jpg">
+					<div class="highlight-desc">
+						<h4>Morning Ramen</h4>
+						<p>Rating 4.6 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		<!-- main menus / order -->
+		<div class="main-menus">
+			
+				<!--list of food menus-->
+				<div class="main-detail">
+					<h2 class="main-title">Choose Order</h2>
+					<div class="detail-wrapper">
+						<div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Deep Ocean.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Deep Ocean</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									 <p>RM9</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Deep Ocean', 9.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Deep Ocean', 9.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>					
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Dry Curry Ramen.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Dry Curry Ramen</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>									
+									<p>RM15</p>
+									</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Dry Curry Ramen', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Dry Curry Ramen', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>							
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Fresh Apple Juice.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Fresh Apple Juice</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM5</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Fresh Apple Juice', 5.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Fresh Apple Juice', 5.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/fried Ramen.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>fried Ramen</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('fried Ramen', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('fried Ramen', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Korean Kimchi Fried Ramen.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Korean Kimchi Fried Ramen</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p> RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Korean Kimchi Fried Ramen', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Korean Kimchi Fried Ramen', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Morning Toast.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Morning Toast</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM10</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Morning Toast', 10.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Morning Toast', 10.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Nyonya Curry Ramen.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Nyonya Curry Ramen</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM23</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Nyonya Curry Ramen', 23.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Nyonya Curry Ramen', 23.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Orange Juice.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Orange Juice</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM5</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Orange Juice', 5.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Orange Juice', 5.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Phoenix.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Phoenix</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Phoenix', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Phoenix', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+							</div><div class="detail-card">
+							<img class="detail-img" src="The Great Cafe/Premium Local Milk Tea.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Premium Local Milk Tea</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Premium Local Milk Tea', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Premium Local Milk Tea', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>				
+
+</body>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<!-- adding javascript -->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="js/menu app.js"></script>
+</html>

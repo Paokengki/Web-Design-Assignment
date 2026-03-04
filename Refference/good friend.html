@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Good Friends Restaurant & Cafe</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css/menu style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<!-- main -->
+	<div class="main">
+		<!--main navbar-->
+		<div class="main-navbar">
+			<!--menu when appear on mobile version-->
+			<ion-icon class="menu-toggle" name="menu-outline"></ion-icon>
+			<!--search bar-->
+			<div class="search">
+				<input type="text" placeholder="What you want to eat?">
+				<button class="search-btn">Search</button>
+			</div>
+			<!--profile icon on  lefty side of navbar-->
+			<div class="profile">
+				<a class="cart" href="#" onclick="toggleCartPopup()">
+					<ion-icon name="cart-outline"></ion-icon>
+					<span class="cart-count" id="cart-count">0</span>
+				</a>
+			<a class="user" href="home.html"><ion-icon name="home-outline"></ion-icon></a>
+			</div>
+		</div>
+		<!--shopping cart section -->
+		<div id="cart-popup" class="cart-popup">
+			<h4>Shopping Cart</h4>
+			<table id="cart-items">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>#</th>
+						<th>Price(RM)</th>
+						<th>Total(RM)</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+				<button class="add-to-cart-btn" onclick="window.location.href='payment.html'" >Pay now</button>
+			</table>
+			<p>Total(RM)<span id="cart-total">0.00</span></p>
+			<a class="cart-close" onclick="closeCart()"><ion-icon name="close-circle-outline"></ion-icon></a>
+			
+		</div>
+		<!--main highlight-->
+		<div class="main-highlight">
+			<!--titlle section and arrow-->
+			<div class="main-header">
+				<h2 class="main-title">Recommendations</h2>
+				<div class="main-arrow">
+					<ion-icon class="back" name="chevron-back-circle-outline"></ion-icon>
+					<ion-icon class="next" name="chevron-forward-circle-outline"></ion-icon>
+				</div>
+			</div>
+			<!--highlight menu-->
+			<div class="highlight-wrapper">
+				<div class="highlight-card">
+					<img class="highlight-img" src="Good Friends Restaurant & Cafe/Beef Burger.jpg">
+					<div class="highlight-desc">
+						<h4>Beef Burger</h4>
+						<p>Rating 4.3 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>				
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="Good Friends Restaurant & Cafe/Chicken Ham and Cheese toastie.jpg">
+					<div class="highlight-desc">
+						<h4>Chicken Ham and Cheese toastie</h4>
+						<p>Rating 4.4 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				<div class="highlight-card">
+					<img class="highlight-img" src="Good Friends Restaurant & Cafe/Eggs Alantitic.jpg">
+					<div class="highlight-desc">
+						<h4>Eggs Alantitic</h4>
+						<p>Rating 4.6 <ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star"></ion-icon>
+						<ion-icon name="star-half"></ion-icon>
+						</p>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		<!-- main menus / order -->
+		<div class="main-menus">
+			
+				<!--list of food menus-->
+				<div class="main-detail">
+					<h2 class="main-title">Choose Order</h2>
+					<div class="detail-wrapper">
+						<div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Beef Burger.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Beef Burger</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									 <p>RM19</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Beef Burger', 19.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Beef Burger', 19.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>					
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Chicken Ham and Cheese toastie.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Chicken Ham and Cheese toastie</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>									
+									<p>RM15</p>
+									</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Chicken Ham and Cheese toastie', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Chicken Ham and Cheese toastie', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>							
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Eggs Alantitic.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Eggs Alantitic</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Eggs Alantitic', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Eggs Alantitic', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Fish And Chips.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Fish And Chips</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM20</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Fish And Chips', 20.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Fish And Chips', 20.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Good Pisang goreng.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Good Pisang goreng</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p> RM10</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Good Pisang goreng', 10.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Good Pisang goreng', 10.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Mozza Sticks.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Mozza Sticks</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Mozza Sticks', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Mozza Sticks', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+						<div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Salmon or Chicken teriyaki.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Salmon or Chicken teriyaki</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Rating</p>  
+									<p>RM23</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Salmon or Chicken teriyaki', 23.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Salmon or Chicken teriyaki', 23.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Strawberry Waffle.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Strawberry Waffle</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Strawberry Waffle', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Strawberry Waffle', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div><div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Tom Yum and Salmon Spaghetti.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Tom Yum and Salmon Spaghetti</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM25</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Tom Yum and Salmon Spaghetti', 25.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Tom Yum and Salmon Spaghetti', 25.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+							</div><div class="detail-card">
+							<img class="detail-img" src="Good Friends Restaurant & Cafe/Trio Mushroom Soup.jpg">
+							<div class="detail-desc">
+								<div class="detail-name">
+									<h4>Trio Mushroom Soup</h4>
+									<p class="detail-sub"></p></br>
+									<p class="Rating">Price</p>  
+									<p>RM15</p>
+									<button class="add-to-cart-btn" onclick="addToCart('Trio Mushroom Soup', 15.00)">Add to Cart</button>
+									<button class="add-to-cart-btn" onclick="removeFromCart('Trio Mushroom Soup', 15.00)">Remove from Cart</button>
+								</div>
+								<ion-icon class="detail-favorites" name="bookmark-outline"></ion-icon>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>				
+
+</body>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<!-- adding javascript -->
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="js/menu app.js"></script>
+</html>

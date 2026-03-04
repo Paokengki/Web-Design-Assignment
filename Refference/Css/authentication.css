@@ -1,0 +1,84 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+#myVideo {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+    text-align: center;
+}
+
+.wrapper {
+    height: 300px;
+    width: 420px;
+    background: rgba(123, 125, 125, 0.6);
+    border-radius: 40px;
+    outline-color: white;
+    outline: 5px;
+    padding: 30px;
+}
+
+.wrapper h1 {
+    font-size: 36px;
+    text-align: center;
+}
+
+.wrapper .logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.wrapper input {
+    width: calc(100% - 40px);
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    outline: none;
+    border: 2px solid rgba(0, 0, 0, 0.6);
+    border-radius: 40px;
+    text-align: center;
+    padding-left: 40px;
+    color: white;
+}
+
+.wrapper input::placeholder {
+    color: #fff;
+}
+
+.wrapper i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+}
+
+.btn {
+    width: 100px;
+    height: 40px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 16px;
+} 
+
+.btn:hover {
+    background-color: #45a049;
