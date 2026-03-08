@@ -149,7 +149,7 @@ body {
 	display: flex;
 	width: 100%;
 	justify-content: space-between;
-	align-items; center;
+	align-items: center;
 }
 
 .main-title {
@@ -161,7 +161,7 @@ body {
 }
 
 .back, .next{
-	cursor:pointer:
+	cursor:pointer;
 }
 
 .back:hover, .next:hover{
@@ -418,5 +418,6 @@ body {
 	.sidebar.active{
 		display: flex;
 		z-index: 10;
+	}
 		
 }
