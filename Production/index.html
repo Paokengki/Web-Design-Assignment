@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CafeDash | Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <video autoplay muted loop id="myVideo">
+        <source src="images/coffee login.mp4" type="video/mp4">
+    </video>
+
+    <div class="content">
+        <div class="wrapper">
+            <form action="login.php" method="post">
+                <h1>Login</h1>
+                <div class="logo"><img src="images/logo.png" alt="logo" style="width:200px;height:200px;"></div>
+
+                <div class="textbox">
+                    <input type="text" name="username" placeholder="Username" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="textbox">
+                    <input type="password" name="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+
+                <div class="remember-pass">
+                    <label><input type="checkbox" name="remember">Remember me</label>
+					<div class="link">
+                    <a href="forgot.html">Forgot password?</a>
+					</div>
+                </div>
+
+                <button type="submit" name="Login_btn" class="btn">Login</button>
+
+                <div class="register">
+                    <p>Don't have an account? <a href="register.html">Register</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>
