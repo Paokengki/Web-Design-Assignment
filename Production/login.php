@@ -23,7 +23,7 @@ $error_message = "";
                 <?php endif; ?>
 
                 <div class="textbox">
-                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="text" name="User_name" placeholder="Username" required>
                     <i class='bx bxs-user'></i>
                 </div>
 
