@@ -1,15 +1,15 @@
 <?php
-require '_home_base.php';
+require 'base.php';
 ?>
 
 <?php
-include '_home_head.php';
+include 'home/_home_sidebar.php';
 ?>
 
 <?php
-include '_home_body.php';
+include 'home/_home_body.php';
 ?>
 
 <?php
-include '_home_footer.php'; 
+include 'home/_home_footer.php'; 
 ?>
