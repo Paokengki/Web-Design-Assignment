@@ -1,3 +1,29 @@
+<?php
+// database connection
+$conn = new mysqli("localhost", "root", "", "food_ordering");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// handle form submit
+if (isset($_POST['submit'])) {
+    $name = $_POST['name'];
+    $phone = $_POST['phone'];
+    $email = $_POST['email'];
+    $message = $_POST['message'];
+
+    $sql = "INSERT INTO contact_us (name, phone, email, message)
+            VALUES ('$name', '$phone', '$email', '$message')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "<script>alert('Message sent successfully!');</script>";
+    } else {
+        echo "Error: " . $conn->error;
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +99,7 @@
     </div>
 
     <div class="map-section">
-        <iframe src="https://www.google.com/maps/embed?pb=!3m2!1sen!2sus!4v1774802584519!5m2!1sen!2sus!6m8!1m7!1s03a2Paa1_eoNLnDHt0j4RA!2m2!1d3.213426454237041!2d101.730402997966!3f164.46545407772578!4f-8.614787379248725!5f0.7820865974627469" width="1000" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!3m2!1sen!2sus!4v1774802584519!5m2!1sen!2sus!6m8!1m7!1s03a2Paa1_eoNLnDHt0j4RA!2m2!1d3.213426454237041!2d101.730402997966!3f164.46545407772578!4f-8.614787379248725!5f0.7820865974627469" width="900" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div>
 
 </body>
