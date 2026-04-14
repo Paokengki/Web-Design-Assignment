@@ -10,7 +10,7 @@
 			<a href="#"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
 			<a href="#"><ion-icon name="wallet-outline"></ion-icon>Wallet</a>
 			<a href="#"><ion-icon name="notifications-outline"></ion-icon>Notification</a>
-			<a href="#"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
+			<a href="contact_us.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
 			<a href="#"><ion-icon name="settings-outline"></ion-icon>Setting</a>
 		</div>
 		<!-- logout -->

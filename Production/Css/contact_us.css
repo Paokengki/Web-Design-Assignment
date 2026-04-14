@@ -35,6 +35,16 @@ body {
     border-radius: 10px;
 }
 
+.info-column {
+    display: grid;
+    gap: 20px;
+}
+
+.info-item {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
 h3 {
     font-size: 14px;
     margin-top: 0;
@@ -46,6 +56,11 @@ h3 {
 
 .row {
     display: flex;
+    gap: 15px;
+}
+
+.hours-grid {
+    display: grid;
     gap: 15px;
 }
 
@@ -70,7 +85,7 @@ input, textarea {
 }
 
 .send-btn {
-    background: #AF601A; /* That specific red from your image */
+    background: #AF601A; 
     color: white;
     border: none;
     padding: 15px;
