@@ -1,4 +1,9 @@
 <?php
+
+date_default_timezone_set('Asia/Kuala_Lumpur');
+?>
+
+<?php
 session_start();
 $error_message = "";
 
@@ -37,3 +42,12 @@ if (isset($_POST['Login_btn'])) {
     $stmt->close();
     $conn->close();
 }
+?>
+
+<?php
+session_start();
+session_unset();
+session_destroy();
+header("Location: _login_base.php"); // Goes back to your specific login file
+exit();
+?>
