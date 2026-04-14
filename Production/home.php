@@ -3,7 +3,7 @@ require '_home_base.php';
 ?>
 
 <?php
-include '_home_head.php';
+include '_home_sidebar.php';
 ?>
 
 <?php
