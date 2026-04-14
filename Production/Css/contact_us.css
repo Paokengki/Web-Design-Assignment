@@ -1,0 +1,94 @@
+body {
+    background-color: #AF601A; /* Dark background like your image */
+    font-family: Arial, sans-serif;
+    color: #333;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #EB984E;
+    padding: 40px;
+    border-radius: 15px;
+}
+
+.header-section h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.header-section p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.main-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 30px;
+}
+
+.info-card, .form-card {
+    background: #ffc107;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+h3 {
+    font-size: 14px;
+    margin-top: 0;
+    border-bottom: 1px solid #ffc107;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    color: #000;
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    flex: 1;
+}
+
+label {
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.send-btn {
+    background: #AF601A; /* That specific red from your image */
+    color: white;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.hours-grid {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.map-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
