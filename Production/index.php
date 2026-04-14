@@ -1,5 +1,5 @@
 <?php
-require '_login_base.php'; 
+require 'base.php'; 
 ?>
 
 <?php 
