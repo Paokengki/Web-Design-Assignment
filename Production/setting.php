@@ -1,3 +1,52 @@
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Include CSV functions
+require_once 'avatar_csv_functions.php';
+
+// Get user ID
+$user_id = $_SESSION['user_id'];
+
+// Database connection
+$conn = new mysqli("localhost", "root", "", "cafedash_db");
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
+}
+
+// Get user information from database
+$stmt = $conn->prepare("SELECT User_Name, Email, Contain_number, Address FROM User WHERE User_ID = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$user_data = [
+    'User_Name' => '',
+    'Email' => '',
+    'Contain_number' => '',
+    'Address' => ''
+];
+
+if ($result->num_rows > 0) {
+    $user_data = $result->fetch_assoc();
+}
+
+$stmt->close();
+$conn->close();
+
+// Get avatar from CSV
+$profile_image = getAvatarFromCSV($user_id);
+
+// Use default SVG if no profile image
+if (!$profile_image) {
+    $profile_image = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 150 150%22%3E%3Crect width=%22150%22 height=%22150%22 fill=%22%23D3D3D3%22/%3E%3Ccircle cx=%2275%22 cy=%2250%22 r=%2230%22 fill=%22white%22/%3E%3Cpath d=%22M 30 90 Q 30 80 75 80 Q 120 80 120 90 L 120 150 Q 120 150 75 150 Q 30 150 30 150 Z%22 fill=%22white%22/%3E%3C/svg%3E';
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -59,19 +108,55 @@
 	<div id="profile" class="setting-content active">
 		<h2>Profile Settings</h2>
 		<div class="setting-form">
+			<!-- Profile Picture Section -->
+			<div class="profile-picture-section">
+				<div class="profile-picture-container">
+					<div id="profilePicWrapper" class="profile-pic-wrapper">
+					<img id="profilePic" src="<?php echo htmlspecialchars($profile_image); ?>" alt="Profile Picture">
+					</div>
+					<label for="profileImageInput" class="upload-btn">Change Photo</label>
+					<input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+				</div>
+			</div>
+
+			<!-- Personal Information -->
 			<div class="form-group">
 				<label>Full Name</label>
-				<input type="text" placeholder="Enter your full name">
+				<input type="text" id="fullName" placeholder="Enter your full name" value="<?php echo htmlspecialchars($user_data['User_Name'] ?? ''); ?>">
 			</div>
 			<div class="form-group">
 				<label>Email</label>
-				<input type="email" placeholder="Enter your email">
+				<input type="email" id="email" placeholder="Enter your email" value="<?php echo htmlspecialchars($user_data['Email'] ?? ''); ?>">
 			</div>
 			<div class="form-group">
 				<label>Phone Number</label>
-				<input type="tel" placeholder="Enter your phone number">
+				<input type="tel" id="phone" placeholder="Enter your phone number" value="<?php echo htmlspecialchars($user_data['Contain_number'] ?? ''); ?>">
 			</div>
-			<button class="save-btn">Save Changes</button>
+			<div class="form-group">
+				<label>Address</label>
+				<textarea id="address" placeholder="Enter your address" rows="3"><?php echo htmlspecialchars($user_data['Address'] ?? ''); ?></textarea>
+			</div>
+			<button class="save-btn" id="saveProfileBtn">Save Profile</button>
+		</div>
+
+		<!-- Change Password Section -->
+		<div class="password-section">
+			<h3>Change Password</h3>
+			<div class="setting-form">
+				<div class="form-group">
+					<label>Current Password</label>
+					<input type="password" placeholder="Enter current password">
+				</div>
+				<div class="form-group">
+					<label>New Password</label>
+					<input type="password" placeholder="Enter new password">
+				</div>
+				<div class="form-group">
+					<label>Confirm Password</label>
+					<input type="password" placeholder="Confirm new password">
+				</div>
+				<button class="save-btn">Update Password</button>
+			</div>
 		</div>
 	</div>
 
@@ -153,9 +238,11 @@
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <!-- adding javascript -->
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-<script src="js/app.js"></script>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+	console.log('=== Setting Page Loaded ===');
+	
 	// Settings Tab Navigation
 	document.querySelectorAll('.setting-tab-link').forEach(link => {
 		link.addEventListener('click', function(e) {
@@ -163,6 +250,7 @@
 			
 			// Get the tab name from data-tab attribute
 			const tabName = this.getAttribute('data-tab');
+			console.log('Tab clicked:', tabName);
 			
 			// Hide all content sections
 			document.querySelectorAll('.setting-content').forEach(content => {
@@ -176,6 +264,136 @@
 			}
 		});
 	});
+
+	// Profile Picture Upload Preview
+	const profileImageInput = document.getElementById('profileImageInput');
+	const profilePic = document.getElementById('profilePic');
+	const profilePicWrapper = document.getElementById('profilePicWrapper');
+
+	console.log('Elements found:', {
+		profileImageInput: !!profileImageInput,
+		profilePic: !!profilePic,
+		profilePicWrapper: !!profilePicWrapper
+	});
+
+	if (profilePic) {
+		profilePic.onerror = function() {
+			console.log('Image load failed, using fallback SVG');
+			this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 150 150%22%3E%3Crect width=%22150%22 height=%22150%22 fill=%22%23D3D3D3%22/%3E%3Ccircle cx=%2275%22 cy=%2250%22 r=%2230%22 fill=%22white%22/%3E%3Cpath d=%22M 30 90 Q 30 80 75 80 Q 120 80 120 90 L 120 150 Q 120 150 75 150 Q 30 150 30 150 Z%22 fill=%22white%22/%3E%3C/svg%3E';
+			this.onerror = null;
+		};
+	}
+
+	if (profileImageInput) {
+		profileImageInput.addEventListener('change', function(e) {
+			const file = e.target.files[0];
+			if (!file) {
+				console.log('No file selected');
+				return;
+			}
+			
+			console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+			
+			// Show preview immediately
+			const reader = new FileReader();
+			reader.onload = function(event) {
+				console.log('Preview loaded');
+				profilePic.src = event.target.result;
+			};
+			reader.readAsDataURL(file);
+
+			// Upload to server (with CSV storage)
+			const formData = new FormData();
+			formData.append('profileImage', file);
+
+			console.log('Starting upload...');
+			fetch('upload_avatar_csv.php', {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => {
+				console.log('Response status:', response.status);
+				return response.json();
+			})
+			.then(data => {
+				console.log('Upload response:', data);
+				if (data.success) {
+					console.log('Upload successful');
+					alert('头像上传成功！');
+					setTimeout(() => {
+						location.reload();
+					}, 1000);
+				} else {
+					alert('上传失败: ' + data.message);
+					console.error('Upload error:', data.message);
+				}
+			})
+			.catch(error => {
+				console.error('Upload error:', error);
+				alert('上传过程中发生错误: ' + error.message);
+			});
+		});
+	} else {
+		console.warn('profileImageInput element not found!');
+	}
+
+	// Click on avatar to trigger upload
+	if (profilePicWrapper) {
+		profilePicWrapper.addEventListener('click', function() {
+			console.log('Avatar clicked');
+			if (profileImageInput) {
+				profileImageInput.click();
+			}
+		});
+		profilePicWrapper.style.cursor = 'pointer';
+	}
+
+	// Save Profile Button
+	const saveProfileBtn = document.getElementById('saveProfileBtn');
+	if (saveProfileBtn) {
+		saveProfileBtn.addEventListener('click', function() {
+			console.log('Save Profile button clicked');
+			
+			const fullName = document.getElementById('fullName').value;
+			const email = document.getElementById('email').value;
+			const phone = document.getElementById('phone').value;
+			const address = document.getElementById('address').value;
+
+			if (!fullName.trim()) {
+				alert('请输入名字');
+				return;
+			}
+
+			const formData = new FormData();
+			formData.append('full_name', fullName);
+			formData.append('email', email);
+			formData.append('phone', phone);
+			formData.append('address', address);
+
+			console.log('Sending profile data to server...');
+			fetch('save_profile.php', {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => {
+				console.log('Response status:', response.status);
+				return response.json();
+			})
+			.then(data => {
+				console.log('Save response:', data);
+				if (data.success) {
+					alert('个人信息已保存！');
+				} else {
+					alert('保存失败: ' + data.message);
+				}
+			})
+			.catch(error => {
+				console.error('Save error:', error);
+				alert('保存过程中发生错误: ' + error.message);
+			});
+		});
+	}
+});
 </script>
 </body>
 </html>

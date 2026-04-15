@@ -116,7 +116,7 @@ body {
 .setting-content {
 	display: none;
 	padding: 2rem;
-	background-color: white;
+	background-color: #F5D5C0;
 	border-radius: 8px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -129,6 +129,83 @@ body {
 	font-size: 24px;
 	margin-bottom: 2rem;
 	color: var(--primaryColor);
+}
+
+.profile-picture-section {
+	text-align: center;
+	margin-bottom: 2rem;
+	padding: 1.5rem;
+	background-color: #FFF5EF;
+	border-radius: 8px;
+}
+
+.profile-picture-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
+
+.profile-picture-container img {
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 4px solid var(--primaryColor);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-pic-wrapper {
+	position: relative;
+	width: 150px;
+	height: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.default-avatar {
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	background-color: #D3D3D3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 4px solid var(--primaryColor);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	font-size: 80px;
+	color: var(--primaryColor);
+}
+
+.default-avatar ion-icon {
+	font-size: 80px;
+}
+
+.upload-btn {
+	padding: 0.75rem 1.5rem;
+	background-color: var(--primaryColor);
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.upload-btn:hover {
+	background-color: var(--darkBrown);
+}
+
+.password-section {
+	margin-top: 2rem;
+	padding-top: 2rem;
+	border-top: 2px solid #E8D5C8;
+}
+
+.password-section h3 {
+	font-size: 18px;
+	color: var(--primaryColor);
+	margin-bottom: 1rem;
 }
 
 .setting-form {
@@ -157,8 +234,18 @@ body {
 	font-family: 'Open Sans', sans-serif;
 }
 
+.form-group textarea {
+	padding: 0.75rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 1rem;
+	font-family: 'Open Sans', sans-serif;
+	resize: vertical;
+}
+
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
 	outline: none;
 	border-color: var(--primaryColor);
 	box-shadow: 0 0 0 3px rgba(175, 96, 26, 0.1);
@@ -186,9 +273,9 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	padding: 1rem;
-	background-color: #f9f9f9;
+	background-color: #FFF5EF;
 	border-radius: 4px;
-	border: 1px solid #eee;
+	border: 1px solid #E8D5C8;
 }
 
 .notification-text,
