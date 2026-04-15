@@ -11,11 +11,11 @@
 			<a href="#"><ion-icon name="wallet-outline"></ion-icon>Wallet</a>
 			<a href="#"><ion-icon name="notifications-outline"></ion-icon>Notification</a>
 			<a href="contact_us.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
-			<a href="#"><ion-icon name="settings-outline"></ion-icon>Setting</a>
+			<a href="setting.php"><ion-icon name="settings-outline"></ion-icon>Setting</a>
 		</div>
 		<!-- logout -->
 		<div class="sidebar-logout">
-			<a href="login.html"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
+			<a href="login.php"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
 		</div>	
 		
 	</div>
