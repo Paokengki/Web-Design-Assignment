@@ -1,15 +1,30 @@
 <?php
-session_start();
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
+$sessionState = session_status();
+if ($sessionState === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $error_message = "";
+$conn = new mysqli("localhost", "root", "", "cafedash_db");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$result = null;
+$currentScript = basename((string) ($_SERVER['PHP_SELF'] ?? ''));
+if ($currentScript === 'home.php') {
+    $sql = "SELECT * FROM Restaurant";
+    $result = $conn->query($sql);
+
+    if ($result === false) {
+        die("Failed to fetch restaurants: " . $conn->error);
+    }
+}
 
 // Only run this logic IF the login button has been pressed
 if (isset($_POST['Login_btn'])) {
-    
-    $conn = new mysqli("localhost", "root", "", "cafedash_db");
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
 
     // Now it is safe to read these because the form was submitted
     $user_input = $_POST['User_name']; 
@@ -39,8 +54,7 @@ if (isset($_POST['Login_btn'])) {
 }
 ?>
 
-<?php 
-session_start();
+<?php
 $error_message = "";
 
 if (isset($_POST['Logout_btn'])) {
@@ -50,8 +64,4 @@ if (isset($_POST['Logout_btn'])) {
     exit();
 }
 
-?>
-
-<?php
-date_default_timezone_set('Asia/Kuala_Lumpur');
 ?>
