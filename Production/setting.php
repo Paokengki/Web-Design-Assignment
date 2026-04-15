@@ -42,10 +42,9 @@ $conn->close();
 // Get avatar from CSV
 $profile_image = getAvatarFromCSV($user_id);
 
-// Use default image file if no profile image
+// Use default SVG if no profile image
 if (!$profile_image) {
-    // Use rawurlencode for proper URL encoding of spaces
-    $profile_image = 'material/images/' . rawurlencode('default user pic.jpg');
+    $profile_image = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 150 150%22%3E%3Crect width=%22150%22 height=%22150%22 fill=%22%23D3D3D3%22/%3E%3Ccircle cx=%2275%22 cy=%2250%22 r=%2230%22 fill=%22white%22/%3E%3Cpath d=%22M 30 90 Q 30 80 75 80 Q 120 80 120 90 L 120 150 Q 120 150 75 150 Q 30 150 30 150 Z%22 fill=%22white%22/%3E%3C/svg%3E';
 }
 ?>
 <!DOCTYPE html>
@@ -119,11 +118,6 @@ if (!$profile_image) {
 					<input type="file" id="profileImageInput" accept="image/*" style="display: none;">
 				</div>
 			</div>
-			<script>
-				// Debug: Show actual image src
-				const debugImg = document.getElementById('profilePic');
-				console.log('Profile Image Src:', debugImg ? debugImg.src : 'Image not found');
-			</script>
 
 			<!-- Personal Information -->
 			<div class="form-group">
@@ -275,8 +269,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (profilePic) {
 		profilePic.onerror = function() {
-			console.log('Image load failed, using fallback image');
-			this.src = 'material/images/' + encodeURIComponent('default user pic.jpg');
+			console.log('Image load failed, using fallback SVG');
+			this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 150 150%22%3E%3Crect width=%22150%22 height=%22150%22 fill=%22%23D3D3D3%22/%3E%3Ccircle cx=%2275%22 cy=%2250%22 r=%2230%22 fill=%22white%22/%3E%3Cpath d=%22M 30 90 Q 30 80 75 80 Q 120 80 120 90 L 120 150 Q 120 150 75 150 Q 30 150 30 150 Z%22 fill=%22white%22/%3E%3C/svg%3E';
 			this.onerror = null;
 		};
 	}
