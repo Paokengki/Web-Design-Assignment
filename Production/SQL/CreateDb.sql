@@ -9,7 +9,6 @@ CREATE TABLE User (
     Address TEXT,
     Contain_number VARCHAR(20),
     Email VARCHAR(255) UNIQUE,
-    Profile_Image VARCHAR(255),
     Suspend BOOLEAN DEFAULT FALSE
 );
 

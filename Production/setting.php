@@ -145,17 +145,17 @@ if (!$profile_image) {
 			<div class="setting-form">
 				<div class="form-group">
 					<label>Current Password</label>
-					<input type="password" placeholder="Enter current password">
+					<input type="password" id="profileCurrentPassword" placeholder="Enter current password">
 				</div>
 				<div class="form-group">
 					<label>New Password</label>
-					<input type="password" placeholder="Enter new password">
+					<input type="password" id="profileNewPassword" placeholder="Enter new password">
 				</div>
 				<div class="form-group">
 					<label>Confirm Password</label>
-					<input type="password" placeholder="Confirm new password">
+					<input type="password" id="profileConfirmPassword" placeholder="Confirm new password">
 				</div>
-				<button class="save-btn">Update Password</button>
+				<button class="save-btn" id="profileUpdatePasswordBtn">Update Password</button>
 			</div>
 		</div>
 	</div>
@@ -194,17 +194,17 @@ if (!$profile_image) {
 		<div class="setting-form">
 			<div class="form-group">
 				<label>Current Password</label>
-				<input type="password" placeholder="Enter current password">
+				<input type="password" id="accountCurrentPassword" placeholder="Enter current password">
 			</div>
 			<div class="form-group">
 				<label>New Password</label>
-				<input type="password" placeholder="Enter new password">
+				<input type="password" id="accountNewPassword" placeholder="Enter new password">
 			</div>
 			<div class="form-group">
 				<label>Confirm Password</label>
-				<input type="password" placeholder="Confirm new password">
+				<input type="password" id="accountConfirmPassword" placeholder="Confirm new password">
 			</div>
-			<button class="save-btn">Update Password</button>
+			<button class="save-btn" id="accountUpdatePasswordBtn">Update Password</button>
 		</div>
 	</div>
 
@@ -214,15 +214,6 @@ if (!$profile_image) {
 		<div class="setting-form">
 			<div class="privacy-item">
 				<div class="privacy-text">
-					<h4>Profile Visibility</h4>
-					<p>Control who can see your profile</p>
-				</div>
-				<select>
-					<option>Public</option>
-					<option>Friends Only</option>
-					<option>Private</option>
-				</select>
-			</div>
 			<div class="privacy-item">
 				<div class="privacy-text">
 					<h4>Data Collection</h4>
@@ -390,6 +381,124 @@ document.addEventListener('DOMContentLoaded', function() {
 			.catch(error => {
 				console.error('Save error:', error);
 				alert('保存过程中发生错误: ' + error.message);
+			});
+		});
+	}
+
+	// Update Password Button - Profile Section
+	const profileUpdatePasswordBtn = document.getElementById('profileUpdatePasswordBtn');
+	if (profileUpdatePasswordBtn) {
+		profileUpdatePasswordBtn.addEventListener('click', function() {
+			const currentPassword = document.getElementById('profileCurrentPassword').value;
+			const newPassword = document.getElementById('profileNewPassword').value;
+			const confirmPassword = document.getElementById('profileConfirmPassword').value;
+
+			if (!currentPassword.trim()) {
+				alert('请输入当前密码');
+				return;
+			}
+			if (!newPassword.trim()) {
+				alert('请输入新密码');
+				return;
+			}
+			if (!confirmPassword.trim()) {
+				alert('请确认新密码');
+				return;
+			}
+			if (newPassword !== confirmPassword) {
+				alert('新密码与确认密码不一致');
+				return;
+			}
+			if (newPassword.length < 6) {
+				alert('新密码长度至少需要6个字符');
+				return;
+			}
+			if (currentPassword === newPassword) {
+				alert('新密码不能与当前密码相同');
+				return;
+			}
+
+			const formData = new FormData();
+			formData.append('current_password', currentPassword);
+			formData.append('new_password', newPassword);
+			formData.append('confirm_password', confirmPassword);
+
+			fetch('change_password.php', {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert('密码已成功更新！');
+					document.getElementById('profileCurrentPassword').value = '';
+					document.getElementById('profileNewPassword').value = '';
+					document.getElementById('profileConfirmPassword').value = '';
+				} else {
+					alert('更新失败: ' + data.message);
+				}
+			})
+			.catch(error => {
+				alert('密码更新错误: ' + error.message);
+			});
+		});
+	}
+
+	// Update Password Button - Account Section
+	const accountUpdatePasswordBtn = document.getElementById('accountUpdatePasswordBtn');
+	if (accountUpdatePasswordBtn) {
+		accountUpdatePasswordBtn.addEventListener('click', function() {
+			const currentPassword = document.getElementById('accountCurrentPassword').value;
+			const newPassword = document.getElementById('accountNewPassword').value;
+			const confirmPassword = document.getElementById('accountConfirmPassword').value;
+
+			if (!currentPassword.trim()) {
+				alert('请输入当前密码');
+				return;
+			}
+			if (!newPassword.trim()) {
+				alert('请输入新密码');
+				return;
+			}
+			if (!confirmPassword.trim()) {
+				alert('请确认新密码');
+				return;
+			}
+			if (newPassword !== confirmPassword) {
+				alert('新密码与确认密码不一致');
+				return;
+			}
+			if (newPassword.length < 6) {
+				alert('新密码长度至少需要6个字符');
+				return;
+			}
+			if (currentPassword === newPassword) {
+				alert('新密码不能与当前密码相同');
+				return;
+			}
+
+			const formData = new FormData();
+			formData.append('current_password', currentPassword);
+			formData.append('new_password', newPassword);
+			formData.append('confirm_password', confirmPassword);
+
+			fetch('change_password.php', {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert('密码已成功更新！');
+					document.getElementById('accountCurrentPassword').value = '';
+					document.getElementById('accountNewPassword').value = '';
+					document.getElementById('accountConfirmPassword').value = '';
+				} else {
+					alert('更新失败: ' + data.message);
+				}
+			})
+			.catch(error => {
+				alert('密码更新错误: ' + error.message);
 			});
 		});
 	}
