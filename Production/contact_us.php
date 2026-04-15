@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
     </div>
 
     <div class="map-section">
-        <iframe src="https://www.google.com/maps/embed?pb=!3m2!1sen!2sus!4v1774802584519!5m2!1sen!2sus!6m8!1m7!1s03a2Paa1_eoNLnDHt0j4RA!2m2!1d3.213426454237041!2d101.730402997966!3f164.46545407772578!4f-8.614787379248725!5f0.7820865974627469" width="900" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!3m2!1sen!2sus!4v1774802584519!5m2!1sen!2sus!6m8!1m7!1s03a2Paa1_eoNLnDHt0j4RA!2m2!1d3.213426454237041!2d101.730402997966!3f164.46545407772578!4f-8.614787379248725!5f0.7820865974627469" width="940" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
 </div>
 
