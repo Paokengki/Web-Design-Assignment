@@ -3,10 +3,9 @@ require 'base.php';
 ?>
 
 <?php 
-include '_login_head.php';
+include 'start/_start_head.php';
 ?>
 
 <?php
-include 'login.php';
-
-
+include 'start/_start_body.php';
+?>
