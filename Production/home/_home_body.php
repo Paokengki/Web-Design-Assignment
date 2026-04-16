@@ -99,86 +99,84 @@
 		<!-- main menus / order -->
 		<div class="main-menus">
 			<!--filter section-->
-			<div class="main-filter'>
+			<div class="main-filter">
 				<div>
 					<h2 class="main-title">Menu<br>Category</h2>
-					<div class="main-arrow">
-						<ion-icon class="back-menus" name="chevron-back-circle-outline"></ion-icon>
-						<ion-icon class="next-menus" name="chevron-forward-circle-outline"></ion-icon>
-					</div>
 				</div>
 			
 			<div class="filter-wrapper">
-				<div class="filter-card">
+				<div class="filter-card active" data-filter="all">
 					<div class="filter-icon">
 						<ion-icon name="restaurant-outline"></ion-icon>
 					</div>
 					<p>All Cafe</p>
 				</div>
-				<div class="filter-card">
+				<div class="filter-card" data-filter="coffee">
 					<div class="filter-icon">
 						<ion-icon name="cafe-outline"></ion-icon>
 					</div>
 					<p>Coffee</p>
 				</div>
-				<div class="filter-card">
+				<div class="filter-card" data-filter="dessert">
 					<div class="filter-icon">
 						<ion-icon name="ice-cream-outline"></ion-icon>
 					</div>
 					<p>Dessert</p>
 				</div>
-					<div class="filter-card">
+					<div class="filter-card" data-filter="food">
 						<div class="filter-icon">
 							<ion-icon name="fast-food-outline"></ion-icon>
 						</div>
 						<p>Food</p>
 					</div>
 				</div>
+			</div>
 				<hr class="divider">
 				<!--list of food menus-->
 				<div class="main-detail">
 					<h2 class="main-title">Choose Order</h2>
 						<div class="detail-wrapper">
 							<?php
-							$cafeImageFolders = [
-								"95 Degres Art Cafe" => "95 Degres Art Cafe",
-								"Copper Pot Cafe" => "Copper Pot Cafe",
-								"Feeka Coffee Roasters" => "Feeka coffee roasters",
-								"Good Friends Restaurant & Cafe" => "Good Friends Restaurant & Cafe",
-								"JDV Cafe" => "JDV CAFE",
-								"Lil' Bird & The Big Bear Cafe" => "Lil' Bird & The Big Bear Cafe",
-								"The Foxhole Bakery Cafe" => "The Foxhole Bakery Cafe",
-								"The Great Cafe" => "The Great Cafe",
-								"Upstairs Cafe" => "Upstairs Cafe"
-							];
-							?>
-							<?php
+							$sql = "SELECT * FROM Restaurant";
+							$result = $conn->query($sql);
+
 							if ($result->num_rows > 0) {
 								while($row = $result->fetch_assoc()) {
 									$cafeName = $row['Name'];
-									$imageFolder = isset($cafeImageFolders[$cafeName]) ? $cafeImageFolders[$cafeName] : "images";
-									$imageSrc = "material/" . $imageFolder . "/shop.jpg";
+									$shopImage = "material/" . $cafeName . "/shop.jpg";
+									$restaurantType = strtolower(trim((string) ($row['Restaurant_type'] ?? '')));
+									$category = 'food';
+
+									if ($restaurantType === '') {
+										$category = 'food';
+									} elseif (strpos($restaurantType, 'coffee') !== false || strpos($restaurantType, 'cafe') !== false) {
+										$category = 'coffee';
+									} elseif (strpos($restaurantType, 'dessert') !== false || strpos($restaurantType, 'bakery') !== false || strpos($restaurantType, 'cake') !== false || strpos($restaurantType, 'ice') !== false) {
+										$category = 'dessert';
+									}
 							?>
-									<a class="detail-card-link" href="cafe.php?id=<?php echo (int) $row['Restaurant_ID']; ?>">
-									<div class="detail-card">
-										<img class="detail-img" src="<?php echo htmlspecialchars($imageSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($cafeName, ENT_QUOTES, 'UTF-8'); ?>">
+							<a class="detail-card-link" data-category="<?php echo htmlspecialchars($category, ENT_QUOTES, 'UTF-8'); ?>" href="cafe.php?id=<?php echo (int) $row['Restaurant_ID']; ?>">
+							<div class="detail-card">
+								<img class="detail-img" 
+								src="<?php echo htmlspecialchars($shopImage, ENT_QUOTES, 'UTF-8'); ?>" 
+								alt="Shop Image"
+								>
 
-										<div class="detail-desc">
-											<div class="detail-name">
-												<h4><?php echo $row['Name']; ?></h4>
+								<div class="detail-desc">
+									<div class="detail-name">
+										<h4><?php echo $row['Name']; ?></h4>
 
-												<p class="detail-sub">
-													<?php echo $row['Address']; ?>
-												</p>
+										<p class="detail-sub">
+											<?php echo $row['Address']; ?>
+										</p>
 
-												<p class="Rating">
-													Rating <?php echo $row['Rating']; ?>
-												</p>
-											</div>
-										</div>
+										<p class="Rating">
+											Rating <?php echo $row['Rating']; ?>
+										</p>
 									</div>
-									</a>
-
+								</div>
+							</div>
+							</a>
 							<?php
 								}
 							} else {

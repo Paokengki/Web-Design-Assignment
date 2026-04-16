@@ -10,12 +10,12 @@
 			<a href="#"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
 			<a href="#"><ion-icon name="wallet-outline"></ion-icon>Wallet</a>
 			<a href="#"><ion-icon name="notifications-outline"></ion-icon>Notification</a>
-			<a href="#"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
+			<a href="contact_us.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
 			<a href="setting.php"><ion-icon name="settings-outline"></ion-icon>Setting</a>
 		</div>
 		<!-- logout -->
 		<div class="sidebar-logout">
-			<a href="login.html"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
+			<a href="login.php"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
 		</div>	
 		
 	</div>
@@ -49,9 +49,9 @@
 			</div>
 			<!--highlight menu-->
 			<div class="highlight-wrapper">
-				<a href="feeka coffee.html" class="highlight-link">
+				<a href="feeka coffee.php" class="highlight-link">
 				<div class="highlight-card">
-					<a href="feeka coffee.html" class="highlight-link">
+					<a href="feeka coffee.php" class="highlight-link">
 					<img class="highlight-img" src="material/Feeka coffee roasters/shop.jpg">
 					<div class="highlight-desc">	
 						<h4>Feeka Coffee Roasters</h4>
@@ -66,7 +66,7 @@
 										
 				</div>
 				<div class="highlight-card">
-					<a href="95 cafe menu.html" class="highlight-link">
+					<a href="95 cafe menu.php" class="highlight-link">
 					<img class="highlight-img" src="material/95 Degres Art Cafe/shop.jpg">
 					<div class="highlight-desc">
 						<h4>95 Degres Art Cafe</h4>
@@ -80,7 +80,7 @@
 					</div>
 				</div>
 				<div class="highlight-card">
-					<a href="copper pot.html" class="highlight-link">
+					<a href="copper pot.php" class="highlight-link">
 					<img class="highlight-img" src="material/Copper Pot Cafe/shop.jpg">
 					<div class="highlight-desc">
 						<h4>Copper Pot Cafe</h4>
@@ -140,7 +140,7 @@
 					<h2 class="main-title">Choose Order</h2>
 					<div class="detail-wrapper">
 						<div class="detail-card">
-							<a href="95 cafe menu.html" class="highlight-link">
+							<a href="95 cafe menu.php" class="highlight-link">
 							<img class="detail-img" src="material/95 Degres Art Cafe/shop.jpg">
 							<div class="detail-desc">
 								<div class="detail-name">
@@ -162,7 +162,7 @@
 							<img class="detail-img" src="material/Copper Pot Cafe/shop.jpg">
 							<div class="detail-desc">
 								<div class="detail-name">
-									<a href="copper pot.html" class="highlight-link">
+									<a href="copper pot.php" class="highlight-link">
 									<h4>Copper Pot Cafe</h4>
 									<p class="detail-sub">23, Jalan USJ 11/4g, Subang Jaya, 47620 Subang Jaya, Selangor, Malaysia</p></br>
 									<p class="Rating">Rating 4.7</p>  

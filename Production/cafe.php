@@ -3,6 +3,10 @@ require_once 'base.php';
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $conn = new mysqli("localhost", "root", "", "cafedash_db");
 
+$pageTitle = 'Cafe Menu - Cafe Dash';
+$extraStylesheets = ['Css/cafe.css'];
+require_once 'home/_home_sidebar.php';
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -12,171 +16,94 @@ if ($restaurantId <= 0) {
     header("Location: home.php");
     exit();
 }
+?>
 
-$cafeImageFolders = [
-    "95 Degres Art Cafe" => "95 Degres Art Cafe",
-    "Copper Pot Cafe" => "Copper Pot Cafe",
-    "Feeka Coffee Roasters" => "Feeka coffee roasters",
-    "Good Friends Restaurant & Cafe" => "Good Friends Restaurant & Cafe",
-    "JDV Cafe" => "JDV CAFE",
-    "Lil' Bird & The Big Bear Cafe" => "Lil' Bird & The Big Bear Cafe",
-    "The Foxhole Bakery Cafe" => "The Foxhole Bakery Cafe",
-    "The Great Cafe" => "The Great Cafe",
-    "Upstairs Cafe" => "Upstairs Cafe"
-];
+<?php
+$shopAddress = '';
+$shopType = '';
+$shopRating = '';
+$shopContact = '';
+$shopEmail = '';
+$shopImage = '';
 
-function normalizeWebImagePath($path)
-{
-    $trimmed = trim((string) $path);
-    if ($trimmed === '') {
-        return '';
-    }
+$sql = "SELECT Restaurant_ID AS Id, Name, Address, Restaurant_type AS Type, Rating, Contain_number AS Contact, Email FROM Restaurant WHERE Restaurant_ID = ?";
+$stmt = $conn->prepare($sql);
 
-    return str_replace('\\', '/', $trimmed);
+if ($stmt === false) {
+    die("Failed to prepare restaurant query: " . $conn->error);
 }
 
-function resolveExistingWebImagePath($webPath)
-{
-    $normalized = normalizeWebImagePath($webPath);
-    if ($normalized === '') {
-        return '';
-    }
+$stmt->bind_param("i", $restaurantId);
+$stmt->execute();
+$result = $stmt->get_result();
 
-    $normalized = ltrim($normalized, '/');
-    $candidates = [
-        $normalized,
-        ltrim($normalized, './')
-    ];
-
-    if (stripos($normalized, 'Production/') === 0) {
-        $candidates[] = substr($normalized, strlen('Production/'));
-    }
-
-    $pathInfo = pathinfo($normalized);
-    $baseWithoutExt = ($pathInfo['dirname'] ?? '') !== '' && ($pathInfo['dirname'] ?? '') !== '.'
-        ? $pathInfo['dirname'] . '/' . ($pathInfo['filename'] ?? '')
-        : ($pathInfo['filename'] ?? '');
-    $ext = strtolower($pathInfo['extension'] ?? '');
-    $supportedExts = ['jpg', 'jpeg', 'png', 'webp'];
-
-    if ($baseWithoutExt !== '') {
-        if ($ext === '') {
-            foreach ($supportedExts as $imageExt) {
-                $candidates[] = $baseWithoutExt . '.' . $imageExt;
-            }
-        } elseif (in_array($ext, $supportedExts, true)) {
-            foreach ($supportedExts as $imageExt) {
-                if ($imageExt !== $ext) {
-                    $candidates[] = $baseWithoutExt . '.' . $imageExt;
-                }
-            }
-        }
-    }
-
-    $seen = [];
-    foreach ($candidates as $candidate) {
-        $candidate = normalizeWebImagePath($candidate);
-        if ($candidate === '' || isset($seen[$candidate])) {
-            continue;
-        }
-        $seen[$candidate] = true;
-
-        // Convert URL-style path to local filesystem path for existence check.
-        $localPath = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, rawurldecode($candidate));
-        if (file_exists($localPath)) {
-            return $candidate;
-        }
-    }
-
-    return '';
-}
-
-function normalizeFoodType($foodType)
-{
-    $trimmed = trim((string) $foodType);
-    return $trimmed !== '' ? $trimmed : 'Others';
-}
-
-function isDrinkCategory($category)
-{
-    $normalized = strtolower(trim((string) $category));
-    return in_array($normalized, ['beverage', 'drink', 'drinks'], true);
-}
-
-$restaurantStmt = $conn->prepare("SELECT Restaurant_ID, Name, Address, Rating FROM Restaurant WHERE Restaurant_ID = ? LIMIT 1");
-$restaurantStmt->bind_param("i", $restaurantId);
-$restaurantStmt->execute();
-$restaurantResult = $restaurantStmt->get_result();
-$restaurant = $restaurantResult->fetch_assoc();
-$restaurantStmt->close();
-
-if (!$restaurant) {
+if ($result !== false && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $shopName = $row['Name'];
+    $shopAddress = $row['Address'];
+    $shopType = $row['Type'];
+    $shopRating = $row['Rating'];
+    $shopContact = $row['Contact'];
+    $shopEmail = $row['Email'];
+    $shopImage = "material/" . $row['Name'] . "/shop.jpg";
+} else {
     header("Location: home.php");
     exit();
 }
 
-$restaurantName = $restaurant['Name'];
-$folderName = isset($cafeImageFolders[$restaurantName]) ? $cafeImageFolders[$restaurantName] : "images";
-$folderFs = __DIR__ . DIRECTORY_SEPARATOR . "material" . DIRECTORY_SEPARATOR . $folderName;
-$folderWeb = "material/" . $folderName;
-
-$shopImage = "material/images/cafe.jpg";
-$shopImageFs = $folderFs . DIRECTORY_SEPARATOR . "shop.jpg";
-if (file_exists($shopImageFs)) {
-    $shopImage = $folderWeb . "/shop.jpg";
-}
-
-$menuItems = [];
-$hasImagePathColumn = false;
-$imageColResult = $conn->query("SHOW COLUMNS FROM Food LIKE 'Image_path'");
-if ($imageColResult && $imageColResult->num_rows > 0) {
-    $hasImagePathColumn = true;
-}
-
-$foodSql = $hasImagePathColumn
-    ? "SELECT Name, Food_type, detail, Image_path FROM Food WHERE Restaurant_ID = ? ORDER BY COALESCE(NULLIF(TRIM(Food_type), ''), 'Others') ASC, Name ASC"
-    : "SELECT Name, Food_type, detail FROM Food WHERE Restaurant_ID = ? ORDER BY COALESCE(NULLIF(TRIM(Food_type), ''), 'Others') ASC, Name ASC";
-
-$foodStmt = $conn->prepare($foodSql);
-$foodStmt->bind_param("i", $restaurantId);
-$foodStmt->execute();
-$foodResult = $foodStmt->get_result();
-
-while ($foodRow = $foodResult->fetch_assoc()) {
-    $foodName = trim($foodRow['Name']);
-    $category = normalizeFoodType($foodRow['Food_type']);
-    $dbImagePath = $hasImagePathColumn ? normalizeWebImagePath($foodRow['Image_path']) : '';
-    $resolvedImage = resolveExistingWebImagePath($dbImagePath);
-    if ($resolvedImage === '') {
-        $resolvedImage = "material/images/card.jpg";
-    }
-
-    $menuItems[] = [
-        'name' => $foodName,
-        'type' => $category,
-        'detail' => trim((string) $foodRow['detail']) !== '' ? $foodRow['detail'] : 'Chef recommendation',
-        'image' => $resolvedImage,
-        'isDrink' => isDrinkCategory($category)
-    ];
-}
-$foodStmt->close();
-$categoryOrder = [];
-$groupedMenuItems = [];
-
-foreach ($menuItems as $item) {
-    $cat = $item['type'];
-    if (!isset($groupedMenuItems[$cat])) {
-        $groupedMenuItems[$cat] = [];
-        $categoryOrder[] = $cat;
-    }
-    $groupedMenuItems[$cat][] = $item;
-}
+$stmt->close();
 ?>
+
 <?php
-$pageTitle = $restaurantName . ' - Cafe Dash';
-$extraStylesheets = ['Css/cafe.css'];
-include 'home/_home_sidebar.php';
+$menuItems = [];
+$groupedMenuItems = [];
+$categoryOrder = [];
+
+$sql = "SELECT Food_ID AS Id, Name, detail AS Detail, Food_type AS Type FROM Food WHERE Restaurant_ID = ?";
+$stmt = $conn->prepare($sql);
+if ($stmt === false) {
+    die("Failed to prepare menu query: " . $conn->error);
+}
+
+$stmt->bind_param("i", $restaurantId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result !== false && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $type = trim((string) ($row['Type'] ?? 'Others'));
+        if ($type === '') {
+            $type = 'Others';
+        }
+        
+        // Determine if the item is a drink based on keywords in the type
+        $typeLower = strtolower($type);
+        $isDrink = strpos($typeLower, 'drink') !== false
+            || strpos($typeLower, 'beverage') !== false
+            || strpos($typeLower, 'coffee') !== false
+            || strpos($typeLower, 'tea') !== false;
+
+        $item = [
+            'id' => $row['Id'],
+            'name' => $row['Name'],
+            'detail' => $row['Detail'],
+            'type' => $type,
+            'isDrink' => $isDrink,
+            'image' => "material/" . $shopName . "/" . $row['Name'] . ".jpg"
+        ];
+
+        $menuItems[] = $item;
+
+        if (!isset($groupedMenuItems[$type])) {
+            $groupedMenuItems[$type] = [];
+            $categoryOrder[] = $type;
+        }
+        $groupedMenuItems[$type][] = $item;
+    }
+}
+$stmt->close();
 ?>
+
 <body>
     <div class="sidebar">
         <h1 class="logo">Cafe Dash</h1>
@@ -185,8 +112,8 @@ include 'home/_home_sidebar.php';
             <a href="#"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
             <a href="#"><ion-icon name="wallet-outline"></ion-icon>Wallet</a>
             <a href="#"><ion-icon name="notifications-outline"></ion-icon>Notification</a>
-            <a href="#"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
-            <a href="#"><ion-icon name="settings-outline"></ion-icon>Setting</a>
+            <a href="contact.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
+            <a href="settings.php"><ion-icon name="settings-outline"></ion-icon>Setting</a>
         </div>
         <div class="sidebar-logout">
             <a href="login.php"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
@@ -196,22 +123,25 @@ include 'home/_home_sidebar.php';
     <div class="main">
         <div class="main-navbar">
             <a href="home.php" class="cart"><ion-icon name="arrow-back-outline"></ion-icon></a>
-            <div class="search">
-                <input type="text" value="<?php echo htmlspecialchars($restaurantName, ENT_QUOTES, 'UTF-8'); ?>" readonly>
-                <button class="search-btn" type="button">Menu</button>
-            </div>
+            
             <div class="profile">
-                <a class="user" href="#"><ion-icon name="person-outline"></ion-icon></a>
+                <a class="user" href="profile.php"><ion-icon name="person-outline"></ion-icon></a>
             </div>
         </div>
-
+        
         <div class="main-highlight">
             <div class="highlight-card" style="width:100%;">
-                <img class="highlight-img" src="<?php echo htmlspecialchars($shopImage, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($restaurantName, ENT_QUOTES, 'UTF-8'); ?>" style="width:120px;height:120px;">
+                <img class="highlight-img" 
+                src="<?php echo htmlspecialchars($shopImage, ENT_QUOTES, 'UTF-8'); ?>" 
+                alt="<?php echo htmlspecialchars($shopName, ENT_QUOTES, 'UTF-8'); ?>" 
+                style="width:120px;height:120px;">
+
                 <div class="highlight-desc">
-                    <h4><?php echo htmlspecialchars($restaurantName, ENT_QUOTES, 'UTF-8'); ?></h4>
-                    <p><?php echo htmlspecialchars($restaurant['Address'], ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p>Rating <?php echo htmlspecialchars((string) $restaurant['Rating'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <h4><?php echo htmlspecialchars($shopName, ENT_QUOTES, 'UTF-8'); ?></h4>
+                    <p><?php echo htmlspecialchars($shopAddress, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p>Rating <?php echo htmlspecialchars((string) $shopRating, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p>Contact: <?php echo htmlspecialchars((string) $shopContact, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p>Email: <?php echo htmlspecialchars((string) $shopEmail, ENT_QUOTES, 'UTF-8'); ?></p>
                 </div>
             </div>
         </div>
@@ -270,6 +200,9 @@ include 'home/_home_sidebar.php';
             </div>
         </div>
     </footer>
+
+
+
 
     <div id="menuModalOverlay" class="menu-modal-overlay" aria-hidden="true">
         <form id="menuModalForm" class="menu-modal">
