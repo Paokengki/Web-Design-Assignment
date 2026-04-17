@@ -18,8 +18,12 @@ body.contact-page {
 .contact-content {
     width: calc(100% - 250px);
     margin-left: 250px;
-    padding: 40px 20px 0 40px;
+    padding: 2% 2% 0 2%;
     margin-bottom: 24px;
+}
+
+.contact-navbar {
+    margin-bottom: 3%;
 }
 
 .contact-container {

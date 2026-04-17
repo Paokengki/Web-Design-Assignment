@@ -114,7 +114,7 @@ $stmt->close();
             <a href="home.php" class="cart"><ion-icon name="arrow-back-outline"></ion-icon></a>
             
             <div class="profile">
-                <a class="user" href="profile.php"><ion-icon name="person-outline"></ion-icon></a>
+                <a class="cart" id="openCartBtn" href="#" aria-label="Open cart"><ion-icon name="cart-outline"></ion-icon></a>
             </div>
         </div>
         
@@ -147,6 +147,7 @@ $stmt->close();
                                     <button type="button" class="detail-card menu-item-trigger"
                                         data-item-name="<?php echo htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'); ?>"
                                         data-item-type="<?php echo htmlspecialchars($item['type'], ENT_QUOTES, 'UTF-8'); ?>"
+                                        data-item-amount="<?php echo htmlspecialchars((string) $item['amount'], ENT_QUOTES, 'UTF-8'); ?>"
                                         data-is-drink="<?php echo $item['isDrink'] ? '1' : '0'; ?>">
                                         <img class="detail-img" src="<?php echo htmlspecialchars($item['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'); ?>">
                                         <div class="detail-desc">
@@ -212,6 +213,36 @@ $stmt->close();
                 <button type="submit" class="btn-primary">Add</button>
             </div>
         </form>
+    </div>
+
+    <!-- jian how see this Cart Modal -->
+    <div id="cartModalOverlay" class="menu-modal-overlay" aria-hidden="true">
+        <div class="menu-modal cart-modal" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle">
+            <h3 id="cartModalTitle">Your Order</h3>
+            <div id="cartItemsContainer" class="cart-items-container">
+                <p class="cart-empty">Your cart is empty.</p>
+            </div>
+
+            <div class="cart-summary" id="cartSummarySection">
+                <div class="cart-summary-row">
+                    <span>Total Amount</span>
+                    <strong id="cartSubtotal">RM 0.00</strong>
+                </div>
+                <div class="cart-summary-row">
+                    <span>SST (6%)</span>
+                    <strong id="cartSst">RM 0.00</strong>
+                </div>
+                <div class="cart-summary-row cart-summary-total">
+                    <span>Total Amount + SST</span>
+                    <strong id="cartGrandTotal">RM 0.00</strong>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <a href="payment.php" id="goPaymentBtn" class="btn-primary">Payment</a>
+                <button type="button" id="closeCartBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
     </div>
 
 <?php require_once 'home/_home_footer.php'; ?>
