@@ -109,9 +109,11 @@ if (isset($_POST['Login_btn'])) {
 
     if ($result->num_rows === 1) {
         $row = $result->fetch_assoc();
-        
-        // Simple string comparison for passwords as per your provided logic
-        if ($pass_input === $row['Password']) {
+
+        // Support both hashed passwords (new accounts) and legacy plain text values.
+        $is_valid_password = password_verify($pass_input, $row['Password']) || ($pass_input === $row['Password']);
+
+        if ($is_valid_password) {
             $_SESSION['user_id'] = $row['User_id'];
             $_SESSION['User_name'] = $row['User_name'];
             header("Location: home.php");
