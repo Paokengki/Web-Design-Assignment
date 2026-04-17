@@ -19,12 +19,18 @@
 					</div>
 				</div>
 			</footer>
-		</div>
-	</div>
 </body>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <!-- adding javascript -->
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script src="js/app.js"></script>
+<?php
+if (!isset($extraScripts) || !is_array($extraScripts)) {
+	$extraScripts = [];
+}
+foreach ($extraScripts as $scriptPath):
+?>
+<script src="<?php echo htmlspecialchars($scriptPath, ENT_QUOTES, 'UTF-8'); ?>"></script>
+<?php endforeach; ?>
 </html>
