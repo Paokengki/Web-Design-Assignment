@@ -20,3 +20,22 @@
 		<link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheet, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php endforeach; ?>
 </head>
+<body>
+	<!-- siddebar -->
+	<div class ="sidebar">
+		<!-- Logo -->
+		<h1 class="logo">Cafe Dash</h1>
+		
+		<!-- List of menus -->
+		<div class="sidebar-menus">
+			<a href="#"><ion-icon name="storefront-outline"></ion-icon>Home</a>
+			<a href="#"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
+			<a href="contact_us.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
+			<a href="setting.php"><ion-icon name="settings-outline"></ion-icon>Setting</a>
+		</div>
+		<!-- logout -->
+		<div class="sidebar-logout">
+			<a href="index.php"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
+		</div>	
+		
+	</div>
