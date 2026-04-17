@@ -128,8 +128,7 @@ INSERT INTO Food (Food_ID, Restaurant_ID, Name, Food_type, detail, amount) VALUE
 (99,9,'Creme Brûlée','Dessert','Imported from material folder',11.50),
 (100,9,'Everything Chicken Ramen','Noodles','Imported from material folder',12.50),
 
-(101,9,'Greek Yoghurt Berry Cake','Dessert','Imported from material folder');
+(101,9,'Greek Yoghurt Berry Cake','Dessert','Imported from material folder',12.50);
 
 INSERT INTO Admin (Name, Password, Contain_number, Email) 
 VALUES ('admin', 'admin123', '012-3456789', 'admin@cafedash.com');
-(101,9,'Greek Yoghurt Berry Cake','Dessert','Imported from material folder',12.50);

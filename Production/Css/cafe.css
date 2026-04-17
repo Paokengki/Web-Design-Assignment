@@ -4,12 +4,6 @@
     text-align: left;
 }
 
-.detail-price {
-    font-weight: 700;
-    color: var(--primaryColor);
-    margin-top: 4px;
-}
-
 .menu-modal-overlay {
     position: fixed;
     inset: 0;
