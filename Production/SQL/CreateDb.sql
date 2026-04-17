@@ -68,15 +68,6 @@ CREATE TABLE `Order` (
     FOREIGN KEY (Payment_ID) REFERENCES Payment(Payment_ID)
 );
 
--- 8. Delivery Table
-CREATE TABLE Delivery (
-    Delivery_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Driver_ID INT,
-    Order_ID INT,
-    FOREIGN KEY (Driver_ID) REFERENCES Driver(Driver_ID),
-    FOREIGN KEY (Order_ID) REFERENCES `Order`(Order_ID)
-);
-
 -- 9. History Table
 CREATE TABLE History (
     History_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -84,4 +75,15 @@ CREATE TABLE History (
     Order_ID INT,
     FOREIGN KEY (User_ID) REFERENCES User(User_ID),
     FOREIGN KEY (Order_ID) REFERENCES `Order`(Order_ID)
+);
+
+-- 10. contact us Table
+CREATE TABLE contact_us (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
 );
