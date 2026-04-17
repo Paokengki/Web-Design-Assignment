@@ -15,7 +15,7 @@
 		</div>
 		<!-- logout -->
 		<div class="sidebar-logout">
-			<a href="login.php"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
+			<a href="index.php"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
 		</div>	
 		
 	</div>
@@ -41,59 +41,36 @@
 		<div class="main-highlight">
 			<!--titlle section and arrow-->
 			<div class="main-header">
-				<h2 class="main-title">Recommendations</h2>
-				<div class="main-arrow">
-					<ion-icon class="back" name="chevron-back-circle-outline"></ion-icon>
-					<ion-icon class="next" name="chevron-forward-circle-outline"></ion-icon>
-				</div>
+				<h2 class="main-title">Top Recommendations</h2>
 			</div>
 			<!--highlight menu-->
 			<div class="highlight-wrapper">
-				<a href="feeka coffee.html" class="highlight-link">
-				<div class="highlight-card">
-					<a href="feeka coffee.html" class="highlight-link">
-					<img class="highlight-img" src="material/Feeka coffee roasters/shop.jpg">
-					<div class="highlight-desc">	
-						<h4>Feeka Coffee Roasters</h4>
-						<p>Rating 4.9 <ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star-half"></ion-icon>
-						</p>
-						</a>
-					</div>
-										
-				</div>
-				<div class="highlight-card">
-					<a href="95 cafe menu.html" class="highlight-link">
-					<img class="highlight-img" src="material/95 Degres Art Cafe/shop.jpg">
-					<div class="highlight-desc">
-						<h4>95 Degres Art Cafe</h4>
-						<p>Rating 4.8 <ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star-half"></ion-icon>
-						</p>
-						</a>
-					</div>
-				</div>
-				<div class="highlight-card">
-					<a href="copper pot.html" class="highlight-link">
-					<img class="highlight-img" src="material/Copper Pot Cafe/shop.jpg">
-					<div class="highlight-desc">
-						<h4>Copper Pot Cafe</h4>
-						<p>Rating 4.7 <ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star"></ion-icon>
-						<ion-icon name="star-half"></ion-icon>
-						</p>
-						</a>
-					</div>
-				</div>
+				<?php
+				$sql = "SELECT Restaurant_ID, Name, Rating FROM Restaurant ORDER BY Rating DESC LIMIT 3";
+				$result = $conn->query($sql);
 				
+				if ($result && $result->num_rows > 0) {
+					while ($row = $result->fetch_assoc()) {
+						$cafeId = (int) $row['Restaurant_ID'];
+						$cafeName = htmlspecialchars($row['Name'], ENT_QUOTES, 'UTF-8');
+						$rating = (float) $row['Rating'];
+						$shopImage = "material/" . $cafeName . "/shop.jpg";
+						$starCount = (int) floor($rating);
+						$hasHalf = ($rating - $starCount) >= 0.5;
+				?>
+				<a href="cafe.php?id=<?php echo $cafeId; ?>" class="highlight-link">
+					<div class="highlight-card">
+						<img class="highlight-img" src="<?php echo htmlspecialchars($shopImage, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo $cafeName; ?>">
+						<div class="highlight-desc">
+							<h4><?php echo $cafeName; ?></h4>
+							<p class="highlight-rating">Rating <?php echo number_format($rating, 1); ?></p>
+						</div>
+					</div>
+				</a>
+				<?php
+					}
+				}
+				?>
 			</div>
 		</div>
 		<!-- main menus / order -->

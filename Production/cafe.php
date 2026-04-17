@@ -59,7 +59,7 @@ $menuItems = [];
 $groupedMenuItems = [];
 $categoryOrder = [];
 
-$sql = "SELECT Food_ID AS Id, Name, detail AS Detail, Food_type AS Type FROM Food WHERE Restaurant_ID = ?";
+$sql = "SELECT Food_ID AS Id, Name, detail AS Detail, Food_type AS Type, amount AS Amount FROM Food WHERE Restaurant_ID = ?";
 $stmt = $conn->prepare($sql);
 if ($stmt === false) {
     die("Failed to prepare menu query: " . $conn->error);
@@ -88,6 +88,7 @@ if ($result !== false && $result->num_rows > 0) {
             'name' => $row['Name'],
             'detail' => $row['Detail'],
             'type' => $type,
+            'amount' => $row['Amount'],
             'isDrink' => $isDrink,
             'image' => "material/" . $shopName . "/" . $row['Name'] . ".jpg"
         ];
@@ -164,6 +165,7 @@ $stmt->close();
                                             <div class="detail-name">
                                                 <h4><?php echo htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'); ?></h4>
                                                 <p class="detail-sub"><?php echo htmlspecialchars($item['detail'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                                <p class="detail-price">RM <?php echo htmlspecialchars(number_format((float) $item['amount'], 2), ENT_QUOTES, 'UTF-8'); ?></p>
                                                 <p class="Rating"><?php echo htmlspecialchars($item['type'], ENT_QUOTES, 'UTF-8'); ?></p>
                                             </div>
                                         </div>

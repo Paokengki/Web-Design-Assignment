@@ -55,6 +55,9 @@ CREATE TABLE Food (
     detail TEXT,
     FOREIGN KEY (Restaurant_ID) REFERENCES Restaurant(Restaurant_ID)
 );
+ALTER TABLE Food
+ADD COLUMN amount DECIMAL(10,2);
+
 
 -- 7. Order Table
 CREATE TABLE `Order` (
