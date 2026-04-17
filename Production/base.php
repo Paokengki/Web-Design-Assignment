@@ -99,11 +99,11 @@ if (isset($_POST['Admin_login_btn'])) {
 
 // 6. User Login Logic
 if (isset($_POST['Login_btn'])) {
-    $user_input = $_POST['User_name'];
-    $pass_input = $_POST['password'];
+    $user_input = trim((string) ($_POST['User_name'] ?? ''));
+    $pass_input = (string) ($_POST['password'] ?? '');
 
-    $stmt = $conn->prepare("SELECT User_id, User_name, Password FROM User WHERE User_name = ?");
-    $stmt->bind_param("s", $user_input);
+    $stmt = $conn->prepare("SELECT User_id, User_name, Password FROM User WHERE User_name = ? OR Email = ? LIMIT 1");
+    $stmt->bind_param("ss", $user_input, $user_input);
     $stmt->execute();
     $result = $stmt->get_result();
 

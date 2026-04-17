@@ -1,8 +1,4 @@
 
-<?php
-$error_message = "";
-?>
-
 <body>
     <video autoplay muted loop id="myVideo">
         <source src="material/images/coffee login.mp4" type="video/mp4">
@@ -35,7 +31,7 @@ $error_message = "";
                 <div class="remember-pass">
                     <label><input type="checkbox" name="remember">Remember me</label>
                     <div class="link">
-                        <a href="forgot.php">Forgot password?</a>
+                        <a href="member_login/_forgot.php">Forgot password?</a>
                     </div>
                 </div>
 
