@@ -61,6 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
 
 
     <div class="contact-content">
+    <div class="main-navbar contact-navbar">
+        <a href="javascript:history.back()" class="cart" aria-label="Go back"><ion-icon name="arrow-back-outline"></ion-icon></a>
+        <div></div>
+    </div>
     <div class="contact-container">
         <div class="header-section">
             <h1>CONTACT US</h1>
