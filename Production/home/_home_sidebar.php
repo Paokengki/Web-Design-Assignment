@@ -8,6 +8,9 @@
 	if (!isset($extraStylesheets) || !is_array($extraStylesheets)) {
 		$extraStylesheets = [];
 	}
+	if (!isset($bodyClass) || !is_string($bodyClass)) {
+		$bodyClass = '';
+	}
 	?>
     <title><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +23,7 @@
 		<link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheet, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php endforeach; ?>
 </head>
-<body>
+<body<?php echo trim($bodyClass) !== '' ? ' class="' . htmlspecialchars($bodyClass, ENT_QUOTES, 'UTF-8') . '"' : ''; ?>>
 	<!-- siddebar -->
 	<div class ="sidebar">
 		<!-- Logo -->
@@ -28,7 +31,7 @@
 		
 		<!-- List of menus -->
 		<div class="sidebar-menus">
-			<a href="#"><ion-icon name="storefront-outline"></ion-icon>Home</a>
+			<a href="home.php"><ion-icon name="storefront-outline"></ion-icon>Home</a>
 			<a href="#"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
 			<a href="contact_us.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
 			<a href="setting.php"><ion-icon name="settings-outline"></ion-icon>Setting</a>

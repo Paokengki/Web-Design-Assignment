@@ -12,7 +12,7 @@
 			<!--profile icon on  lefty side of navbar-->
 			<div class="profile">
 				<a class="cart" href="#"><ion-icon name="cart-outline"></ion-icon></a>
-				<a class="user" href="#"><ion-icon name="person-outline"></ion-icon></a>
+				<a class="user" href="setting.php#profile"><ion-icon name="person-outline"></ion-icon></a>
 			</div>
 		</div>
 		<!--main highlight-->

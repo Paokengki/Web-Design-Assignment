@@ -1,10 +1,12 @@
 <?php
 require_once 'base.php';
+
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $conn = new mysqli("localhost", "root", "", "cafedash_db");
 
 $pageTitle = 'Cafe Menu - Cafe Dash';
 $extraStylesheets = ['Css/cafe.css'];
+$extraScripts = ['js/cafe.js'];
 require_once 'home/_home_sidebar.php';
 
 if ($conn->connect_error) {
@@ -103,23 +105,9 @@ if ($result !== false && $result->num_rows > 0) {
     }
 }
 $stmt->close();
+
 ?>
 
-<body>
-    <div class="sidebar">
-        <h1 class="logo">Cafe Dash</h1>
-        <div class="sidebar-menus">
-            <a href="home.php"><ion-icon name="storefront-outline"></ion-icon>Home</a>
-            <a href="#"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
-            <a href="#"><ion-icon name="wallet-outline"></ion-icon>Wallet</a>
-            <a href="#"><ion-icon name="notifications-outline"></ion-icon>Notification</a>
-            <a href="contact.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
-            <a href="settings.php"><ion-icon name="settings-outline"></ion-icon>Setting</a>
-        </div>
-        <div class="sidebar-logout">
-            <a href="login.php"><ion-icon name="log-out-outline"></ion-icon>Logout</a>
-        </div>
-    </div>
 
     <div class="main">
         <div class="main-navbar">
@@ -181,31 +169,6 @@ $stmt->close();
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>Contact Us</h4>
-                    <p>Edumetro, Persiaran Subang Permai, Usj 1, 47500 Subang Jaya, Selangor</p>
-                    <p>Email: CafeDash@gmail.com</p>
-                    <p>Phone: 03-8600 1777</p>
-                </div>
-                <div class="col-md-6">
-                    <h4>Follow Us</h4>
-                    <p>Stay connected with us on social media:</p>
-                    <ul class="social-icons">
-                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                        <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-
-
-
     <div id="menuModalOverlay" class="menu-modal-overlay" aria-hidden="true">
         <form id="menuModalForm" class="menu-modal">
             <h3 id="modalItemTitle">Item</h3>
@@ -250,9 +213,5 @@ $stmt->close();
             </div>
         </form>
     </div>
-</body>
-<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-<script src="js/cafe.js"></script>
-</html>
+
+<?php require_once 'home/_home_footer.php'; ?>
