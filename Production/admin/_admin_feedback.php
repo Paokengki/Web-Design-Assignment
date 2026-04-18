@@ -1,13 +1,17 @@
+<?php require 'base.php'; ?>
+
 <body>
     <div class="main">
         <div class="main-navbar">
             <div class="main-title">
                 <h1>Admin Dashboard</h1>
             </div>
-            <div class="profile">
-                <div class="user"><ion-icon name="person-circle-outline"></ion-icon></div>
-                <strong>Admin User</strong>
-            </div>
+            <a href="../admin/_admin_setting.php" style="text-decoration: none; color: inherit;">
+                <div class="profile" style="cursor: pointer;">
+                    <span class="user"><ion-icon name="people-circle-outline"></ion-icon></span>
+                    <strong>Admin</strong>
+             </div>
+            </a>
         </div>
 
         <div class="main-highlight">
@@ -28,7 +32,6 @@
         <div class="main-menus">
             <div class="main-detail">
                 <div class="detail-wrapper">
-                    <!-- Fetch feedback rows once, then render each message card with a delete action. -->
                     <?php
                     $result = getAllFeedback($conn);
                     if ($result && $result->num_rows > 0):
@@ -52,7 +55,6 @@
                                 </p>
                             </div>
 
-                            <!-- The form posts the selected feedback ID back to base.php for deletion. -->
                             <form method="POST" onsubmit="return confirm('Confirm deletion of this feedback?');">
                                 <input type="hidden" name="feedback_id" value="<?php echo $row['id']; ?>">
                                 <button type="submit" name="delete_feedback" 
