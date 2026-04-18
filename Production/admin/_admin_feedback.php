@@ -30,6 +30,7 @@
         <div class="main-menus">
             <div class="main-detail">
                 <div class="detail-wrapper">
+                    <!-- Fetch feedback rows once, then render each message card with a delete action. -->
                     <?php
                     $result = getAllFeedback($conn);
                     if ($result && $result->num_rows > 0):
@@ -53,6 +54,7 @@
                                 </p>
                             </div>
 
+                            <!-- The form posts the selected feedback ID back to base.php for deletion. -->
                             <form method="POST" onsubmit="return confirm('Confirm deletion of this feedback?');">
                                 <input type="hidden" name="feedback_id" value="<?php echo $row['id']; ?>">
                                 <button type="submit" name="delete_feedback" 

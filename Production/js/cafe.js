@@ -1,17 +1,13 @@
-// jian how see this file for reference only, not to be used in the project
-// cafe.js - JavaScript for cafe menu and cart interactions
 $(function () {
+    // Menu modal state for the currently selected item.
     var $overlay = $('#menuModalOverlay');
     var $form = $('#menuModalForm');
     var $modalTitle = $('#modalItemTitle');
     var $qtyInput = $('#itemQty');
     var $drinkOptions = $('#drinkOptions');
     var $remarkInput = $('#itemRemark');
-    var $cartOverlay = $('#cartModalOverlay');
-    var $cartItemsContainer = $('#cartItemsContainer');
-    var $cartSubtotal = $('#cartSubtotal');
-    var $cartSst = $('#cartSst');
-    var $cartGrandTotal = $('#cartGrandTotal');
+    var $toast = null;
+    var toastTimer = null;
     var currentItem = null;
 
     function escapeHtml(value) {
@@ -25,15 +21,52 @@ $(function () {
 
     function callCartApi(action, payload) {
         return $.ajax({
-            url: 'cart_actions.php',
+            url: '../payment_cart/cart_actions.php',
             method: 'POST',
             dataType: 'json',
             data: $.extend({ action: action }, payload || {})
         });
     }
 
-    function openModal(itemName, itemType, isDrink, itemAmount) {
+    function ensureToast() {
+        if ($toast && $toast.length > 0) {
+            return $toast;
+        }
+
+        $toast = $('<div class="top-toast" role="status" aria-live="polite"></div>');
+        $('body').append($toast);
+        return $toast;
+    }
+
+    function showToast(message, type) {
+        var $el = ensureToast();
+        var toneClass = type === 'error' ? 'top-toast-error' : 'top-toast-success';
+
+        if (toastTimer) {
+            clearTimeout(toastTimer);
+            toastTimer = null;
+        }
+
+        $el.removeClass('top-toast-success top-toast-error top-toast-show')
+            .addClass(toneClass)
+            .text(message);
+
+        // Trigger animation frame so repeated messages still animate.
+        window.requestAnimationFrame(function () {
+            $el.addClass('top-toast-show');
+        });
+
+        toastTimer = setTimeout(function () {
+            $el.removeClass('top-toast-show');
+        }, 2200);
+    }
+
+    function openModal(foodId, restaurantId, restaurantName, itemName, itemType, isDrink, itemAmount) {
+        // Keep source ids in modal state so checkout can persist accurate history data.
         currentItem = {
+            foodId: Number(foodId) || 0,
+            restaurantId: Number(restaurantId) || 0,
+            restaurantName: String(restaurantName || ''),
             name: itemName,
             type: itemType,
             isDrink: isDrink,
@@ -60,86 +93,18 @@ $(function () {
         currentItem = null;
     }
 
-    function closeCartModal() {
-        $cartOverlay.removeClass('open').attr('aria-hidden', 'true');
-    }
-
-    function renderCart(data) {
-        var items = (data && data.items) ? data.items : [];
-        var html = '';
-
-        if (items.length === 0) {
-            html = '<p class="cart-empty">Your cart is empty.</p>';
-        } else {
-            $.each(items, function (_, item) {
-                var options = [];
-                if (item.sugar) {
-                    options.push('Sugar: ' + escapeHtml(item.sugar));
-                }
-                if (item.ice) {
-                    options.push('Ice: ' + escapeHtml(item.ice));
-                }
-                if (item.remark) {
-                    options.push('Remark: ' + escapeHtml(item.remark));
-                }
-
-                html += '<div class="cart-item-row">';
-                html += '  <div class="cart-item-main">';
-                html += '    <p class="cart-item-name">' + escapeHtml(item.itemName) + '</p>';
-                html += '    <p class="cart-item-meta">Qty: ' + escapeHtml(item.quantity) + ' x ' + formatMoney(item.unitAmount) + '</p>';
-                if (options.length > 0) {
-                    html += '    <p class="cart-item-options">' + options.join(' | ') + '</p>';
-                }
-                html += '    <div class="cart-item-controls">';
-                html += '      <button type="button" class="cart-mini-btn cart-qty-minus" data-cart-id="' + escapeHtml(item.cartId) + '" data-qty="' + escapeHtml(item.quantity) + '">-</button>';
-                html += '      <span class="cart-qty-value">' + escapeHtml(item.quantity) + '</span>';
-                html += '      <button type="button" class="cart-mini-btn cart-qty-plus" data-cart-id="' + escapeHtml(item.cartId) + '" data-qty="' + escapeHtml(item.quantity) + '">+</button>';
-                html += '      <button type="button" class="cart-remove-btn" data-cart-id="' + escapeHtml(item.cartId) + '">Remove</button>';
-                html += '    </div>';
-                html += '  </div>';
-                html += '  <div class="cart-item-total">' + formatMoney(item.lineTotal) + '</div>';
-                html += '</div>';
-            });
-        }
-
-        $cartItemsContainer.html(html);
-        $cartSubtotal.text(formatMoney(data.subtotal));
-        $cartSst.text(formatMoney(data.sst));
-        $cartGrandTotal.text(formatMoney(data.grandTotal));
-    }
-
-    function openCartModal() {
-        $.ajax({
-            url: 'cart_actions.php',
-            method: 'GET',
-            dataType: 'json',
-            data: { action: 'get' }
-        }).done(function (response) {
-            if (!response || !response.success) {
-                alert('Unable to load cart now.');
-                return;
-            }
-
-            renderCart(response);
-            $cartOverlay.addClass('open').attr('aria-hidden', 'false');
-        }).fail(function () {
-            alert('Unable to load cart now.');
-        });
-    }
-
+    // Open the modal from any menu item button on the page.
     $(document).on('click', '.menu-item-trigger', function () {
         var $btn = $(this);
         openModal(
+            $btn.data('food-id') || 0,
+            $btn.data('restaurant-id') || 0,
+            $btn.data('restaurant-name') || '',
             $btn.data('item-name') || 'Item',
             $btn.data('item-type') || 'Food / Beverage',
             String($btn.data('is-drink')) === '1',
             $btn.data('item-amount') || 0
         );
-    });
-
-    $('#openCartBtn').on('click', function (event) {
-        event.preventDefault();
-        openCartModal();
     });
 
     $('#qtyMinus').on('click', function () {
@@ -161,81 +126,6 @@ $(function () {
         closeModal();
     });
 
-    $('#closeCartBtn').on('click', function () {
-        closeCartModal();
-    });
-
-    $cartItemsContainer.on('click', '.cart-remove-btn', function () {
-        var cartId = String($(this).data('cart-id') || '');
-        if (cartId === '') {
-            return;
-        }
-
-        callCartApi('remove', { cart_id: cartId }).done(function (response) {
-            if (!response || !response.success) {
-                alert('Failed to remove item.');
-                return;
-            }
-
-            renderCart(response);
-        }).fail(function () {
-            alert('Failed to remove item.');
-        });
-    });
-
-    $cartItemsContainer.on('click', '.cart-qty-minus, .cart-qty-plus', function () {
-        var $btn = $(this);
-        var cartId = String($btn.data('cart-id') || '');
-        var currentQty = Math.max(1, parseInt($btn.data('qty') || '1', 10));
-        var nextQty = currentQty;
-
-        if ($btn.hasClass('cart-qty-minus')) {
-            nextQty = Math.max(1, currentQty - 1);
-        } else {
-            nextQty = currentQty + 1;
-        }
-
-        if (cartId === '' || nextQty === currentQty) {
-            return;
-        }
-
-        callCartApi('update', {
-            cart_id: cartId,
-            quantity: nextQty
-        }).done(function (response) {
-            if (!response || !response.success) {
-                alert('Failed to update quantity.');
-                return;
-            }
-
-            renderCart(response);
-        }).fail(function () {
-            alert('Failed to update quantity.');
-        });
-    });
-
-    $overlay.on('click', function (event) {
-        if (event.target === this) {
-            closeModal();
-        }
-    });
-
-    $cartOverlay.on('click', function (event) {
-        if (event.target === this) {
-            closeCartModal();
-        }
-    });
-
-    $(document).on('keydown', function (event) {
-        if (event.key === 'Escape') {
-            if ($overlay.hasClass('open')) {
-                closeModal();
-            }
-            if ($cartOverlay.hasClass('open')) {
-                closeCartModal();
-            }
-        }
-    });
 
     $form.on('submit', function (event) {
         event.preventDefault();
@@ -243,21 +133,14 @@ $(function () {
             return;
         }
 
+        // Send the selected item and options to the shared cart API.
         var quantity = Math.max(1, parseInt($qtyInput.val() || '1', 10));
         var remark = $.trim($remarkInput.val());
-        var summary = currentItem.name + ' x' + quantity;
-
-        if (currentItem.isDrink) {
-            var sugar = $form.find('input[name="sugar"]:checked').val() || 'Normal';
-            var ice = $form.find('input[name="ice"]:checked').val() || 'Normal';
-            summary += '\nSugar: ' + sugar + ' | Ice: ' + ice;
-        }
-
-        if (remark !== '') {
-            summary += '\nRemark: ' + remark;
-        }
-
         callCartApi('add', {
+            // Send both display and relational identifiers for downstream payment persistence.
+            food_id: currentItem.foodId,
+            restaurant_id: currentItem.restaurantId,
+            restaurant_name: currentItem.restaurantName,
             item_name: currentItem.name,
             item_type: currentItem.type,
             quantity: quantity,
@@ -267,14 +150,14 @@ $(function () {
             remark: remark
         }).done(function (response) {
             if (!response || !response.success) {
-                alert('Failed to add item to cart.');
+                showToast('加入购物车失败，请重试。', 'error');
                 return;
             }
 
-            alert('Added to order:\n' + summary);
+            showToast('已添加 ' + currentItem.name + ' x' + quantity, 'success');
             closeModal();
         }).fail(function () {
-            alert('Failed to add item to cart.');
+            showToast('加入购物车失败，请重试。', 'error');
         });
     });
 });

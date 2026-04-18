@@ -22,28 +22,22 @@ $(function () {
         return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test($.trim(value));
     }
 
+    // Perform client-side validation first so the form shows all errors at once.
     $form.on('submit', function (event) {
         var errors = [];
-        var name = $form.find('[name="name"]').val();
-        var phone = $form.find('[name="phone"]').val();
-        var email = $form.find('[name="email"]').val();
-        var message = $form.find('[name="message"]').val();
+        var fields = [
+            { name: 'name', validator: validateInput, message: 'Please enter your name.' },
+            { name: 'phone', validator: validateInput, message: 'Please enter your phone number.' },
+            { name: 'email', validator: validateEmail, message: 'Please enter a valid email address.' },
+            { name: 'message', validator: validateInput, message: 'Please enter your message.' }
+        ];
 
-        if (!validateInput(name)) {
-            errors.push('Please enter your name.');
-        }
-
-        if (!validateInput(phone)) {
-            errors.push('Please enter your phone number.');
-        }
-
-        if (!validateEmail(email)) {
-            errors.push('Please enter a valid email address.');
-        }
-
-        if (!validateInput(message)) {
-            errors.push('Please enter your message.');
-        }
+        $.each(fields, function (_, field) {
+            var value = $form.find('[name="' + field.name + '"]').val();
+            if (!field.validator(value)) {
+                errors.push(field.message);
+            }
+        });
 
         if (errors.length > 0) {
             event.preventDefault();
