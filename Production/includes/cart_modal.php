@@ -1,0 +1,28 @@
+<div id="cartModalOverlay" class="menu-modal-overlay" aria-hidden="true">
+	<div class="menu-modal cart-modal" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle">
+		<h3 id="cartModalTitle">Your Order</h3>
+		<div id="cartItemsContainer" class="cart-items-container">
+			<p class="cart-empty">Your cart is empty.</p>
+		</div>
+
+		<div class="cart-summary" id="cartSummarySection">
+			<div class="cart-summary-row">
+				<span>Total Amount</span>
+				<strong id="cartSubtotal">RM 0.00</strong>
+			</div>
+			<div class="cart-summary-row">
+				<span>SST (6%)</span>
+				<strong id="cartSst">RM 0.00</strong>
+			</div>
+			<div class="cart-summary-row cart-summary-total">
+				<span>Total Amount + SST</span>
+				<strong id="cartGrandTotal">RM 0.00</strong>
+			</div>
+		</div>
+
+		<div class="modal-actions">
+			<a href="payment.php" id="goPaymentBtn" class="btn-primary">Payment</a>
+			<button type="button" id="closeCartBtn" class="btn-secondary">Close</button>
+		</div>
+	</div>
+</div>
