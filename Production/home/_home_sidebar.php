@@ -32,7 +32,7 @@
 		<!-- List of menus -->
 		<div class="sidebar-menus">
 			<a href="../sidebar/home.php"><ion-icon name="storefront-outline"></ion-icon>Home</a>
-			<a href="#"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
+			<a href="../sidebar/bills.php"><ion-icon name="receipt-outline"></ion-icon>Bills</a>
 			<a href="../sidebar/contact.php"><ion-icon name="chatbubbles-outline"></ion-icon>Contact Us</a>
 			<a href="../sidebar/setting.php"><ion-icon name="settings-outline"></ion-icon>Setting</a>
 		</div>

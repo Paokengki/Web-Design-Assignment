@@ -6,6 +6,8 @@ $(function () {
     var $qtyInput = $('#itemQty');
     var $drinkOptions = $('#drinkOptions');
     var $remarkInput = $('#itemRemark');
+    var $toast = null;
+    var toastTimer = null;
     var currentItem = null;
 
     function escapeHtml(value) {
@@ -26,8 +28,45 @@ $(function () {
         });
     }
 
-    function openModal(itemName, itemType, isDrink, itemAmount) {
+    function ensureToast() {
+        if ($toast && $toast.length > 0) {
+            return $toast;
+        }
+
+        $toast = $('<div class="top-toast" role="status" aria-live="polite"></div>');
+        $('body').append($toast);
+        return $toast;
+    }
+
+    function showToast(message, type) {
+        var $el = ensureToast();
+        var toneClass = type === 'error' ? 'top-toast-error' : 'top-toast-success';
+
+        if (toastTimer) {
+            clearTimeout(toastTimer);
+            toastTimer = null;
+        }
+
+        $el.removeClass('top-toast-success top-toast-error top-toast-show')
+            .addClass(toneClass)
+            .text(message);
+
+        // Trigger animation frame so repeated messages still animate.
+        window.requestAnimationFrame(function () {
+            $el.addClass('top-toast-show');
+        });
+
+        toastTimer = setTimeout(function () {
+            $el.removeClass('top-toast-show');
+        }, 2200);
+    }
+
+    function openModal(foodId, restaurantId, restaurantName, itemName, itemType, isDrink, itemAmount) {
+        // Keep source ids in modal state so checkout can persist accurate history data.
         currentItem = {
+            foodId: Number(foodId) || 0,
+            restaurantId: Number(restaurantId) || 0,
+            restaurantName: String(restaurantName || ''),
             name: itemName,
             type: itemType,
             isDrink: isDrink,
@@ -58,6 +97,9 @@ $(function () {
     $(document).on('click', '.menu-item-trigger', function () {
         var $btn = $(this);
         openModal(
+            $btn.data('food-id') || 0,
+            $btn.data('restaurant-id') || 0,
+            $btn.data('restaurant-name') || '',
             $btn.data('item-name') || 'Item',
             $btn.data('item-type') || 'Food / Beverage',
             String($btn.data('is-drink')) === '1',
@@ -94,19 +136,11 @@ $(function () {
         // Send the selected item and options to the shared cart API.
         var quantity = Math.max(1, parseInt($qtyInput.val() || '1', 10));
         var remark = $.trim($remarkInput.val());
-        var summary = currentItem.name + ' x' + quantity;
-
-        if (currentItem.isDrink) {
-            var sugar = $form.find('input[name="sugar"]:checked').val() || 'Normal';
-            var ice = $form.find('input[name="ice"]:checked').val() || 'Normal';
-            summary += '\nSugar: ' + sugar + ' | Ice: ' + ice;
-        }
-
-        if (remark !== '') {
-            summary += '\nRemark: ' + remark;
-        }
-
         callCartApi('add', {
+            // Send both display and relational identifiers for downstream payment persistence.
+            food_id: currentItem.foodId,
+            restaurant_id: currentItem.restaurantId,
+            restaurant_name: currentItem.restaurantName,
             item_name: currentItem.name,
             item_type: currentItem.type,
             quantity: quantity,
@@ -116,14 +150,14 @@ $(function () {
             remark: remark
         }).done(function (response) {
             if (!response || !response.success) {
-                alert('Failed to add item to cart.');
+                showToast('加入购物车失败，请重试。', 'error');
                 return;
             }
 
-            alert('Added to order:\n' + summary);
+            showToast('已添加 ' + currentItem.name + ' x' + quantity, 'success');
             closeModal();
         }).fail(function () {
-            alert('Failed to add item to cart.');
+            showToast('加入购物车失败，请重试。', 'error');
         });
     });
 });
