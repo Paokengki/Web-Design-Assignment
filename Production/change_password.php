@@ -3,12 +3,12 @@ session_start();
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => '未登录']);
+    echo json_encode(['success' => false, 'message' => 'Not logged in']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => '只支持POST请求']);
+    echo json_encode(['success' => false, 'message' => 'Only POST requests are supported']);
     exit;
 }
 
@@ -20,49 +20,49 @@ $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password
 
 // Validate required fields
 if (empty($current_password)) {
-    echo json_encode(['success' => false, 'message' => '请输入当前密码']);
+    echo json_encode(['success' => false, 'message' => 'Please enter current password']);
     exit;
 }
 
 if (empty($new_password)) {
-    echo json_encode(['success' => false, 'message' => '请输入新密码']);
+    echo json_encode(['success' => false, 'message' => 'Please enter new password']);
     exit;
 }
 
 if (empty($confirm_password)) {
-    echo json_encode(['success' => false, 'message' => '请确认新密码']);
+    echo json_encode(['success' => false, 'message' => 'Please confirm new password']);
     exit;
 }
 
 // Check if new password and confirm password match
 if ($new_password !== $confirm_password) {
-    echo json_encode(['success' => false, 'message' => '新密码与确认密码不一致']);
+    echo json_encode(['success' => false, 'message' => 'New password and confirm password do not match']);
     exit;
 }
 
 // Check password length
 if (strlen($new_password) < 6) {
-    echo json_encode(['success' => false, 'message' => '新密码长度至少需要6个字符']);
+    echo json_encode(['success' => false, 'message' => 'New password must be at least 6 characters long']);
     exit;
 }
 
 // Check if new password is same as current password
 if ($current_password === $new_password) {
-    echo json_encode(['success' => false, 'message' => '新密码不能与当前密码相同']);
+    echo json_encode(['success' => false, 'message' => 'New password cannot be the same as current password']);
     exit;
 }
 
 // Database connection
 $conn = new mysqli("localhost", "root", "", "cafedash_db");
 if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => '数据库连接失败']);
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
     exit;
 }
 
 // Get current password from database
 $stmt = $conn->prepare("SELECT Password FROM User WHERE User_ID = ?");
 if (!$stmt) {
-    echo json_encode(['success' => false, 'message' => '数据库错误: ' . $conn->error]);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
     $conn->close();
     exit;
 }
@@ -72,7 +72,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    echo json_encode(['success' => false, 'message' => '用户不存在']);
+    echo json_encode(['success' => false, 'message' => 'User does not exist']);
     $stmt->close();
     $conn->close();
     exit;
@@ -91,7 +91,7 @@ if (password_verify($current_password, $user['Password'])) {
 }
 
 if (!$password_verified) {
-    echo json_encode(['success' => false, 'message' => '当前密码错误']);
+    echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
     $conn->close();
     exit;
 }
@@ -102,7 +102,7 @@ $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
 // Update password in database (hashed)
 $update_stmt = $conn->prepare("UPDATE User SET Password = ? WHERE User_ID = ?");
 if (!$update_stmt) {
-    echo json_encode(['success' => false, 'message' => '数据库错误: ' . $conn->error]);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
     $conn->close();
     exit;
 }
@@ -112,10 +112,10 @@ $update_stmt->bind_param("si", $hashed_new_password, $user_id);
 if ($update_stmt->execute()) {
     echo json_encode([
         'success' => true,
-        'message' => '密码已成功更新'
+        'message' => 'Password updated successfully'
     ]);
 } else {
-    echo json_encode(['success' => false, 'message' => '更新失败: ' . $update_stmt->error]);
+    echo json_encode(['success' => false, 'message' => 'Update failed: ' . $update_stmt->error]);
 }
 
 $update_stmt->close();
