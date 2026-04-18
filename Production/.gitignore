@@ -1,2 +1,4 @@
 vendor/
 config/mail_config.php
+config/stripe.php
+config/mail.config.php

@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 				$reset_link = build_reset_link($token);
 
-				$config_path = __DIR__ . '/../config/mail_config.php';
+				$config_path = __DIR__ . '/../config/mail.config.php';
 				if (!file_exists($config_path)) {
 					throw new RuntimeException('Mail config file is missing.');
 				}
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$mail->SMTPAuth = true;
 				$mail->Username = $mail_config['username'];
 				$mail->Password = $mail_config['password'];
-				$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+				$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 				$mail->Port = (int) $mail_config['port'];
 
 				$mail->setFrom($mail_config['from_email'], $mail_config['from_name']);
