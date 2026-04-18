@@ -113,26 +113,6 @@ require '../home/_home_sidebar.php';
 				</div>
 				<button class="save-btn" id="saveProfileBtn">Save Profile</button>
 			</div>
-
-			<!-- Change Password Section -->
-			<div class="password-section">
-				<h3>Change Password</h3>
-				<div class="setting-form">
-					<div class="form-group">
-						<label>Current Password</label>
-						<input type="password" id="profileCurrentPassword" placeholder="Enter current password">
-					</div>
-					<div class="form-group">
-						<label>New Password</label>
-						<input type="password" id="profileNewPassword" placeholder="Enter new password">
-					</div>
-					<div class="form-group">
-						<label>Confirm Password</label>
-						<input type="password" id="profileConfirmPassword" placeholder="Confirm new password">
-					</div>
-					<button class="save-btn" id="profileUpdatePasswordBtn">Update Password</button>
-				</div>
-			</div>
 		</div>
 
 		<!-- Notification Content -->
@@ -349,65 +329,6 @@ require '../home/_home_sidebar.php';
 				.catch(error => {
 					console.error('Save error:', error);
 					alert('保存过程中发生错误: ' + error.message);
-				});
-			});
-		}
-
-		// Update the profile-section password fields against the shared password API.
-		const profileUpdatePasswordBtn = document.getElementById('profileUpdatePasswordBtn');
-		if (profileUpdatePasswordBtn) {
-			profileUpdatePasswordBtn.addEventListener('click', function() {
-				const currentPassword = document.getElementById('profileCurrentPassword').value;
-				const newPassword = document.getElementById('profileNewPassword').value;
-				const confirmPassword = document.getElementById('profileConfirmPassword').value;
-
-				if (!currentPassword.trim()) {
-					alert('请输入当前密码');
-					return;
-				}
-				if (!newPassword.trim()) {
-					alert('请输入新密码');
-					return;
-				}
-				if (!confirmPassword.trim()) {
-					alert('请确认新密码');
-					return;
-				}
-				if (newPassword !== confirmPassword) {
-					alert('新密码与确认密码不一致');
-					return;
-				}
-				if (newPassword.length < 6) {
-					alert('新密码长度至少需要6个字符');
-					return;
-				}
-				if (currentPassword === newPassword) {
-					alert('新密码不能与当前密码相同');
-					return;
-				}
-
-				const formData = new FormData();
-				formData.append('current_password', currentPassword);
-				formData.append('new_password', newPassword);
-				formData.append('confirm_password', confirmPassword);
-
-				fetch('../api/profile/change_password.php', {
-					method: 'POST',
-					body: formData
-				})
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
-						alert('密码已成功更新！');
-						document.getElementById('profileCurrentPassword').value = '';
-						document.getElementById('profileNewPassword').value = '';
-						document.getElementById('profileConfirmPassword').value = '';
-					} else {
-						alert('更新失败: ' + data.message);
-					}
-				})
-				.catch(error => {
-					alert('密码更新错误: ' + error.message);
 				});
 			});
 		}
