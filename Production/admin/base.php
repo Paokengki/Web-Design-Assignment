@@ -215,12 +215,7 @@ if (isset($_POST['toggle_suspend'])) {
     
     $stmt = $conn->prepare("UPDATE User SET Suspend = ? WHERE User_ID = ?");
     $stmt->bind_param("ii", $newStatus, $userId);
-    
-    if ($stmt->execute()) {
-        $_SESSION['msg'] = ($newStatus == 1) ? "User has been suspended." : "User has been reactivated.";
-    } else {
-        $_SESSION['msg'] = "Error updating user status.";
-    }
+    $stmt->execute();
     $stmt->close();
     
     header("Location: ../admin/_admin_members.php");

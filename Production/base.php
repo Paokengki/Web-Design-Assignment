@@ -68,23 +68,29 @@ if (isset($_POST['Admin_login_btn'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result->num_rows === 1) {
-        $row = $result->fetch_assoc();
-        
-        // Direct string comparison as used in your Member login
-        if ($admin_pass === $row['Password']) {
-            $_SESSION['admin_id'] = $row['Admin_ID'];
-            $_SESSION['admin_name'] = $row['Name'];
-            header("Location: ../admin_panel.php"); // Redirect to the control panel
-            exit();
-        } else {
-            $error_message = "Incorrect Admin Password!";
-        }
-    } else {
-        $error_message = "Admin account not found!";
-    }
-    $stmt->close();
-} 
+	if ($result->num_rows === 1) {
+		$row = $result->fetch_assoc();
+
+		// Check if password is hashed (starts with $2y$) or plain text
+		if (password_verify($admin_pass, $row['Password'])) {
+			$_SESSION['admin_id'] = $row['Admin_ID'];
+			$_SESSION['admin_name'] = $row['Name'];
+			header("Location: admin_panel.php");
+			exit();
+		} elseif ($admin_pass === $row['Password']) {
+			// Fallback for plain text passwords (for backward compatibility)
+			$_SESSION['admin_id'] = $row['Admin_ID'];
+			$_SESSION['admin_name'] = $row['Name'];
+			header("Location: ../admin_panel.php");
+			exit();
+		} else {
+			$error_message = "Incorrect Admin Password!";
+		}
+	} else {
+		$error_message = "Admin account not found!";
+	}
+	$stmt->close();
+}
 
 // Handle member login submissions.
 if (isset($_POST['Login_btn'])) {
