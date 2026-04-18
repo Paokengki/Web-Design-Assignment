@@ -39,6 +39,7 @@ function build_reset_link(string $token): string {
 	return sprintf('%s://%s%s/_reset_password.php?token=%s', $scheme, $host, $path, urlencode($token));
 }
 
+// Look up the account, replace any old token, then email a fresh reset link.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$email_or_username = trim($_POST['email_or_username'] ?? '');
 
@@ -74,13 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 				$reset_link = build_reset_link($token);
 
-				$config_path = __DIR__ . '/../config/mail.config.php';
+				$config_path = __DIR__ . '/../../config/mail.config.php';
 				if (!file_exists($config_path)) {
 					throw new RuntimeException('Mail config file is missing.');
 				}
 				$mail_config = require $config_path;
 
-				$autoload_path = __DIR__ . '/../vendor/autoload.php';
+				$autoload_path = __DIR__ . '/../../vendor/autoload.php';
 				if (!file_exists($autoload_path)) {
 					throw new RuntimeException('PHPMailer is not installed. Please run composer require phpmailer/phpmailer.');
 				}
@@ -123,13 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>CafeDash | Forgot Password</title>
-	<link rel="stylesheet" href="../Css/forgot.css">
+	<link rel="stylesheet" href="../../css/forgot.css">
 	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 
 <body>
 	<video autoplay muted loop id="myVideo">
-		<source src="../material/images/coffee login.mp4" type="video/mp4">
+		<source src="../../material/images/coffee login.mp4" type="video/mp4">
 	</video>
 
 	<div class="forgot-password-content">
@@ -137,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			<form action="" method="post">
 				<h1>Forgot Password</h1>
 				<div class="logo">
-					<img src="../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
+					<img src="../../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
 				</div>
 
 				<?php if (!empty($errors)): ?>

@@ -3,7 +3,7 @@
 ?>
 <body>
     <video autoplay muted loop id="myVideo">
-        <source src="material/images/coffee login.mp4" type="video/mp4">
+        <source src="../material/images/coffee login.mp4" type="video/mp4">
     </video>
 
     <div class="content">
@@ -11,7 +11,7 @@
             <form action="" method="post">
                 <h1>Admin Login</h1>
                 <div class="logo">
-                    <img src="material/images/logo.png" alt="logo" style="width:200px;height:200px;">
+                    <img src="../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
                 </div>
 
                 <?php if ($error_message != ""): ?>
@@ -33,7 +33,7 @@
                 <button type="submit" name="Admin_login_btn" class="btn">Login</button>
                 
                 <div style="margin-top: 20px; text-align: center;">
-                    <a href="index.php" style="color: white; text-decoration: none; font-size: 14px;">Back to Home</a>
+                    <a href="../index.php" style="color: white; text-decoration: none; font-size: 14px;">Back to Home</a>
                 </div>
             </form>
         </div>

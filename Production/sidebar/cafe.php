@@ -1,18 +1,19 @@
 <?php
-require_once 'base.php';
+require_once __DIR__ . '/../base.php';
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $conn = new mysqli("localhost", "root", "", "cafedash_db");
 
 $pageTitle = 'Cafe Menu - Cafe Dash';
-$extraStylesheets = ['Css/cafe.css'];
-$extraScripts = ['js/cafe.js'];
-require_once 'home/_home_sidebar.php';
+$extraStylesheets = ['../css/cafe.css'];
+$extraScripts = ['../js/cafe.js'];
+require_once __DIR__ . '/../home/_home_sidebar.php';
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Require a valid restaurant id so the page always opens on a real cafe.
 $restaurantId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($restaurantId <= 0) {
     header("Location: home.php");
@@ -28,6 +29,7 @@ $shopContact = '';
 $shopEmail = '';
 $shopImage = '';
 
+// Load the cafe header details before rendering the menu.
 $sql = "SELECT Restaurant_ID AS Id, Name, Address, Restaurant_type AS Type, Rating, Contain_number AS Contact, Email FROM Restaurant WHERE Restaurant_ID = ?";
 $stmt = $conn->prepare($sql);
 
@@ -47,7 +49,7 @@ if ($result !== false && $result->num_rows > 0) {
     $shopRating = $row['Rating'];
     $shopContact = $row['Contact'];
     $shopEmail = $row['Email'];
-    $shopImage = "material/" . $row['Name'] . "/shop.jpg";
+    $shopImage = "../material/" . $row['Name'] . "/shop.jpg";
 } else {
     header("Location: home.php");
     exit();
@@ -61,6 +63,7 @@ $menuItems = [];
 $groupedMenuItems = [];
 $categoryOrder = [];
 
+// Fetch the menu items and split them into display groups.
 $sql = "SELECT Food_ID AS Id, Name, detail AS Detail, Food_type AS Type, amount AS Amount FROM Food WHERE Restaurant_ID = ?";
 $stmt = $conn->prepare($sql);
 if ($stmt === false) {
@@ -78,7 +81,7 @@ if ($result !== false && $result->num_rows > 0) {
             $type = 'Others';
         }
         
-        // Determine if the item is a drink based on keywords in the type
+        // Mark drink items so the modal can show sugar and ice options.
         $typeLower = strtolower($type);
         $isDrink = strpos($typeLower, 'drink') !== false
             || strpos($typeLower, 'beverage') !== false
@@ -92,7 +95,7 @@ if ($result !== false && $result->num_rows > 0) {
             'type' => $type,
             'amount' => $row['Amount'],
             'isDrink' => $isDrink,
-            'image' => "material/" . $shopName . "/" . $row['Name'] . ".jpg"
+            'image' => "../material/" . $shopName . "/" . $row['Name'] . ".jpg"
         ];
 
         $menuItems[] = $item;
@@ -215,6 +218,6 @@ $stmt->close();
         </form>
     </div>
 
-    <?php require_once __DIR__ . '/includes/cart_modal.php'; ?>
+    <?php require_once __DIR__ . '/../includes/cart_modal.php'; ?>
 
-<?php require_once 'home/_home_footer.php'; ?>
+<?php require_once __DIR__ . '/../home/_home_footer.php'; ?>

@@ -3,12 +3,12 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+	header("Location: ../login/_member_login.php");
     exit;
 }
 
 // Include CSV functions
-require_once 'avatar_csv_functions.php';
+require_once __DIR__ . '/../profile/avatar_csv_functions.php';
 
 // Get user ID
 $user_id = $_SESSION['user_id'];
@@ -48,12 +48,13 @@ if (!$profile_image) {
 }
 
 $pageTitle = 'Settings - Cafe Dash';
-$extraStylesheets = ['Css/setting style.css'];
+$extraStylesheets = ['../css/setting style.css'];
 $bodyClass = 'setting-page';
 
-require 'home/_home_sidebar.php';
+require '../home/_home_sidebar.php';
 ?>
 
+	<!-- The settings page keeps profile, account, notification, and privacy in separate tabs. -->
 	<!-- Settings Sidebar - Right of Home Sidebar -->
 	<div class="settingsidebar">
 		<h2>
@@ -201,21 +202,21 @@ require 'home/_home_sidebar.php';
 	document.addEventListener('DOMContentLoaded', function() {
 		console.log('=== Setting Page Loaded ===');
 		
-		// Settings Tab Navigation
+		// Switch the visible settings tab without leaving the page.
 		document.querySelectorAll('.setting-tab-link').forEach(link => {
 			link.addEventListener('click', function(e) {
 				e.preventDefault();
 				
-				// Get the tab name from data-tab attribute
+				// Read the target section from the data-tab attribute.
 				const tabName = this.getAttribute('data-tab');
 				console.log('Tab clicked:', tabName);
 				
-				// Hide all content sections
+				// Hide every section before showing the selected one.
 				document.querySelectorAll('.setting-content').forEach(content => {
 					content.classList.remove('active');
 				});
 				
-				// Show the selected content section
+				// Show the requested settings section.
 				const selectedContent = document.getElementById(tabName);
 				if (selectedContent) {
 					selectedContent.classList.add('active');
@@ -223,7 +224,7 @@ require 'home/_home_sidebar.php';
 			});
 		});
 
-		// Profile Picture Upload Preview
+		// Keep the avatar preview responsive and fall back to a default image if needed.
 		const profileImageInput = document.getElementById('profileImageInput');
 		const profilePic = document.getElementById('profilePic');
 		const profilePicWrapper = document.getElementById('profilePicWrapper');
@@ -252,7 +253,7 @@ require 'home/_home_sidebar.php';
 				
 				console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
 				
-				// Show preview immediately
+				// Show the selected avatar immediately before uploading it.
 				const reader = new FileReader();
 				reader.onload = function(event) {
 					console.log('Preview loaded');
@@ -260,12 +261,12 @@ require 'home/_home_sidebar.php';
 				};
 				reader.readAsDataURL(file);
 
-				// Upload to server (with CSV storage)
+				// Upload the avatar to the server and persist the CSV mapping.
 				const formData = new FormData();
 				formData.append('profileImage', file);
 
 				console.log('Starting upload...');
-				fetch('upload_avatar_csv.php', {
+				fetch('../api/profile/upload_avatar_csv.php', {
 					method: 'POST',
 					body: formData
 				})
@@ -295,7 +296,7 @@ require 'home/_home_sidebar.php';
 			console.warn('profileImageInput element not found!');
 		}
 
-		// Click on avatar to trigger upload
+		// Let the avatar image itself act as the upload trigger.
 		if (profilePicWrapper) {
 			profilePicWrapper.addEventListener('click', function() {
 				console.log('Avatar clicked');
@@ -306,7 +307,7 @@ require 'home/_home_sidebar.php';
 			profilePicWrapper.style.cursor = 'pointer';
 		}
 
-		// Save Profile Button
+		// Save the basic profile fields through the profile API.
 		const saveProfileBtn = document.getElementById('saveProfileBtn');
 		if (saveProfileBtn) {
 			saveProfileBtn.addEventListener('click', function() {
@@ -329,7 +330,7 @@ require 'home/_home_sidebar.php';
 				formData.append('address', address);
 
 				console.log('Sending profile data to server...');
-				fetch('save_profile.php', {
+				fetch('../api/profile/save_profile.php', {
 					method: 'POST',
 					body: formData
 				})
@@ -352,7 +353,7 @@ require 'home/_home_sidebar.php';
 			});
 		}
 
-		// Update Password Button - Profile Section
+		// Update the profile-section password fields against the shared password API.
 		const profileUpdatePasswordBtn = document.getElementById('profileUpdatePasswordBtn');
 		if (profileUpdatePasswordBtn) {
 			profileUpdatePasswordBtn.addEventListener('click', function() {
@@ -390,7 +391,7 @@ require 'home/_home_sidebar.php';
 				formData.append('new_password', newPassword);
 				formData.append('confirm_password', confirmPassword);
 
-				fetch('change_password.php', {
+				fetch('../api/profile/change_password.php', {
 					method: 'POST',
 					body: formData
 				})
@@ -411,7 +412,7 @@ require 'home/_home_sidebar.php';
 			});
 		}
 
-		// Update Password Button - Account Section
+		// The account tab uses the same password API, but with a separate UI trigger.
 		const accountUpdatePasswordBtn = document.getElementById('accountUpdatePasswordBtn');
 		if (accountUpdatePasswordBtn) {
 			accountUpdatePasswordBtn.addEventListener('click', function() {
@@ -449,7 +450,7 @@ require 'home/_home_sidebar.php';
 				formData.append('new_password', newPassword);
 				formData.append('confirm_password', confirmPassword);
 
-				fetch('change_password.php', {
+				fetch('../api/profile/change_password.php', {
 					method: 'POST',
 					body: formData
 				})
@@ -472,4 +473,4 @@ require 'home/_home_sidebar.php';
 	});
 	</script>
 
-<?php require_once 'home/_home_footer.php'; ?>
+<?php require_once '../home/_home_footer.php'; ?>

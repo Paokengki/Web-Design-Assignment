@@ -1,4 +1,5 @@
 $(function () {
+    // Cart modal, search, and home-page category filter wiring live here.
     var $filterCards = $('.filter-card[data-filter]');
     var $restaurantLinks = $('.detail-card-link[data-category]');
     var $detailWrapper = $('.detail-wrapper').first();
@@ -22,7 +23,7 @@ $(function () {
 
     function callCartApi(action, payload) {
         return $.ajax({
-            url: 'cart_actions.php',
+            url: '../payment_cart/cart_actions.php',
             method: 'POST',
             dataType: 'json',
             data: $.extend({ action: action }, payload || {})
@@ -78,8 +79,9 @@ $(function () {
     }
 
     function openCartModal() {
+        // Load the current cart before showing the modal.
         $.ajax({
-            url: 'cart_actions.php',
+            url: '../payment_cart/cart_actions.php',
             method: 'GET',
             dataType: 'json',
             data: { action: 'get' }
@@ -169,6 +171,7 @@ $(function () {
     }
     
     function runCafeSearch() {
+        // Search the restaurant list and jump to the matched cafe page.
         var keyword = $.trim($searchInput.val() || '');
 
         if (keyword === '') {
@@ -178,13 +181,13 @@ $(function () {
         }
 
         $.ajax({
-            url: 'search_cafe.php',
+            url: '../api/search/search_cafe.php',
             method: 'GET',
             dataType: 'json',
             data: { q: keyword }
         }).done(function (response) {
             if (response && response.success && response.found && response.cafeId) {
-                window.location.href = 'cafe.php?id=' + encodeURIComponent(response.cafeId);
+                window.location.href = '../sidebar/cafe.php?id=' + encodeURIComponent(response.cafeId);
                 return;
             }
 
@@ -211,6 +214,7 @@ $(function () {
         return;
     }
 
+    // Hide restaurants that do not match the selected category.
     var $emptyMessage = $('<p class="filter-empty" style="display:none;">No restaurants found for this category.</p>');
     $detailWrapper.after($emptyMessage);
 

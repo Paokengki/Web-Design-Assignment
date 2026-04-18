@@ -1,13 +1,13 @@
 <?php
-require_once 'base.php';
+require_once __DIR__ . '/../base.php';
 
 $pageTitle = 'Payment - Cafe Dash';
-$extraStylesheets = ['Css/payment style.css'];
+$extraStylesheets = ['../css/payment style.css'];
 $bodyClass = 'payment-page';
-require_once 'home/_home_sidebar.php';
+require_once __DIR__ . '/../home/_home_sidebar.php';
 
-// 从 config 读取 Stripe Publishable Key
-$stripeConfig = require __DIR__ . '/config/stripe.php';
+// Load the Stripe public key once for the client-side card confirmation step.
+$stripeConfig = require __DIR__ . '/../config/stripe.php';
 
 if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -30,7 +30,7 @@ $grandTotal = round($subtotal + $sst, 2);
     <div class="main-navbar">
         <a href="javascript:history.back()" class="cart"><ion-icon name="arrow-back-outline"></ion-icon></a>
         <div class="profile">
-            <a class="cart" href="home.php"><ion-icon name="home-outline"></ion-icon></a>
+            <a class="cart" href="../sidebar/home.php"><ion-icon name="home-outline"></ion-icon></a>
         </div>
     </div>
 
@@ -88,7 +88,7 @@ $grandTotal = round($subtotal + $sst, 2);
                     </div>
                 </div>
 
-                <!-- Stripe 卡号输入区域 -->
+                <!-- The card field only collects payment details; the charge is created server-side. -->
                 <div class="payment-card-section">
                     <label class="payment-card-label">Card Details</label>
                     <div class="payment-card-row">
@@ -109,12 +109,12 @@ $grandTotal = round($subtotal + $sst, 2);
     </div>
 </div>
 
-<?php require_once 'home/_home_footer.php'; ?>
+<?php require_once '../home/_home_footer.php'; ?>
 
 <!-- Stripe.js -->
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    // Publishable Key 从 config 读取
+    // Initialize Stripe with the public key loaded from config.
     const stripe = Stripe('<?php echo htmlspecialchars($stripeConfig["publishable_key"], ENT_QUOTES, "UTF-8"); ?>');
 
     const elements = stripe.elements({ locale: 'en' });
@@ -135,12 +135,12 @@ $grandTotal = round($subtotal + $sst, 2);
 
     cardElement.mount('#card-element');
 
-    // 实时错误提示
+    // Show card validation errors immediately as the user types.
     cardElement.on('change', (event) => {
         document.getElementById('card-errors').textContent = event.error ? event.error.message : '';
     });
 
-    // 点击 Pay Now
+    // Recompute the amount on the server, create a PaymentIntent, then confirm the card payment.
     document.getElementById('pay-btn').addEventListener('click', async () => {
     const btn      = document.getElementById('pay-btn');
     const errorDiv = document.getElementById('card-errors');
@@ -156,7 +156,7 @@ $grandTotal = round($subtotal + $sst, 2);
             headers: { 'Content-Type': 'application/json' }
         });
 
-        // 尝试解析 JSON。如果解析失败，通常是因为后端返回了 PHP 报错网页
+        // Parse the JSON response before handing the secret to Stripe.
         const text = await res.text(); 
         let data;
         try {
@@ -173,7 +173,7 @@ $grandTotal = round($subtotal + $sst, 2);
             return;
         }
 
-        // Stripe 确认付款
+        // Confirm the card payment with the PaymentIntent secret.
         const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(
             data.clientSecret,
             { payment_method: { card: cardElement } }
@@ -184,7 +184,7 @@ $grandTotal = round($subtotal + $sst, 2);
             btn.disabled    = false;
             btn.textContent = original;
         } else if (paymentIntent.status === 'succeeded') {
-            window.location.href = 'payment_success.php';
+            window.location.href = 'Payment_success.php';
         }
 
     } catch (err) {

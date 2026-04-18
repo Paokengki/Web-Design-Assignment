@@ -5,7 +5,7 @@ $error_message = "";
 
 <body>
     <video autoplay muted loop id="myVideo">
-        <source src="material/images/coffee login.mp4" type="video/mp4">
+        <source src="../material/images/coffee login.mp4" type="video/mp4">
     </video>
 
     <div class="content">
@@ -13,7 +13,7 @@ $error_message = "";
             <form action="" method="post">
                 <h1>Welcome</h1>
                 <div class="logo">
-                    <img src="material/images/logo.png" alt="logo" style="width:200px;height:200px;">
+                    <img src="../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
                 </div>
 
                 <button type="submit" name="Member_login" class="btn">Member</button>

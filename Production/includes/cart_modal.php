@@ -21,7 +21,7 @@
 		</div>
 
 		<div class="modal-actions">
-			<a href="payment.php" id="goPaymentBtn" class="btn-primary">Payment</a>
+			<a href="../payment_cart/payment.php" id="goPaymentBtn" class="btn-primary">Payment</a>
 			<button type="button" id="closeCartBtn" class="btn-secondary">Close</button>
 		</div>
 	</div>
