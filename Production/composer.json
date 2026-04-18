@@ -1,5 +1,8 @@
 {
+    "name": "cafedash/web-design-assignment",
+    "description": "CafeDash - Cafe management and payment system",
     "require": {
+        "php": ">=5.6",
         "phpmailer/phpmailer": "^7.0.0",
         "stripe/stripe-php": "^11.0.0"
     },
