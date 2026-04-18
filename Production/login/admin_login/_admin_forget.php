@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $reset_link = build_admin_reset_link($token);
 
                 // --- Email Logic (Keep your existing PHPMailer config) ---
-                $config_path = __DIR__ . '/../../config/mail.config.php';
+                $config_path = __DIR__ . '/../../config/mail_config.php';
                 $autoload_path = __DIR__ . '/../../vendor/autoload.php';
                 
                 require_once $autoload_path;
@@ -105,13 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>CafeDash | Forgot Password</title>
-	<link rel="stylesheet" href="../Css/forgot.css">
+    <link rel="stylesheet" href="../../Css/forgot.css">
 	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 
 <body>
 	<video autoplay muted loop id="myVideo">
-		<source src="../material/images/coffee login.mp4" type="video/mp4">
+        <source src="../../material/images/coffee login.mp4" type="video/mp4">
 	</video>
 
 	<div class="forgot-password-content">
@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			<form action="" method="post">
 				<h1>Forgot Password</h1>
 				<div class="logo">
-					<img src="../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
+                    <img src="../../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
 				</div>
 
 				<?php if (!empty($errors)): ?>

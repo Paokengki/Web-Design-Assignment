@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 				$reset_link = build_reset_link($token);
 
-				$config_path = __DIR__ . '/../../config/mail.config.php';
+				$config_path = __DIR__ . '/../../config/mail_config.php';
 				if (!file_exists($config_path)) {
 					throw new RuntimeException('Mail config file is missing.');
 				}
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>CafeDash | Forgot Password</title>
-	<link rel="stylesheet" href="../../css/forgot.css">
+	<link rel="stylesheet" href="../../Css/forgot.css">
 	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 

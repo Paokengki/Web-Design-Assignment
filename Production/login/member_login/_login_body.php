@@ -42,7 +42,7 @@
                 </div>
 
                 <div style="margin-top: 20px; text-align: center;">
-                    <a href="index.php" style="color: red; text-decoration: none; font-size: 14px;">Back to Home</a>
+                    <a href="../index.php" style="color: red; text-decoration: none; font-size: 14px;">Back to Home</a>
                 </div>
             
             </form>
