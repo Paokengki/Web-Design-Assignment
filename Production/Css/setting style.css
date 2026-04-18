@@ -16,7 +16,7 @@ body {
 	position: fixed;
 	left: 250px;
 	top: 0;
-	width: 200px;
+	width: 250px;
 	height: 100vh;
 	background: #CD7C34;
 	color: white;
@@ -61,16 +61,16 @@ body {
 }
 
 .setting-main {
-	margin-left: 450px;
-	width: calc(100% - 450px);
+	margin-left: 500px;
+	width: calc(100% - 500px);
 	padding: 2%;
 	background-color: var(--lightBrown);
 	min-height: 100vh;
 }
 
 body.setting-page .footer {
-	margin-left: 450px;
-	width: calc(100% - 450px);
+	margin-left: 500px;
+	width: calc(100% - 500px);
 }
 
 @media (max-width: 900px) {

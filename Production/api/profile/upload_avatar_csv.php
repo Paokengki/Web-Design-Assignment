@@ -5,17 +5,17 @@ session_start();
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => '未登录']);
+    echo json_encode(['success' => false, 'message' => 'Not logged in']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => '只支持POST请求']);
+    echo json_encode(['success' => false, 'message' => 'Only POST requests are supported']);
     exit;
 }
 
 if (!isset($_FILES['profileImage'])) {
-    echo json_encode(['success' => false, 'message' => '没有上传文件']);
+    echo json_encode(['success' => false, 'message' => 'No file uploaded']);
     exit;
 }
 
@@ -24,20 +24,20 @@ $user_id = $_SESSION['user_id'];
 
 // Validate the upload before saving anything to disk.
 if ($file['error'] !== UPLOAD_ERR_OK) {
-    echo json_encode(['success' => false, 'message' => '文件上传失败']);
+    echo json_encode(['success' => false, 'message' => 'File upload failed']);
     exit;
 }
 
 // Only allow common image formats.
 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-    echo json_encode(['success' => false, 'message' => '不支持的文件格式']);
+    echo json_encode(['success' => false, 'message' => 'Unsupported file format']);
     exit;
 }
 
 // Keep avatar uploads small.
 if ($file['size'] > 5 * 1024 * 1024) {
-    echo json_encode(['success' => false, 'message' => '文件太大（超过5MB）']);
+    echo json_encode(['success' => false, 'message' => 'File too large (over 5MB)']);
     exit;
 }
 
@@ -54,12 +54,12 @@ $filepath = $upload_dir . $filename;
 $webpath = '../material/images/uploads/' . $filename;
 
 if (!move_uploaded_file($file['tmp_name'], $filepath)) {
-    echo json_encode(['success' => false, 'message' => '文件保存失败']);
+    echo json_encode(['success' => false, 'message' => 'File save failed']);
     exit;
 }
 
 if (!file_exists($filepath)) {
-    echo json_encode(['success' => false, 'message' => '文件保存后找不到']);
+    echo json_encode(['success' => false, 'message' => 'File not found after saving']);
     exit;
 }
 
@@ -67,13 +67,13 @@ if (!file_exists($filepath)) {
 $avatars = getAllAvatars();
 $avatars[$user_id] = $webpath;
 if (!saveAvatarMap($avatars)) {
-    echo json_encode(['success' => false, 'message' => '头像记录保存失败']);
+    echo json_encode(['success' => false, 'message' => 'Avatar record save failed']);
     exit;
 }
 
 echo json_encode([
     'success' => true,
-    'message' => '上传成功',
+    'message' => 'Upload successful',
     'filepath' => $webpath,
     'filename' => $filename,
     'csv_saved' => true

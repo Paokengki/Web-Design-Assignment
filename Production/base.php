@@ -70,7 +70,14 @@ if (isset($_POST['Admin_login_btn'])) {
 	if ($result->num_rows === 1) {
 		$row = $result->fetch_assoc();
 
-		if ($admin_pass === $row['Password']) {
+		// Check if password is hashed (starts with $2y$) or plain text
+		if (password_verify($admin_pass, $row['Password'])) {
+			$_SESSION['admin_id'] = $row['Admin_ID'];
+			$_SESSION['admin_name'] = $row['Name'];
+			header("Location: admin_panel.php");
+			exit();
+		} elseif ($admin_pass === $row['Password']) {
+			// Fallback for plain text passwords (for backward compatibility)
 			$_SESSION['admin_id'] = $row['Admin_ID'];
 			$_SESSION['admin_name'] = $row['Name'];
 			header("Location: admin_panel.php");

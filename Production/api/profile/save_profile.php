@@ -3,12 +3,12 @@ session_start();
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => '未登录']);
+    echo json_encode(['success' => false, 'message' => 'Not logged in']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => '只支持POST请求']);
+    echo json_encode(['success' => false, 'message' => 'Only POST requests are supported']);
     exit;
 }
 
@@ -21,21 +21,21 @@ $address = isset($_POST['address']) ? trim($_POST['address']) : '';
 
 // Validate required fields
 if (empty($full_name)) {
-    echo json_encode(['success' => false, 'message' => '名字不能为空']);
+    echo json_encode(['success' => false, 'message' => 'Name cannot be empty']);
     exit;
 }
 
 // Database connection
 $conn = new mysqli("localhost", "root", "", "cafedash_db");
 if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => '数据库连接失败']);
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
     exit;
 }
 
 // Update user information
 $stmt = $conn->prepare("UPDATE User SET User_Name = ?, Email = ?, Contain_number = ?, Address = ? WHERE User_ID = ?");
 if (!$stmt) {
-    echo json_encode(['success' => false, 'message' => '数据库错误: ' . $conn->error]);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
     $conn->close();
     exit;
 }
@@ -48,7 +48,7 @@ if ($stmt->execute()) {
     
     echo json_encode([
         'success' => true,
-        'message' => '个人信息已保存',
+        'message' => 'Personal information saved successfully',
         'data' => [
             'full_name' => $full_name,
             'email' => $email,
@@ -57,7 +57,7 @@ if ($stmt->execute()) {
         ]
     ]);
 } else {
-    echo json_encode(['success' => false, 'message' => '保存失败: ' . $stmt->error]);
+    echo json_encode(['success' => false, 'message' => 'Save failed: ' . $stmt->error]);
 }
 
 $stmt->close();
