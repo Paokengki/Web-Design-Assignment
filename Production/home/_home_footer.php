@@ -24,7 +24,7 @@
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <!-- adding javascript -->
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-<script src="js/app.js"></script>
+<script src="../js/app.js"></script>
 <?php
 if (!isset($extraScripts) || !is_array($extraScripts)) {
 	$extraScripts = [];

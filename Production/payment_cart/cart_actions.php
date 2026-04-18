@@ -1,6 +1,6 @@
 <?php
 // jian how see this file for reference only, not to be used in the project
-require_once 'base.php';
+require_once __DIR__ . '/../base.php';
 
 header('Content-Type: application/json; charset=utf-8');
 

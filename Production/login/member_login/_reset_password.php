@@ -47,10 +47,12 @@ function find_reset(PDO $pdo, string $token): ?array {
     return $row;
 }
 
+// Require a valid reset token before accepting any password change.
 if ($token === '') {
     $errors[] = 'Reset token is missing or invalid.';
 }
 
+// Validate the new password pair, then update the account and clear the token.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
     $password = (string) ($_POST['password'] ?? '');
     $confirm_password = (string) ($_POST['confirm_password'] ?? '');
@@ -102,12 +104,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CafeDash | Reset Password</title>
-    <link rel="stylesheet" href="../Css/reset.css">
+    <link rel="stylesheet" href="../../css/reset.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
     <video autoplay muted loop id="myVideo">
-        <source src="../material/images/coffee login.mp4" type="video/mp4">
+        <source src="../../material/images/coffee login.mp4" type="video/mp4">
     </video>
 
     <div class="reset-content">
@@ -115,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
             <form action="?token=<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>" method="post">
                 <h1>Reset Password</h1>
                 <div class="logo">
-                    <img src="../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
+                    <img src="../../material/images/logo.png" alt="logo" style="width:200px;height:200px;">
                 </div>
 
                 <?php if (!empty($errors)): ?>

@@ -68,7 +68,8 @@
     color: #ffffff;
 }
 
-.forgot-password-wrapper i {
+
+.forgot-password-wrapper .textbox i {
     position: absolute;
     left: 10px;
     top: 50%;
@@ -115,6 +116,9 @@
     margin: 10px 0 14px;
     text-align: left;
     font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .error-box {
@@ -132,4 +136,15 @@
     background: rgba(76, 175, 80, 0.24);
     border: 1px solid #4caf50;
     color: #ffffff;
+}
+
+.error-box i,
+.success-box i {
+    position: static;
+    transform: none;
+    top: auto;
+    left: auto;
+    color: inherit;
+    flex: 0 0 auto;
+    margin-top: 2px;
 }

@@ -1,10 +1,10 @@
 <?php
-require_once 'base.php';
+require_once __DIR__ . '/../base.php';
 
 $pageTitle = 'Payment Successful - Cafe Dash';
-$extraStylesheets = ['Css/payment style.css'];
+$extraStylesheets = ['../css/payment style.css'];
 $bodyClass = 'payment-success-page';
-require_once 'home/_home_sidebar.php';
+require_once __DIR__ . '/../home/_home_sidebar.php';
 
 // 清空购物车
 $_SESSION['cart'] = [];
@@ -13,7 +13,7 @@ $_SESSION['cart'] = [];
 <div class="main">
     <div class="main-navbar">
         <div class="profile">
-            <a class="cart" href="home.php"><ion-icon name="home-outline"></ion-icon></a>
+            <a class="cart" href="../sidebar/home.php"><ion-icon name="home-outline"></ion-icon></a>
         </div>
     </div>
 
@@ -27,11 +27,11 @@ $_SESSION['cart'] = [];
             <p style="color:#555;">Your order is being prepared. ☕</p>
 
             <div style="margin-top:30px;">
-                <a href="home.php" class="search-btn payment-action-btn">Back to Home</a>
+                <a href="../sidebar/home.php" class="search-btn payment-action-btn">Back to Home</a>
             </div>
 
         </div>
     </div>
 </div>
 
-<?php require_once 'home/_home_footer.php'; ?>
+<?php require_once __DIR__ . '/../home/_home_footer.php'; ?>

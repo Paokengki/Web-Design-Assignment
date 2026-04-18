@@ -1,6 +1,5 @@
-// jian how see this file for reference only, not to be used in the project
-// cafe.js - JavaScript for cafe menu and cart interactions
 $(function () {
+    // Menu modal state for the currently selected item.
     var $overlay = $('#menuModalOverlay');
     var $form = $('#menuModalForm');
     var $modalTitle = $('#modalItemTitle');
@@ -20,7 +19,7 @@ $(function () {
 
     function callCartApi(action, payload) {
         return $.ajax({
-            url: 'cart_actions.php',
+            url: '../payment_cart/cart_actions.php',
             method: 'POST',
             dataType: 'json',
             data: $.extend({ action: action }, payload || {})
@@ -55,6 +54,7 @@ $(function () {
         currentItem = null;
     }
 
+    // Open the modal from any menu item button on the page.
     $(document).on('click', '.menu-item-trigger', function () {
         var $btn = $(this);
         openModal(
@@ -91,6 +91,7 @@ $(function () {
             return;
         }
 
+        // Send the selected item and options to the shared cart API.
         var quantity = Math.max(1, parseInt($qtyInput.val() || '1', 10));
         var remark = $.trim($remarkInput.val());
         var summary = currentItem.name + ' x' + quantity;

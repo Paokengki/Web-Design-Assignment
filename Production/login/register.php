@@ -11,6 +11,7 @@ $form_values = [
 	'address' => ''
 ];
 
+// Validate the submitted registration form before touching the database.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$form_values['user_name'] = trim($_POST['user_name'] ?? '');
 	$form_values['email'] = trim($_POST['email'] ?? '');
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 
 	if (empty($errors)) {
+		// Check for duplicates, then insert the new account with a hashed password.
 		try {
 			$pdo = new PDO(
 				'mysql:host=localhost;dbname=cafedash_db;charset=utf8mb4',
@@ -88,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					':email' => $form_values['email']
 				]);
 
+				// Clear the form values after a successful registration.
 				$success_message = 'Registration successful. You can now login with your account.';
 				$form_values = [
 					'user_name' => '',
@@ -110,13 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>CafeDash | Register</title>
-	<link rel="stylesheet" href="Css/register.css">
+	<link rel="stylesheet" href="../css/register.css">
 	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 <body>
 	<video autoplay muted loop id="myVideo">
-		<source src="material/images/coffee login.mp4" type="video/mp4">
+		<source src="../material/images/coffee login.mp4" type="video/mp4">
 	</video>
 
 	<div class="content">
@@ -124,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			<form action="" method="post" id="registerForm" novalidate>
 				<h1>Sign Up</h1>
 				<div class="logo">
-					<img src="material/images/logo.png" alt="logo" style="width:180px;height:180px;">
+					<img src="../material/images/logo.png" alt="logo" style="width:180px;height:180px;">
 				</div>
 
 				<?php if (!empty($errors)): ?>
@@ -201,6 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				icon.toggleClass('bx-show bx-hide');
 			});
 
+			// Keep the confirmation error on the client side before the form submits.
 			$('#registerForm').on('submit', function (e) {
 				const password = $('#passwordField').val();
 				const confirmPassword = $('#confirmPasswordField').val();
