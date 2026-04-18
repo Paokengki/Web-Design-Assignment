@@ -33,7 +33,7 @@
                 <button type="submit" name="Admin_login_btn" class="btn">Login</button>
                 
                 <div style="margin-top: 20px; text-align: center;">
-                    <a href="index.php" style="color: white; text-decoration: none; font-size: 14px;">Back to Home</a>
+                    <a href="index.php" style="color: red; text-decoration: none; font-size: 14px;">Back to Home</a>
                 </div>
             </form>
         </div>

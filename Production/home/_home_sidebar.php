@@ -14,6 +14,11 @@
 	?>
     <title><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+	<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+	<!-- adding javascript -->
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	<script src="js/app.js"></script>
 	<link rel="stylesheet" href="Css/home style.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">

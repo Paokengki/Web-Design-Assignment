@@ -1,5 +1,5 @@
 <?php
-require 'base.php'; 
+require 'admin/base.php'; 
 ?>
 
 <?php 

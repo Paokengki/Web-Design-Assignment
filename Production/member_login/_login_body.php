@@ -40,6 +40,11 @@
                 <div class="register">
                     <p>Don't have an account? <a href="register.php">Register</a></p>
                 </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="index.php" style="color: red; text-decoration: none; font-size: 14px;">Back to Home</a>
+                </div>
+            
             </form>
         </div>
     </div>

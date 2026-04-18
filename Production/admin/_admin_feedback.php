@@ -1,3 +1,5 @@
+<?php require 'base.php'; ?>
+
 <body>
     <div class="main">
         <div class="main-navbar">
@@ -5,9 +7,9 @@
                 <h1>Admin Dashboard</h1>
             </div>
             <div class="profile">
-                <div class="user"><ion-icon name="person-circle-outline"></ion-icon></div>
-                <strong>Admin User</strong>
-            </div>
+            <span class="user"><ion-icon name="people-circle-outline"></ion-icon></span>
+            <strong>Admin</strong>
+        </div>
         </div>
 
         <div class="main-highlight">

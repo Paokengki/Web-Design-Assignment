@@ -102,7 +102,7 @@ if (isset($_POST['Login_btn'])) {
     $user_input = trim((string) ($_POST['User_name'] ?? ''));
     $pass_input = (string) ($_POST['password'] ?? '');
 
-    $stmt = $conn->prepare("SELECT User_id, User_name, Password FROM User WHERE User_name = ? OR Email = ? LIMIT 1");
+    $stmt = $conn->prepare("SELECT User_id, User_name, Password, Suspend FROM User WHERE User_name = ? OR Email = ? LIMIT 1");
     $stmt->bind_param("ss", $user_input, $user_input);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -110,16 +110,20 @@ if (isset($_POST['Login_btn'])) {
     if ($result->num_rows === 1) {
         $row = $result->fetch_assoc();
 
-        // Support both hashed passwords (new accounts) and legacy plain text values.
-        $is_valid_password = password_verify($pass_input, $row['Password']) || ($pass_input === $row['Password']);
-
-        if ($is_valid_password) {
-            $_SESSION['user_id'] = $row['User_id'];
-            $_SESSION['User_name'] = $row['User_name'];
-            header("Location: home.php");
-            exit();
+        if ($row['Suspend'] == 1) {
+            $error_message = "Your account has been suspended. Please contact the administrator.";
         } else {
-            $error_message = "Incorrect Password!";
+            // Support both hashed passwords (new accounts) and legacy plain text values.
+            $is_valid_password = password_verify($pass_input, $row['Password']) || ($pass_input === $row['Password']);
+
+            if ($is_valid_password) {
+                $_SESSION['user_id'] = $row['User_id'];
+                $_SESSION['User_name'] = $row['User_name'];
+                header("Location: home.php");
+                exit();
+            } else {
+                $error_message = "Incorrect Password!";
+            }
         }
     } else {
         $error_message = "User not found!";
