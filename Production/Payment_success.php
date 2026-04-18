@@ -2,6 +2,8 @@
 require_once 'base.php';
 
 $pageTitle = 'Payment Successful - Cafe Dash';
+$extraStylesheets = ['Css/payment style.css'];
+$bodyClass = 'payment-success-page';
 require_once 'home/_home_sidebar.php';
 
 // 清空购物车
@@ -25,7 +27,7 @@ $_SESSION['cart'] = [];
             <p style="color:#555;">Your order is being prepared. ☕</p>
 
             <div style="margin-top:30px;">
-                <a href="home.php" class="search-btn" style="text-decoration:none;">Back to Home</a>
+                <a href="home.php" class="search-btn payment-action-btn">Back to Home</a>
             </div>
 
         </div>

@@ -2,7 +2,8 @@
 require_once 'base.php';
 
 $pageTitle = 'Payment - Cafe Dash';
-$extraStylesheets = [];
+$extraStylesheets = ['Css/payment style.css'];
+$bodyClass = 'payment-page';
 require_once 'home/_home_sidebar.php';
 
 // 从 config 读取 Stripe Publishable Key
@@ -70,20 +71,37 @@ $grandTotal = round($subtotal + $sst, 2);
                 </table>
 
                 <!-- 金额汇总 -->
-                <div style="margin-top:16px; background:#fff; padding:14px; border-radius:8px;">
-                    <p><strong>Total Amount:</strong> RM <?php echo number_format($subtotal, 2); ?></p>
-                    <p><strong>SST (6%):</strong> RM <?php echo number_format($sst, 2); ?></p>
-                    <p style="font-size:20px; color:#6E2C00;"><strong>Total Amount + SST:</strong> RM <?php echo number_format($grandTotal, 2); ?></p>
+                <div class="payment-totals-card">
+                    <div class="payment-totals-list">
+                        <div class="payment-total-row">
+                            <span class="payment-total-label">Total Amount</span>
+                            <strong class="payment-total-value">RM <?php echo number_format($subtotal, 2); ?></strong>
+                        </div>
+                        <div class="payment-total-row">
+                            <span class="payment-total-label">SST (6%)</span>
+                            <strong class="payment-total-value">RM <?php echo number_format($sst, 2); ?></strong>
+                        </div>
+                        <div class="payment-total-row payment-total-row-grand">
+                            <span class="payment-total-label">Total Amount + SST</span>
+                            <strong class="payment-total-value">RM <?php echo number_format($grandTotal, 2); ?></strong>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Stripe 卡号输入区域 -->
-                <div style="margin-top:14px;">
-                    <label style="display:block; margin-bottom:6px; font-weight:bold; font-size:14px;">Card Details</label>
-                    <div id="card-element" style="padding:12px; border:1px solid #ddd; border-radius:8px; background:#fff; margin-bottom:10px;"></div>
-                    <div id="card-errors" style="color:red; font-size:14px; margin-bottom:10px;"></div>
-                    <button type="button" class="search-btn" id="pay-btn">
-                        Pay Now — RM <?php echo number_format($grandTotal, 2); ?>
-                    </button>
+                <div class="payment-card-section">
+                    <label class="payment-card-label">Card Details</label>
+                    <div class="payment-card-row">
+                        <div class="payment-card-field">
+                            <div id="card-element" class="payment-card-element"></div>
+                        </div>
+                    </div>
+                    <div class="payment-card-actions">
+                        <button type="button" class="search-btn payment-action-btn" id="pay-btn">
+                            Pay Now — RM <?php echo number_format($grandTotal, 2); ?>
+                        </button>
+                    </div>
+                    <div id="card-errors" class="payment-card-errors"></div>
                 </div>
 
             <?php endif; ?>
