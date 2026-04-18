@@ -148,6 +148,9 @@ $stmt->close();
                             <div class="detail-wrapper">
                                 <?php foreach ($groupedMenuItems[$category] as $item): ?>
                                     <button type="button" class="detail-card menu-item-trigger"
+                                        data-food-id="<?php echo (int) $item['id']; ?>"
+                                        data-restaurant-id="<?php echo (int) $restaurantId; ?>"
+                                        data-restaurant-name="<?php echo htmlspecialchars($shopName, ENT_QUOTES, 'UTF-8'); ?>"
                                         data-item-name="<?php echo htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'); ?>"
                                         data-item-type="<?php echo htmlspecialchars($item['type'], ENT_QUOTES, 'UTF-8'); ?>"
                                         data-item-amount="<?php echo htmlspecialchars((string) $item['amount'], ENT_QUOTES, 'UTF-8'); ?>"

@@ -11,6 +11,7 @@ $(function () {
     var $cartSubtotal = $('#cartSubtotal');
     var $cartSst = $('#cartSst');
     var $cartGrandTotal = $('#cartGrandTotal');
+    var $goPaymentBtn = $('#goPaymentBtn');
 
     function escapeHtml(value) {
         return $('<div>').text(value == null ? '' : String(value)).html();
@@ -72,6 +73,15 @@ $(function () {
         $cartSubtotal.text(formatMoney(data.subtotal));
         $cartSst.text(formatMoney(data.sst));
         $cartGrandTotal.text(formatMoney(data.grandTotal));
+
+        // Only allow checkout when there is at least one cart item.
+        if ($goPaymentBtn.length > 0) {
+            if (items.length === 0) {
+                $goPaymentBtn.hide().attr('aria-hidden', 'true');
+            } else {
+                $goPaymentBtn.show().removeAttr('aria-hidden');
+            }
+        }
     }
 
     function closeCartModal() {

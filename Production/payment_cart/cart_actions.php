@@ -47,6 +47,10 @@ function calculateCartSummary($items) {
 
         $normalized[] = [
             'cartId' => $cartId,
+            // Keep ids/names in cart payload so finalize_order can write complete payment history.
+            'foodId' => (int) ($item['foodId'] ?? 0),
+            'restaurantId' => (int) ($item['restaurantId'] ?? 0),
+            'restaurantName' => (string) ($item['restaurantName'] ?? ''),
             'itemName' => (string) ($item['itemName'] ?? ''),
             'itemType' => (string) ($item['itemType'] ?? ''),
             'quantity' => $quantity,
@@ -82,6 +86,9 @@ if ($action === 'add') {
 
     $itemName = trim((string) ($_POST['item_name'] ?? ''));
     $itemType = trim((string) ($_POST['item_type'] ?? ''));
+    $foodId = max(0, (int) ($_POST['food_id'] ?? 0));
+    $restaurantId = max(0, (int) ($_POST['restaurant_id'] ?? 0));
+    $restaurantName = trim((string) ($_POST['restaurant_name'] ?? ''));
     $quantity = max(1, (int) ($_POST['quantity'] ?? 1));
     $unitAmount = (float) ($_POST['unit_amount'] ?? 0);
     $sugar = trim((string) ($_POST['sugar'] ?? ''));
@@ -95,6 +102,10 @@ if ($action === 'add') {
 
     $_SESSION['cart'][] = [
         'cartId' => generateCartId(),
+        // Persist source metadata now to avoid extra lookups during payment finalization.
+        'foodId' => $foodId,
+        'restaurantId' => $restaurantId,
+        'restaurantName' => $restaurantName,
         'itemName' => $itemName,
         'itemType' => $itemType,
         'quantity' => $quantity,

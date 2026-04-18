@@ -6,8 +6,7 @@ $extraStylesheets = ['../css/payment style.css'];
 $bodyClass = 'payment-success-page';
 require_once __DIR__ . '/../home/_home_sidebar.php';
 
-// 清空购物车
-$_SESSION['cart'] = [];
+$paymentId = max(0, (int) ($_GET['payment_id'] ?? ($_SESSION['last_payment_id'] ?? 0)));
 ?>
 
 <div class="main">
@@ -25,6 +24,9 @@ $_SESSION['cart'] = [];
             <h2 class="main-title" style="color:#4CAF50;">Payment Successful!</h2>
             <p style="color:#555; margin-top:8px;">Thank you for your order at Cafe Dash.</p>
             <p style="color:#555;">Your order is being prepared. ☕</p>
+            <?php if ($paymentId > 0): ?>
+                <p style="color:#555; margin-top:8px;">Payment ID: #<?php echo $paymentId; ?></p>
+            <?php endif; ?>
 
             <div style="margin-top:30px;">
                 <a href="../sidebar/home.php" class="search-btn payment-action-btn">Back to Home</a>
@@ -34,4 +36,4 @@ $_SESSION['cart'] = [];
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../home/_home_footer.php'; ?>
+<?php require_once __DIR__ . '/../home/_home_footer.php'; ?>    

@@ -40,11 +40,27 @@ CREATE TABLE Restaurant (
 );
 
 -- 5. Payment Table
+-- Stores one finalized transaction record (header-level data).
 CREATE TABLE Payment (
     Payment_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Payment_type VARCHAR(50),
-    Payment_amount DECIMAL(10, 2)
+    User_ID INT NOT NULL,
+    Restaurant_ID INT NULL,
+    Payment_type VARCHAR(50) DEFAULT 'card',
+    Payment_amount DECIMAL(10, 2) NOT NULL,
+    Subtotal_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    SST_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    Currency CHAR(3) NOT NULL DEFAULT 'MYR',
+    Payment_status ENUM('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED') NOT NULL DEFAULT 'PENDING',
+    Provider VARCHAR(30) NOT NULL DEFAULT 'STRIPE',
+    Provider_payment_id VARCHAR(100) NULL UNIQUE,
+    Created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Paid_at DATETIME NULL,
+    FOREIGN KEY (User_ID) REFERENCES User(User_ID),
+    FOREIGN KEY (Restaurant_ID) REFERENCES Restaurant(Restaurant_ID)
 );
+
+CREATE INDEX idx_payment_user_created ON Payment(User_ID, Created_at);
+CREATE INDEX idx_payment_restaurant_status ON Payment(Restaurant_ID, Payment_status);
 
 -- 6. Food Table
 CREATE TABLE Food (
@@ -58,29 +74,28 @@ CREATE TABLE Food (
 ALTER TABLE Food
 ADD COLUMN amount DECIMAL(10,2);
 
-
--- 7. Order Table
-CREATE TABLE `Order` (
-    Order_ID INT AUTO_INCREMENT PRIMARY KEY,
-    User_ID INT,
-    Food_ID INT,
-    Payment_ID INT,
+-- 6b. Payment Item Table (for Bills details)
+-- Stores purchased line items as snapshots for reliable Bills history.
+CREATE TABLE Payment_Item (
+    Payment_Item_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Payment_ID INT NOT NULL,
+    Food_ID INT NULL,
+    Item_name VARCHAR(255) NOT NULL,
+    Item_type VARCHAR(100),
+    Unit_amount DECIMAL(10, 2) NOT NULL,
+    Quantity INT NOT NULL,
+    Line_total DECIMAL(10, 2) NOT NULL,
+    Sugar_level VARCHAR(20),
+    Ice_level VARCHAR(20),
     Remark TEXT,
-    FOREIGN KEY (User_ID) REFERENCES User(User_ID),
-    FOREIGN KEY (Food_ID) REFERENCES Food(Food_ID),
-    FOREIGN KEY (Payment_ID) REFERENCES Payment(Payment_ID)
+    Created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (Payment_ID) REFERENCES Payment(Payment_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Food_ID) REFERENCES Food(Food_ID) ON DELETE SET NULL
 );
 
--- 9. History Table
-CREATE TABLE History (
-    History_ID INT AUTO_INCREMENT PRIMARY KEY,
-    User_ID INT,
-    Order_ID INT,
-    FOREIGN KEY (User_ID) REFERENCES User(User_ID),
-    FOREIGN KEY (Order_ID) REFERENCES `Order`(Order_ID)
-);
+CREATE INDEX idx_payment_item_payment ON Payment_Item(Payment_ID);
 
--- 10. contact us Table
+-- 7. contact us Table
 CREATE TABLE contact_us (
     id INT(11) NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -91,7 +106,7 @@ CREATE TABLE contact_us (
     PRIMARY KEY (id)
 );
 
--- 11. password resets Table
+-- 8. password resets Table
 CREATE TABLE IF NOT EXISTS password_resets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,

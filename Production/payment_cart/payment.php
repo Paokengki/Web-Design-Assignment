@@ -184,7 +184,22 @@ $grandTotal = round($subtotal + $sst, 2);
             btn.disabled    = false;
             btn.textContent = original;
         } else if (paymentIntent.status === 'succeeded') {
-            window.location.href = 'Payment_success.php';
+            // Persist the successful transaction into Payment and Payment_Item tables.
+            const finalizeRes = await fetch('finalize_order.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payment_intent_id: paymentIntent.id })
+            });
+
+            const finalizeData = await finalizeRes.json();
+            if (!finalizeData || !finalizeData.success) {
+                errorDiv.textContent = (finalizeData && finalizeData.message) ? finalizeData.message : 'Payment succeeded but failed to save order.';
+                btn.disabled    = false;
+                btn.textContent = original;
+                return;
+            }
+
+            window.location.href = 'Payment_success.php?payment_id=' + encodeURIComponent(finalizeData.payment_id || '');
         }
 
     } catch (err) {
