@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/base.php'; ?>
+<?php __DIR__ . '../admin/base.php'; ?>
 
 <body>
     <div class="main">

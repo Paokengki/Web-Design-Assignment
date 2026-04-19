@@ -10,6 +10,64 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Delete a feedback row from the contact_us table.
+if (isset($_POST['delete_feedback'])) {
+	$feedbackId = $_POST['feedback_id'];
+	$stmt = $conn->prepare("DELETE FROM contact_us WHERE id = ?");
+	$stmt->bind_param("i", $feedbackId);
+    
+	if ($stmt->execute()) {
+		$_SESSION['msg'] = "Feedback deleted successfully.";
+	} else {
+		$_SESSION['msg'] = "Error deleting feedback.";
+	}
+	$stmt->close();
+    
+	// Refresh to update the list
+	header("Location: ../admin/admin_panel.php");
+	exit();
+}
+
+function getAllFeedback($conn) {
+	$sql = "SELECT * FROM contact_us ORDER BY id DESC";
+	return $conn->query($sql);
+}
+
+// Handle admin login submissions.
+if (isset($_POST['Admin_login_btn'])) {
+    $admin_user = $_POST['admin_name'];
+    $admin_pass = $_POST['admin_password'];
+
+    // Query the 'Admin' table specifically
+    $stmt = $conn->prepare("SELECT Admin_ID, Name, Password FROM Admin WHERE Name = ?");
+    $stmt->bind_param("s", $admin_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+	if ($result->num_rows === 1) {
+		$row = $result->fetch_assoc();
+
+		// Check if password is hashed (starts with $2y$) or plain text
+		if (password_verify($admin_pass, $row['Password'])) {
+			$_SESSION['admin_id'] = $row['Admin_ID'];
+			$_SESSION['admin_name'] = $row['Name'];
+			header("Location: ../admin/admin_panel.php");
+			exit();
+		} elseif ($admin_pass === $row['Password']) {
+			// Fallback for plain text passwords (for backward compatibility)
+			$_SESSION['admin_id'] = $row['Admin_ID'];
+			$_SESSION['admin_name'] = $row['Name'];
+			header("Location: ../admin/admin_panel.php");
+			exit();
+		} else {
+			$error_message = "Incorrect Admin Password!";
+		}
+	} else {
+		$error_message = "Admin account not found!";
+	}
+	$stmt->close();
+}
+
 $error_message = "";
 
 function sanitizeNameForPath($name) {
