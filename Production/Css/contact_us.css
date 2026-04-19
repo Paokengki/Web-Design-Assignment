@@ -120,6 +120,138 @@ body.contact-page {
     color: var(--darkBrown);
 }
 
+#formStatusNotification {
+    position: fixed;
+    top: 110px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 380px;
+    width: calc(100% - 40px);
+    pointer-events: auto;
+}
+
+.status-notification {
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+    padding: 18px 20px;
+    color: #ffffff;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.status-notification-content {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.status-notification strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.status-notification ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.status-notification li {
+    margin-bottom: 6px;
+}
+
+.status-notification-error {
+    background: rgba(255, 87, 51, 0.96);
+}
+
+.status-notification-success {
+    background: rgba(34, 162, 91, 0.96);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(24px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 760px) {
+    #formStatusNotification {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+}
+
+#formStatusNotification {
+    position: fixed;
+    top: 110px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 380px;
+    width: calc(100% - 40px);
+    pointer-events: auto;
+}
+
+.status-notification {
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+    padding: 18px 20px;
+    color: #ffffff;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.status-notification-content {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.status-notification strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.status-notification ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.status-notification li {
+    margin-bottom: 6px;
+}
+
+.status-notification-error {
+    background: rgba(255, 87, 51, 0.96);
+}
+
+.status-notification-success {
+    background: rgba(34, 162, 91, 0.96);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(24px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 760px) {
+    #formStatusNotification {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+}
+
 /* 营业时间网格 */
 .contact-container .hours-grid {
     display: flex;

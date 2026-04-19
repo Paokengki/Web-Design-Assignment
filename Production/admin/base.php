@@ -12,6 +12,71 @@ if ($conn->connect_error) {
 
 $error_message = "";
 
+function sanitizeNameForPath($name) {
+    $safe = preg_replace('/[\\\\\/\\:\*\?\"<>\|]+/', '', $name);
+    $safe = trim($safe);
+    return $safe !== '' ? $safe : 'restaurant_' . uniqid();
+}
+
+function getRestaurantFolderPath($restaurantName) {
+    $safeName = sanitizeNameForPath($restaurantName);
+    return __DIR__ . '/../material/' . $safeName;
+}
+
+function ensureRestaurantFolder($restaurantName) {
+    $folder = getRestaurantFolderPath($restaurantName);
+    if (!is_dir($folder)) {
+        mkdir($folder, 0755, true);
+    }
+    return $folder;
+}
+
+function renameRestaurantFolder($oldName, $newName) {
+    $oldPath = getRestaurantFolderPath($oldName);
+    $newPath = getRestaurantFolderPath($newName);
+    if ($oldPath !== $newPath && is_dir($oldPath)) {
+        if (!is_dir($newPath)) {
+            rename($oldPath, $newPath);
+        } else {
+            ensureRestaurantFolder($newName);
+        }
+    }
+    return $newPath;
+}
+
+function saveImageAsJpeg($sourceFile, $destinationFile) {
+    $info = getimagesize($sourceFile);
+    if ($info === false) {
+        return false;
+    }
+
+    $mime = $info['mime'];
+    switch ($mime) {
+        case 'image/jpeg':
+            $srcImage = imagecreatefromjpeg($sourceFile);
+            break;
+        case 'image/png':
+            $srcImage = imagecreatefrompng($sourceFile);
+            break;
+        case 'image/gif':
+            $srcImage = imagecreatefromgif($sourceFile);
+            break;
+        case 'image/webp':
+            $srcImage = imagecreatefromwebp($sourceFile);
+            break;
+        default:
+            return false;
+    }
+
+    if (!$srcImage) {
+        return false;
+    }
+
+    $result = imagejpeg($srcImage, $destinationFile, 90);
+    imagedestroy($srcImage);
+    return $result;
+}
+
 // Handle restaurant update
 if (isset($_POST['update_restaurant'])) {
     $resId = $_POST['restaurant_id'];
@@ -21,15 +86,50 @@ if (isset($_POST['update_restaurant'])) {
     $phone = $_POST['res_phone'] ?? '';
     $address = $_POST['res_address'] ?? '';
 
+    $stmtGet = $conn->prepare("SELECT Name FROM Restaurant WHERE Restaurant_ID = ?");
+    $stmtGet->bind_param("i", $resId);
+    $stmtGet->execute();
+    $currentRes = $stmtGet->get_result()->fetch_assoc();
+    $stmtGet->close();
+    $oldName = $currentRes['Name'] ?? $name;
+    $restaurantFolder = renameRestaurantFolder($oldName, $name);
+    ensureRestaurantFolder($name);
+
+    $uploadSuccess = true;
+    if (!empty($_FILES['res_image']['name']) && $_FILES['res_image']['error'] === UPLOAD_ERR_OK) {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $extension = strtolower(pathinfo($_FILES['res_image']['name'], PATHINFO_EXTENSION));
+        if (!in_array($extension, $allowedExtensions, true)) {
+            $uploadSuccess = false;
+            $_SESSION['msg'] = "Invalid restaurant image type. Please upload JPG, PNG, GIF, or WEBP.";
+        } else {
+            $targetFile = rtrim($restaurantFolder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'shop.jpg';
+            if ($extension === 'jpg' || $extension === 'jpeg') {
+                if (!move_uploaded_file($_FILES['res_image']['tmp_name'], $targetFile)) {
+                    $uploadSuccess = false;
+                    $_SESSION['msg'] = "Restaurant updated, but image upload failed.";
+                }
+            } else {
+                $tmpPath = $_FILES['res_image']['tmp_name'];
+                if (!saveImageAsJpeg($tmpPath, $targetFile)) {
+                    $uploadSuccess = false;
+                    $_SESSION['msg'] = "Restaurant updated, but unable to convert image to JPG.";
+                }
+            }
+        }
+    }
+
     $stmt = $conn->prepare("UPDATE Restaurant SET Name = ?, Restaurant_type = ?, Email = ?, Contain_number = ?, Address = ? WHERE Restaurant_ID = ?");
     $stmt->bind_param("sssssi", $name, $type, $email, $phone, $address, $resId);
     if ($stmt->execute()) {
-        $_SESSION['msg'] = "Restaurant updated successfully!";
+        if (empty($_SESSION['msg'])) {
+            $_SESSION['msg'] = $uploadSuccess ? "Restaurant updated successfully!" : "Restaurant updated, but image upload failed.";
+        }
     } else {
         $_SESSION['msg'] = "Error updating restaurant.";
     }
     $stmt->close();
-    header("Location: _admin_restaurants.php");
+    header("Location: _admin_restaurants.php?edit_id=$resId");
     exit();
 }
 
@@ -124,17 +224,46 @@ if (!function_exists('getAllRestaurants')) {
 }
 
 if (isset($_POST['add_restaurant'])) {
-    $name = $_POST['res_name'];
-    $address = $_POST['res_address'];
-    $type = $_POST['res_type'];
-    $email = $_POST['res_email'];
-    $phone = $_POST['res_phone'];
+    $name = trim($_POST['res_name'] ?? '');
+    $address = trim($_POST['res_address'] ?? '');
+    $type = trim($_POST['res_type'] ?? '');
+    $email = trim($_POST['res_email'] ?? '');
+    $phone = trim($_POST['res_phone'] ?? '');
+
+    $errors = [];
+    if ($name === '') {
+        $errors[] = 'Restaurant name is required.';
+    }
+    if ($type === '') {
+        $errors[] = 'Cuisine type is required.';
+    }
+    if ($email === '') {
+        $errors[] = 'Email is required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Please enter a valid email address.';
+    }
+    if ($phone === '') {
+        $errors[] = 'Phone number is required.';
+    }
+    if ($address === '') {
+        $errors[] = 'Restaurant address is required.';
+    }
+
+    if (!empty($errors)) {
+        $_SESSION['msg'] = implode(' ', $errors);
+        header("Location: ../admin/_admin_restaurants.php");
+        exit();
+    }
+
+    ensureRestaurantFolder($name);
 
     $stmt = $conn->prepare("INSERT INTO Restaurant (Name, Address, Restaurant_type, Email, Contain_number) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $name, $address, $type, $email, $phone);
     
     if ($stmt->execute()) {
         $_SESSION['msg'] = "Restaurant added successfully!";
+    } else {
+        $_SESSION['msg'] = "Error adding restaurant.";
     }
     $stmt->close();
     header("Location: ../admin/_admin_restaurants.php");
@@ -198,11 +327,20 @@ if (!function_exists('getAllMembers')) {
 
 if (isset($_POST['delete_user'])) {
     $userId = $_POST['user_id'];
+
+    // Remove dependent payment records before deleting the user.
+    $stmtPayments = $conn->prepare("DELETE FROM Payment WHERE User_ID = ?");
+    $stmtPayments->bind_param("i", $userId);
+    $stmtPayments->execute();
+    $stmtPayments->close();
+
     $stmt = $conn->prepare("DELETE FROM User WHERE User_ID = ?");
     $stmt->bind_param("i", $userId);
     
     if ($stmt->execute()) {
         $_SESSION['msg'] = "User #$userId has been removed.";
+    } else {
+        $_SESSION['msg'] = "Error removing user. Please check related records.";
     }
     $stmt->close();
     header("Location: ../admin/_admin_members.php");
@@ -319,6 +457,45 @@ if (isset($_POST['add_food'])) {
     $foodDetail = $_POST['food_desc'];
     $restaurantId = $_POST['restaurant_id'];
     $amount = $_POST['food_amount'] ?? null;
+
+    $stmtGet = $conn->prepare("SELECT Name FROM Restaurant WHERE Restaurant_ID = ?");
+    $stmtGet->bind_param("i", $restaurantId);
+    $stmtGet->execute();
+    $resultGet = $stmtGet->get_result();
+    $restaurantData = $resultGet->fetch_assoc();
+    $stmtGet->close();
+
+    $restaurantName = $restaurantData['Name'] ?? '';
+    $restaurantFolder = ensureRestaurantFolder($restaurantName);
+
+    if (!empty($_FILES['food_image']['name']) && $_FILES['food_image']['error'] === UPLOAD_ERR_OK) {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $extension = strtolower(pathinfo($_FILES['food_image']['name'], PATHINFO_EXTENSION));
+        if (!in_array($extension, $allowedExtensions, true)) {
+            $_SESSION['msg'] = "Invalid food image type. Please upload JPG, PNG, GIF, or WEBP.";
+            header("Location: _admin_restaurants.php?edit_id=$restaurantId");
+            exit();
+        }
+
+        $safeFoodName = sanitizeNameForPath($foodName);
+        $targetFile = rtrim($restaurantFolder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $safeFoodName . '.jpg';
+
+        if ($extension === 'jpg' || $extension === 'jpeg') {
+            if (!move_uploaded_file($_FILES['food_image']['tmp_name'], $targetFile)) {
+                $_SESSION['msg'] = "Food item added, but image upload failed.";
+                header("Location: _admin_restaurants.php?edit_id=$restaurantId");
+                exit();
+            }
+        } else {
+            $tmpPath = $_FILES['food_image']['tmp_name'];
+            if (!saveImageAsJpeg($tmpPath, $targetFile)) {
+                $_SESSION['msg'] = "Food item added, but unable to convert image to JPG.";
+                header("Location: _admin_restaurants.php?edit_id=$restaurantId");
+                exit();
+            }
+        }
+    }
+
     $stmt = $conn->prepare("INSERT INTO Food (Name, Food_type, detail, amount, Restaurant_ID) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssdi", $foodName, $foodType, $foodDetail, $amount, $restaurantId);
     if ($stmt->execute()) {

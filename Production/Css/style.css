@@ -292,7 +292,7 @@ input[type="password"]::-webkit-contacts-auto-fill-button {
 }
 
 .auth-wrapper .remember-pass {
-    margin: 6px 2px 10px;
+    margin: 8px 2px 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -313,12 +313,21 @@ input[type="password"]::-webkit-contacts-auto-fill-button {
     accent-color: #ffc107;
 }
 
+.auth-wrapper .register {
+    margin-top: 2px;
+}
+
 .auth-wrapper .remember-pass a,
 .auth-wrapper .register a,
 .auth-wrapper .back-home {
     color: #ffd66f !important;
     font-weight: 600;
     text-decoration: none !important;
+}
+
+.auth-wrapper .back-home {
+    display: inline-block;
+    margin: 6px 0 6px;
 }
 
 .auth-wrapper .remember-pass a:hover,

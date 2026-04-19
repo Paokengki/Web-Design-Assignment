@@ -43,6 +43,8 @@
                 <div class="register">
                     <p>Don't have an account? <a href="register.php">Register</a></p>
                 </div>
+
+                <a href="../index.php" class="back-home">Back to Home</a>
             </form>
         </div>
     </div>

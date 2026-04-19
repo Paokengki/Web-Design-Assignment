@@ -37,9 +37,9 @@ if ($edit_id) {
                 <option value="Dessert">Dessert</option>
                 <option value="Cafe">Cafe</option>
             </select>
-            <input type="email" name="res_email" placeholder="Email" style="padding: 8px; border-radius: 5px; border: none;">
-            <input type="text" name="res_phone" placeholder="Phone Number" style="padding: 8px; border-radius: 5px; border: none;">
-            <textarea name="res_address" placeholder="Full Address" style="grid-column: span 2; padding: 8px; border-radius: 5px; border: none;"></textarea>
+            <input type="email" name="res_email" placeholder="Email" required style="padding: 8px; border-radius: 5px; border: none;">
+            <input type="text" name="res_phone" placeholder="Phone Number" required style="padding: 8px; border-radius: 5px; border: none;">
+            <textarea name="res_address" placeholder="Full Address" required style="grid-column: span 2; padding: 8px; border-radius: 5px; border: none;"></textarea>
             <button type="submit" name="add_restaurant" style="background: var(--darkBrown); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; grid-column: span 2;">
                 Add Restaurant
             </button>
@@ -257,27 +257,33 @@ if ($edit_id) {
                         const previewImg = $('#preview_img');
                         const foodNameInput = $('input[name="food_name"]');
                         const priceInput = $('#food_price_input');
+
+                        function updatePreview() {
+                            const file = fileInput[0].files[0];
+                            const foodName = foodNameInput.val().trim();
+
+                            if (!file || !foodName) {
+                                previewDiv.hide();
+                                return;
+                            }
+
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                previewImg.attr('src', event.target.result);
+                                previewDiv.show();
+                            };
+                            reader.readAsDataURL(file);
+                        }
                         
                         fileInput.on('change', function() {
                             const fileName = this.files.length > 0 ? this.files[0].name : '';
                             fileNameDisplay.text(fileName ? '✓ ' + fileName : '');
-                            
-                            if (this.files.length > 0 && foodNameInput.val()) {
-                                const foodName = foodNameInput.val().trim();
-                                const imagePath = '../material/' + cafeName + '/' + foodName + '.jpg';
-                                previewImg.attr('src', imagePath);
-                                previewDiv.show();
-                            } else {
-                                previewDiv.hide();
-                            }
+                            updatePreview();
                         });
                         
                         foodNameInput.on('change input', function() {
-                            if (fileInput[0].files.length > 0 && $(this).val()) {
-                                const foodName = $(this).val().trim();
-                                const imagePath = '../material/' + cafeName + '/' + foodName + '.jpg';
-                                previewImg.attr('src', imagePath);
-                                previewDiv.show();
+                            if (fileInput[0].files.length > 0) {
+                                updatePreview();
                             } else {
                                 previewDiv.hide();
                             }
