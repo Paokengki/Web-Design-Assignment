@@ -43,7 +43,7 @@
         <h1 class="logo">Cafe Dash</h1>
         
         <div class="sidebar-menus">
-            <a href="../admin_panel.php"><ion-icon name="mail-outline"></ion-icon>Feedback</a>
+            <a href="admin_panel.php"><ion-icon name="mail-outline"></ion-icon>Feedback</a>
             <a href="../admin/_admin_restaurants.php"><ion-icon name="restaurant-outline"></ion-icon>Restaurants</a>
 			<a href="../admin/_admin_members.php"><ion-icon name="people-outline"></ion-icon>Members</a>
             <a href="../admin/_admin_ranking.php"><ion-icon name="trophy-outline"></ion-icon>Ranking</a>

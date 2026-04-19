@@ -12,7 +12,7 @@ include '_admin_sidebar.php';
 ?>
 
 <div class="main">
-    <div class="main-navbar">
+    <div class="main-navbar" style="margin-bottom: 20px;">
         <div class="main-title">
             <h1>Business Analytics</h1>
         </div>

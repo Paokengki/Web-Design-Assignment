@@ -74,6 +74,19 @@ body {
     color: #e2e2e2;
 }
 
+/* Hide browser-native password reveal controls to avoid duplicate/black eye icons. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-contacts-auto-fill-button {
+    display: none !important;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .textbox i {
     position: absolute;
     left: 14px;

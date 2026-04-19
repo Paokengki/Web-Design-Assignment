@@ -139,13 +139,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
                 <?php endif; ?>
 
                 <div class="textbox">
-                    <input type="password" name="password" placeholder="New Password" required>
+                    <input type="password" name="password" id="resetPasswordField" placeholder="New Password" required>
                     <i class='bx bxs-lock-alt'></i>
+                    <button type="button" class="toggle-pass" data-target="#resetPasswordField" aria-label="Toggle password visibility">
+                        <i class='bx bx-show'></i>
+                    </button>
                 </div>
 
                 <div class="textbox">
-                    <input type="password" name="confirm_password" placeholder="Confirm New Password" required>
+                    <input type="password" name="confirm_password" id="resetConfirmPasswordField" placeholder="Confirm New Password" required>
                     <i class='bx bxs-lock-alt'></i>
+                    <button type="button" class="toggle-pass" data-target="#resetConfirmPasswordField" aria-label="Toggle confirm password visibility">
+                        <i class='bx bx-show'></i>
+                    </button>
                 </div>
 
                 <button type="submit" class="reset-btn">Update Password</button>
@@ -156,5 +162,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
             </form>
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.toggle-pass').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var target = document.querySelector(button.getAttribute('data-target'));
+                var icon = button.querySelector('i');
+
+                if (!target || !icon) {
+                    return;
+                }
+
+                var isPassword = target.getAttribute('type') === 'password';
+                target.setAttribute('type', isPassword ? 'text' : 'password');
+                icon.classList.toggle('bx-show', !isPassword);
+                icon.classList.toggle('bx-hide', isPassword);
+            });
+        });
+    </script>
 </body>
 </html>
