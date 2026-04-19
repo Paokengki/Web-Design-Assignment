@@ -42,9 +42,9 @@ $conn->close();
 // Get avatar from CSV
 $profile_image = getAvatarFromCSV($user_id);
 
-// Use default SVG if no profile image
+// Use default image if no profile image
 if (!$profile_image) {
-    $profile_image = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 150 150%22%3E%3Crect width=%22150%22 height=%22150%22 fill=%22%23D3D3D3%22/%3E%3Ccircle cx=%2275%22 cy=%2250%22 r=%2230%22 fill=%22white%22/%3E%3Cpath d=%22M 30 90 Q 30 80 75 80 Q 120 80 120 90 L 120 150 Q 120 150 75 150 Q 30 150 30 150 Z%22 fill=%22white%22/%3E%3C/svg%3E';
+	$profile_image = '../material/images/uploads/avatar_1_1776275013.jpg';
 }
 
 $pageTitle = 'Settings - Cafe Dash';
@@ -287,8 +287,8 @@ require '../home/_home_sidebar.php';
 
 		if (profilePic) {
 			profilePic.onerror = function() {
-				console.log('Image load failed, using fallback SVG');
-				this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 150 150%22%3E%3Crect width=%22150%22 height=%22150%22 fill=%22%23D3D3D3%22/%3E%3Ccircle cx=%2275%22 cy=%2250%22 r=%2230%22 fill=%22white%22/%3E%3Cpath d=%22M 30 90 Q 30 80 75 80 Q 120 80 120 90 L 120 150 Q 120 150 75 150 Q 30 150 30 150 Z%22 fill=%22white%22/%3E%3C/svg%3E';
+				console.log('Image load failed, using fallback image');
+				this.src = '../material/images/uploads/avatar_1_1776275013.jpg';
 				this.onerror = null;
 			};
 		}
