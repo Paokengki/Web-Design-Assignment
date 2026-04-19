@@ -95,6 +95,16 @@
     color: rgba(255, 255, 255, 0.85);
 }
 
+.reset-wrapper .textbox input:-webkit-autofill,
+.reset-wrapper .textbox input:-webkit-autofill:hover,
+.reset-wrapper .textbox input:-webkit-autofill:focus,
+.reset-wrapper .textbox input:-webkit-autofill:active {
+    -webkit-text-fill-color: #ffffff !important;
+    box-shadow: 0 0 0 1000px rgba(13, 13, 13, 0.72) inset !important;
+    -webkit-box-shadow: 0 0 0 1000px rgba(13, 13, 13, 0.72) inset !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
 /* Hide browser-native password reveal controls to avoid duplicate/black eye icons. */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {

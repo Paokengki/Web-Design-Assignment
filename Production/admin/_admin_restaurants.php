@@ -257,27 +257,33 @@ if ($edit_id) {
                         const previewImg = $('#preview_img');
                         const foodNameInput = $('input[name="food_name"]');
                         const priceInput = $('#food_price_input');
+
+                        function updatePreview() {
+                            const file = fileInput[0].files[0];
+                            const foodName = foodNameInput.val().trim();
+
+                            if (!file || !foodName) {
+                                previewDiv.hide();
+                                return;
+                            }
+
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                previewImg.attr('src', event.target.result);
+                                previewDiv.show();
+                            };
+                            reader.readAsDataURL(file);
+                        }
                         
                         fileInput.on('change', function() {
                             const fileName = this.files.length > 0 ? this.files[0].name : '';
                             fileNameDisplay.text(fileName ? '✓ ' + fileName : '');
-                            
-                            if (this.files.length > 0 && foodNameInput.val()) {
-                                const foodName = foodNameInput.val().trim();
-                                const imagePath = '../material/' + cafeName + '/' + foodName + '.jpg';
-                                previewImg.attr('src', imagePath);
-                                previewDiv.show();
-                            } else {
-                                previewDiv.hide();
-                            }
+                            updatePreview();
                         });
                         
                         foodNameInput.on('change input', function() {
-                            if (fileInput[0].files.length > 0 && $(this).val()) {
-                                const foodName = $(this).val().trim();
-                                const imagePath = '../material/' + cafeName + '/' + foodName + '.jpg';
-                                previewImg.attr('src', imagePath);
-                                previewDiv.show();
+                            if (fileInput[0].files.length > 0) {
+                                updatePreview();
                             } else {
                                 previewDiv.hide();
                             }
