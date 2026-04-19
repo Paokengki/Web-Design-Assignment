@@ -11,9 +11,9 @@
 							<h4>Follow Us</h4>
 							<p>Stay connected with us on social media:</p>
 							<ul class="social-icons">
-								<li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-								<li><a href="#"><i class="fab fa-twitter"></i></a></li>
-								<li><a href="#"><i class="fab fa-instagram"></i></a></li>
+								<li><a href="https://www.facebook.com/share/1BEvvsF4YG/?mibextid=wwXIfr"><i class="fab fa-facebook-f"></i></a></li>
+								<li><a href="https://x.com/CafeDash44362"><i class="fab fa-twitter"></i></a></li>
+								<li><a href="https://www.instagram.com/cafedashoffical?igsh=MXQxY204dDJ1eGpu&utm_source=qr"><i class="fab fa-instagram"></i></a></li>
 							</ul>
 						</div>
 					</div>
