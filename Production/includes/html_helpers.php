@@ -90,19 +90,25 @@ function renderStatusMessage(string $message = '', array $errors = []): string
         }
 
         return <<<HTML
-<div class="error-box" id="formErrorMessages">
-    <ul>{$errorsHtml}</ul>
+<div id="formStatusNotification" class="status-notification status-notification-error" role="alert" aria-live="assertive">
+    <div class="status-notification-content">
+        <strong>Validation Error</strong>
+        <ul>{$errorsHtml}</ul>
+    </div>
 </div>
 HTML;
     }
 
     if ($message !== '') {
         return <<<HTML
-<div class="success-box" id="formSuccessMessage">
-    <p>{$message}</p>
+<div id="formStatusNotification" class="status-notification status-notification-success" role="status" aria-live="polite">
+    <div class="status-notification-content">
+        <strong>Success</strong>
+        <p>{$message}</p>
+    </div>
 </div>
 HTML;
     }
 
-    return '<div id="formErrorMessages"></div>';
+    return '<div id="formStatusNotification"></div>';
 }

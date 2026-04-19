@@ -37,9 +37,9 @@ if ($edit_id) {
                 <option value="Dessert">Dessert</option>
                 <option value="Cafe">Cafe</option>
             </select>
-            <input type="email" name="res_email" placeholder="Email" style="padding: 8px; border-radius: 5px; border: none;">
-            <input type="text" name="res_phone" placeholder="Phone Number" style="padding: 8px; border-radius: 5px; border: none;">
-            <textarea name="res_address" placeholder="Full Address" style="grid-column: span 2; padding: 8px; border-radius: 5px; border: none;"></textarea>
+            <input type="email" name="res_email" placeholder="Email" required style="padding: 8px; border-radius: 5px; border: none;">
+            <input type="text" name="res_phone" placeholder="Phone Number" required style="padding: 8px; border-radius: 5px; border: none;">
+            <textarea name="res_address" placeholder="Full Address" required style="grid-column: span 2; padding: 8px; border-radius: 5px; border: none;"></textarea>
             <button type="submit" name="add_restaurant" style="background: var(--darkBrown); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; grid-column: span 2;">
                 Add Restaurant
             </button>

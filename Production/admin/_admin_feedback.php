@@ -1,4 +1,4 @@
-<?php require 'base.php'; ?>
+<?php require_once __DIR__ . '/base.php'; ?>
 
 <body>
     <div class="main">

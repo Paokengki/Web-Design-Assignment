@@ -224,11 +224,36 @@ if (!function_exists('getAllRestaurants')) {
 }
 
 if (isset($_POST['add_restaurant'])) {
-    $name = $_POST['res_name'];
-    $address = $_POST['res_address'];
-    $type = $_POST['res_type'];
-    $email = $_POST['res_email'];
-    $phone = $_POST['res_phone'];
+    $name = trim($_POST['res_name'] ?? '');
+    $address = trim($_POST['res_address'] ?? '');
+    $type = trim($_POST['res_type'] ?? '');
+    $email = trim($_POST['res_email'] ?? '');
+    $phone = trim($_POST['res_phone'] ?? '');
+
+    $errors = [];
+    if ($name === '') {
+        $errors[] = 'Restaurant name is required.';
+    }
+    if ($type === '') {
+        $errors[] = 'Cuisine type is required.';
+    }
+    if ($email === '') {
+        $errors[] = 'Email is required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Please enter a valid email address.';
+    }
+    if ($phone === '') {
+        $errors[] = 'Phone number is required.';
+    }
+    if ($address === '') {
+        $errors[] = 'Restaurant address is required.';
+    }
+
+    if (!empty($errors)) {
+        $_SESSION['msg'] = implode(' ', $errors);
+        header("Location: ../admin/_admin_restaurants.php");
+        exit();
+    }
 
     ensureRestaurantFolder($name);
 
@@ -302,11 +327,20 @@ if (!function_exists('getAllMembers')) {
 
 if (isset($_POST['delete_user'])) {
     $userId = $_POST['user_id'];
+
+    // Remove dependent payment records before deleting the user.
+    $stmtPayments = $conn->prepare("DELETE FROM Payment WHERE User_ID = ?");
+    $stmtPayments->bind_param("i", $userId);
+    $stmtPayments->execute();
+    $stmtPayments->close();
+
     $stmt = $conn->prepare("DELETE FROM User WHERE User_ID = ?");
     $stmt->bind_param("i", $userId);
     
     if ($stmt->execute()) {
         $_SESSION['msg'] = "User #$userId has been removed.";
+    } else {
+        $_SESSION['msg'] = "Error removing user. Please check related records.";
     }
     $stmt->close();
     header("Location: ../admin/_admin_members.php");

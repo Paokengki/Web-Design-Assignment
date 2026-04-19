@@ -1,17 +1,33 @@
 $(function () {
     var $form = $('#contactForm');
-    var $messageArea = $('#formErrorMessages');
+    var $messageArea = $('#formStatusNotification');
 
     function escapeHtml(value) {
         return $('<div>').text(value).html();
     }
 
-    function buildErrorList(errors) {
+    function buildNotification(errors) {
         var listItems = errors.map(function (message) {
             return '<li>' + escapeHtml(message) + '</li>';
         });
 
-        return '<div class="error-box"><ul>' + listItems.join('') + '</ul></div>';
+        return '<div class="status-notification status-notification-error" role="alert" aria-live="assertive">' +
+            '<div class="status-notification-content">' +
+            '<strong>Validation Error</strong>' +
+            '<ul>' + listItems.join('') + '</ul>' +
+            '</div>' +
+            '</div>';
+    }
+
+    function showNotification(html) {
+        $messageArea.html(html);
+        $messageArea.addClass('status-notification-wrapper-visible');
+
+        window.clearTimeout($messageArea.data('hideTimer'));
+        $messageArea.data('hideTimer', window.setTimeout(function () {
+            $messageArea.empty();
+            $messageArea.removeClass('status-notification-wrapper-visible');
+        }, 6000));
     }
 
     function validateInput(value) {
@@ -22,7 +38,6 @@ $(function () {
         return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test($.trim(value));
     }
 
-    // Perform client-side validation first so the form shows all errors at once.
     $form.on('submit', function (event) {
         var errors = [];
         var fields = [
@@ -41,8 +56,7 @@ $(function () {
 
         if (errors.length > 0) {
             event.preventDefault();
-            $messageArea.html(buildErrorList(errors));
-            $('html, body').animate({ scrollTop: $messageArea.offset().top - 20 }, 200);
+            showNotification(buildNotification(errors));
         }
     });
 });
