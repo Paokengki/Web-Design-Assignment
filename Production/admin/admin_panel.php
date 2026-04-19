@@ -1,11 +1,11 @@
 <?php
-require 'admin/base.php'; 
+require __DIR__ . '/base.php';
 ?>
 
 <?php 
-include 'admin/_admin_sidebar.php';
+include __DIR__ . '/_admin_sidebar.php';
 ?>
 
 <?php
-include 'admin/_admin_feedback.php';
+include __DIR__ . '/_admin_feedback.php';
 ?>
