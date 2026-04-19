@@ -23,10 +23,42 @@
             </div>
         </div>
 
-        <?php if (isset($_SESSION['msg'])): ?>
-            <div style="background-color: var(--whiteColor); color: var(--darkBrown); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--primaryColor);">
-                <strong>System Notification:</strong> <?php echo $_SESSION['msg']; unset($_SESSION['msg']); ?>
+        <?php if (isset($_SESSION['msg'])): 
+            $msg = $_SESSION['msg'];
+            $isError = stripos($msg, 'error') !== false ? true : false;
+            unset($_SESSION['msg']);
+        ?>
+            <div id="notification-bar" style="position: fixed; top: 20px; right: 20px; max-width: 400px; padding: 16px 20px; border-radius: 8px; background: <?php echo $isError ? '#e74c3c' : '#27ae60'; ?>; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px; z-index: 9999; animation: slideIn 0.3s ease-out, slideOut 3s ease-out 2.7s forwards;">
+                <div style="font-size: 20px;">
+                    <?php echo $isError ? '❌' : '✓'; ?>
+                </div>
+                <div style="flex: 1; font-weight: 500;">
+                    <?php echo htmlspecialchars($msg); ?>
+                </div>
+                <button onclick="document.getElementById('notification-bar').style.display='none';" style="background: transparent; border: none; color: white; font-size: 18px; cursor: pointer; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">✕</button>
             </div>
+            <style>
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(420px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOut {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(420px);
+                        opacity: 0;
+                    }
+                }
+            </style>
         <?php endif; ?>
 
         <div class="main-menus">
@@ -55,7 +87,7 @@
                                 </p>
                             </div>
 
-                            <form method="POST" onsubmit="return confirm('Confirm deletion of this feedback?');">
+                            <form method="POST">
                                 <input type="hidden" name="feedback_id" value="<?php echo $row['id']; ?>">
                                 <button type="submit" name="delete_feedback" 
                                         style="background-color: var(--primaryColor); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; width: 100%;">

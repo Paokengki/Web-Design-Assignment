@@ -144,13 +144,19 @@ if (isset($_POST['add_restaurant'])) {
 if (isset($_POST['delete_restaurant'])) {
     $resId = $_POST['restaurant_id'];
     
-    // 1. First, delete all food associated with this restaurant
+    // 1. First, delete all payments associated with this restaurant
+    $stmt_del_payments = $conn->prepare("DELETE FROM Payment WHERE Restaurant_ID = ?");
+    $stmt_del_payments->bind_param("i", $resId);
+    $stmt_del_payments->execute();
+    $stmt_del_payments->close();
+
+    // 2. Delete all food associated with this restaurant
     $stmt1 = $conn->prepare("DELETE FROM Food WHERE Restaurant_ID = ?");
     $stmt1->bind_param("i", $resId);
     $stmt1->execute();
     $stmt1->close();
 
-    // 2. Now, delete the restaurant
+    // 3. Now, delete the restaurant
     $stmt2 = $conn->prepare("DELETE FROM Restaurant WHERE Restaurant_ID = ?");
     $stmt2->bind_param("i", $resId);
     

@@ -150,14 +150,14 @@ $(function () {
             remark: remark
         }).done(function (response) {
             if (!response || !response.success) {
-                showToast('加入购物车失败，请重试。', 'error');
+                showToast('Failed to add item to cart. Please try again.', 'error');
                 return;
             }
 
-            showToast('已添加 ' + currentItem.name + ' x' + quantity, 'success');
+            showToast('Added ' + currentItem.name + ' x' + quantity, 'success');
             closeModal();
         }).fail(function () {
-            showToast('加入购物车失败，请重试。', 'error');
+            showToast('Failed to add item to cart. Please try again.', 'error');
         });
     });
 });

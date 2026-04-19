@@ -48,7 +48,7 @@ if (isset($_POST['delete_feedback'])) {
 	$stmt->close();
     
 	// Refresh to update the list
-	header("Location: ../admin_panel.php");
+	header("Location: ../admin/admin_panel.php");
 	exit();
 }
 
@@ -75,13 +75,13 @@ if (isset($_POST['Admin_login_btn'])) {
 		if (password_verify($admin_pass, $row['Password'])) {
 			$_SESSION['admin_id'] = $row['Admin_ID'];
 			$_SESSION['admin_name'] = $row['Name'];
-			header("Location: admin_panel.php");
+			header("Location: ../admin/admin_panel.php");
 			exit();
 		} elseif ($admin_pass === $row['Password']) {
 			// Fallback for plain text passwords (for backward compatibility)
 			$_SESSION['admin_id'] = $row['Admin_ID'];
 			$_SESSION['admin_name'] = $row['Name'];
-			header("Location: ../admin_panel.php");
+			header("Location: ../admin/admin_panel.php");
 			exit();
 		} else {
 			$error_message = "Incorrect Admin Password!";

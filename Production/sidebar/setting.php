@@ -181,6 +181,76 @@ require '../home/_home_sidebar.php';
 	<script>
 	document.addEventListener('DOMContentLoaded', function() {
 		console.log('=== Setting Page Loaded ===');
+
+		function showNotification(message, type = 'info') {
+			const text = String(message || '');
+			if (type === 'info') {
+				const lowerText = text.toLowerCase();
+				if (lowerText.includes('success') || lowerText.includes('successful')) {
+					type = 'success';
+				} else if (lowerText.includes('failed') || lowerText.includes('error') || lowerText.includes('cannot') || lowerText.includes('not match')) {
+					type = 'error';
+				}
+			}
+
+			const existingBar = document.getElementById('notification-bar');
+			if (existingBar) {
+				existingBar.remove();
+			}
+
+			const colors = {
+				success: '#27ae60',
+				error: '#e74c3c',
+				info: '#3498db'
+			};
+
+			const bar = document.createElement('div');
+			bar.id = 'notification-bar';
+			bar.style.cssText = [
+				'position: fixed',
+				'top: 20px',
+				'right: 20px',
+				'max-width: 420px',
+				'padding: 16px 20px',
+				'border-radius: 8px',
+				`background: ${colors[type] || colors.info}`,
+				'color: white',
+				'box-shadow: 0 4px 12px rgba(0,0,0,0.2)',
+				'display: flex',
+				'align-items: center',
+				'gap: 12px',
+				'z-index: 9999',
+				'transform: translateX(420px)',
+				'opacity: 0',
+				'transition: transform 0.3s ease, opacity 0.3s ease'
+			].join(';');
+
+			const icon = type === 'success' ? '✓' : type === 'error' ? '❌' : 'ℹ';
+			bar.innerHTML = `
+				<div style="font-size:20px;">${icon}</div>
+				<div style="flex:1;font-weight:500;">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+				<button type="button" style="background:transparent;border:none;color:white;font-size:18px;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;">✕</button>
+			`;
+
+			document.body.appendChild(bar);
+			requestAnimationFrame(() => {
+				bar.style.transform = 'translateX(0)';
+				bar.style.opacity = '1';
+			});
+
+			const closeBar = () => {
+				bar.style.transform = 'translateX(420px)';
+				bar.style.opacity = '0';
+				setTimeout(() => {
+					if (bar.parentNode) {
+						bar.parentNode.removeChild(bar);
+					}
+				}, 300);
+			};
+
+			bar.querySelector('button').addEventListener('click', closeBar);
+			setTimeout(closeBar, 3000);
+		}
 		
 		// Switch the visible settings tab without leaving the page.
 		document.querySelectorAll('.setting-tab-link').forEach(link => {
@@ -258,18 +328,18 @@ require '../home/_home_sidebar.php';
 					console.log('Upload response:', data);
 					if (data.success) {
 						console.log('Upload successful');
-						alert('Profile picture uploaded successfully!');
+						showNotification('Profile picture uploaded successfully!');
 						setTimeout(() => {
 							location.reload();
 						}, 1000);
 					} else {
-						alert('Upload failed: ' + data.message);
+						showNotification('Upload failed: ' + data.message);
 						console.error('Upload error:', data.message);
 					}
 				})
 				.catch(error => {
 					console.error('Upload error:', error);
-					alert('Error occurred during upload: ' + error.message);
+					showNotification('Error occurred during upload: ' + error.message);
 				});
 			});
 		} else {
@@ -299,7 +369,7 @@ require '../home/_home_sidebar.php';
 				const address = document.getElementById('address').value;
 
 				if (!fullName.trim()) {
-					alert('Please enter your name');
+					showNotification('Please enter your name');
 					return;
 				}
 
@@ -321,14 +391,14 @@ require '../home/_home_sidebar.php';
 				.then(data => {
 					console.log('Save response:', data);
 					if (data.success) {
-						alert('Personal information saved successfully!');
+						showNotification('Personal information saved successfully!');
 					} else {
-						alert('Save failed: ' + data.message);
+						showNotification('Save failed: ' + data.message);
 					}
 				})
 				.catch(error => {
 					console.error('Save error:', error);
-					alert('Error occurred during saving: ' + error.message);
+					showNotification('Error occurred during saving: ' + error.message);
 				});
 			});
 		}
@@ -342,27 +412,27 @@ require '../home/_home_sidebar.php';
 				const confirmPassword = document.getElementById('accountConfirmPassword').value;
 
 				if (!currentPassword.trim()) {
-					alert('Please enter current password');
+					showNotification('Please enter current password');
 					return;
 				}
 				if (!newPassword.trim()) {
-					alert('Please enter new password');
+					showNotification('Please enter new password');
 					return;
 				}
 				if (!confirmPassword.trim()) {
-					alert('Please confirm new password');
+					showNotification('Please confirm new password');
 					return;
 				}
 				if (newPassword !== confirmPassword) {
-					alert('New password and confirm password do not match');
+					showNotification('New password and confirm password do not match');
 					return;
 				}
 				if (newPassword.length < 6) {
-					alert('New password must be at least 6 characters long');
+					showNotification('New password must be at least 6 characters long');
 					return;
 				}
 				if (currentPassword === newPassword) {
-					alert('New password cannot be the same as current password');
+					showNotification('New password cannot be the same as current password');
 					return;
 				}
 
@@ -378,16 +448,16 @@ require '../home/_home_sidebar.php';
 				.then(response => response.json())
 				.then(data => {
 					if (data.success) {
-						alert('Password updated successfully!');
+						showNotification('Password updated successfully!');
 						document.getElementById('accountCurrentPassword').value = '';
 						document.getElementById('accountNewPassword').value = '';
 						document.getElementById('accountConfirmPassword').value = '';
 					} else {
-						alert('Update failed: ' + data.message);
+						showNotification('Update failed: ' + data.message);
 					}
 				})
 				.catch(error => {
-					alert('Password update error: ' + error.message);
+					showNotification('Password update error: ' + error.message);
 				});
 			});
 		}
