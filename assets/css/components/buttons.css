@@ -1,0 +1,40 @@
+/* CafeDash · components/buttons.css */
+
+/* ---------- buttons ---------- */
+.btn {
+	--b: var(--glass-border);
+	display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+	height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid var(--b);
+	background: var(--glass); color: var(--text); font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap;
+	transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s, border-color .25s;
+}
+.btn:hover { border-color: var(--glass-border-hi); background: var(--glass-strong); }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-primary { background: var(--grad); color: #160d02; border: 0; box-shadow: 0 8px 30px -10px rgba(245,165,36,.7); }
+.btn-primary:hover { background: var(--grad); box-shadow: var(--glow); }
+.btn-ghost { background: transparent; border-color: transparent; }
+.btn-ghost:hover { background: var(--glass); }
+.btn-glass { background: var(--glass-strong); }
+.btn-danger { color: #fecaca; --b: rgba(248,113,113,.35); background: rgba(248,113,113,.08); }
+.btn-danger:hover { background: rgba(248,113,113,.18); border-color: rgba(248,113,113,.6); }
+.btn-sm { height: 36px; padding: 0 14px; font-size: 13px; }
+.btn-lg { height: 54px; padding: 0 28px; font-size: 15px; }
+.btn-block { width: 100%; }
+.btn.is-loading { pointer-events: none; color: transparent !important; position: relative; }
+.btn.is-loading::after {
+	content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%;
+	border: 2px solid rgba(255,255,255,.25); border-top-color: #fff; animation: spin .7s linear infinite;
+}
+.btn-primary.is-loading::after { border-color: rgba(0,0,0,.2); border-top-color: #160d02; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.icon-btn {
+	display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 10px;
+	background: transparent; border: 1px solid transparent; color: var(--text-2); cursor: pointer;
+	transition: background .2s, color .2s, border-color .2s;
+}
+.icon-btn:hover { background: var(--glass-strong); color: var(--text); border-color: var(--glass-border); }
+.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn.danger:hover { color: var(--bad); }
