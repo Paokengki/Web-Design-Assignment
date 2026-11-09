@@ -1,0 +1,2 @@
+# Command-line tools only — never served by Apache.
+Require all denied

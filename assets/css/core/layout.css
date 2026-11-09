@@ -1,0 +1,110 @@
+/* CafeDash · core/layout.css */
+
+/* ---------- top nav ---------- */
+.topnav {
+	position: fixed; z-index: 50; top: 14px; left: 50%; transform: translateX(-50%);
+	width: min(1180px, calc(100% - 24px)); height: 60px; padding: 0 10px 0 18px;
+	display: flex; align-items: center; justify-content: space-between; gap: 16px;
+	border-radius: 999px; border: 1px solid var(--glass-border);
+	background: rgba(12, 12, 18, .55); backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%);
+	transition: background .4s, border-color .4s, color .4s;
+}
+.topnav.is-light { background: rgba(255,255,255,.6); border-color: rgba(0,0,0,.08); color: #17130e; }
+.topnav.is-light .btn-ghost { color: #17130e; }
+.topnav.is-light .btn-ghost:hover { background: rgba(0,0,0,.05); }
+.topnav.is-light .btn-glass { background: rgba(0,0,0,.06); border-color: rgba(0,0,0,.08); }
+.topnav.is-light .topnav-links a { color: #4a443d; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 18px/1 var(--font-display); letter-spacing: -0.02em; }
+.brand small { display: block; font: 500 11px/1.3 var(--font); color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; }
+.logo-mark { display: block; flex: none; width: 36px; height: 36px; border-radius: 50%; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(245,165,36,.25)); transition: transform .5s var(--ease); }
+.brand:hover .logo-mark { transform: rotate(-8deg) scale(1.05); }
+.topnav-links { display: flex; gap: 4px; }
+.topnav-links a { padding: 8px 14px; border-radius: 999px; color: var(--text-2); font-weight: 500; font-size: 14px; transition: color .2s, background .2s; }
+.topnav-links a:hover, .topnav-links a.is-active { color: inherit; background: rgba(255,255,255,.06); }
+.topnav-actions { display: flex; align-items: center; gap: 6px; }
+.topnav-actions form { margin: 0; }
+.main { min-height: 70vh; }
+.nav-shop .main, .nav-none .main { padding: calc(var(--nav-h) + 40px) var(--gutter) 80px; max-width: 1240px; margin: 0 auto; }
+.nav-none .main { padding-top: 40px; }
+.auth .main, .landing .main { padding: 0; max-width: none; }
+
+@media (max-width: 760px) {
+	.topnav-links { display: none; }
+	.topnav { padding-left: 12px; }
+	.brand > span { font-size: 16px; }
+}
+
+/* ---------- footer ---------- */
+.footer {
+	display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+	max-width: 1180px; margin: 0 auto; padding: 40px var(--gutter); border-top: 1px solid var(--glass-border); color: var(--text-3); font-size: 13px;
+}
+.footer nav { display: flex; gap: 18px; }
+.footer nav a:hover { color: var(--text); }
+
+/* ---------- page header ---------- */
+.page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+.page-head h1 { font-size: clamp(28px, 4vw, 40px); margin-top: 8px; }
+.page-head p { color: var(--text-2); margin-top: 6px; }
+.page-head-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ================= ADMIN ================= */
+.nav-admin { display: block; }
+.sidebar {
+	position: fixed; z-index: 40; top: 14px; bottom: 14px; left: 14px; width: 248px; padding: 20px 14px;
+	display: flex; flex-direction: column; gap: 28px; border-radius: var(--r-lg);
+}
+.sidebar .brand { padding: 0 8px; }
+.side-nav { display: grid; gap: 4px; }
+.side-nav a { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; color: var(--text-2); font-weight: 500; font-size: 14px; position: relative; transition: background .2s, color .2s; }
+.side-nav a:hover { background: rgba(255,255,255,.05); color: var(--text); }
+.side-nav a.is-active { background: var(--grad-soft); color: var(--text); box-shadow: inset 0 0 0 1px rgba(245,165,36,.25); }
+.side-nav a.is-active::before { content: ""; position: absolute; left: -14px; top: 10px; bottom: 10px; width: 3px; border-radius: 9px; background: var(--grad); }
+.side-nav svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.side-legacy { margin-top: 12px; border-top: 1px solid var(--glass-border); border-radius: 0 !important; padding-top: 18px !important; font-size: 13px !important; color: var(--text-3) !important; }
+.side-user { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid var(--glass-border); }
+.side-user div { flex: 1; min-width: 0; }
+.side-user strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-user small { color: var(--text-3); font-size: 12px; }
+.side-user form { margin: 0; }
+.admin-main { margin-left: 276px; padding: 32px var(--gutter) 60px 24px; }
+@media (max-width: 960px) {
+	.sidebar { position: sticky; top: 0; left: 0; right: 0; bottom: auto; width: auto; flex-direction: row; align-items: center; border-radius: 0; padding: 10px 16px; gap: 12px; }
+	.sidebar .brand small, .side-user div, .side-legacy { display: none; }
+	.side-nav { display: flex; flex: 1; overflow-x: auto; }
+	.side-nav a.is-active::before { display: none; }
+	.side-user { margin: 0; padding: 4px; }
+	.admin-main { margin-left: 0; padding: 24px 16px 60px; }
+}
+
+/* ---------- shared nav bits ---------- */
+.ico { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.skip-link { position: fixed; left: 16px; top: -60px; z-index: 1000; padding: 10px 16px; border-radius: 10px; background: var(--amber); color: #160d02; font-weight: 600; }
+.skip-link:focus { top: 16px; }
+.cart-btn { position: relative; }
+.cart-count {
+	position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px;
+	background: var(--grad); color: #160d02; font: 700 11px/18px var(--font); text-align: center; box-shadow: 0 0 12px rgba(245,165,36,.6);
+}
+.topnav.is-light .icon-btn { color: #4a443d; }
+.nav-avatar .avatar { border-color: var(--glass-border-hi); }
+.nav-toggle { display: none; }
+@media (max-width: 760px) {
+	.hide-sm { display: none !important; }
+	.nav-toggle { display: inline-grid; }
+	.topnav { flex-wrap: wrap; height: auto; min-height: 60px; border-radius: 24px; padding-top: 10px; padding-bottom: 10px; }
+	.topnav.is-open .topnav-links { display: grid; width: 100%; order: 3; padding: 8px 0 4px; gap: 2px; }
+	.topnav.is-open .topnav-links a { padding: 12px 14px; }
+}
+.side-nav a span { flex: 1; }
+.side-badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: var(--amber); color: #160d02; font: 700 11px/20px var(--font); text-align: center; }
+.side-user .icon-btn { width: 32px; height: 32px; }
+
+/* control panel on small screens: brand + account on one row, the section links scroll underneath */
+@media (max-width: 960px) {
+	.sidebar { flex-wrap: wrap; row-gap: 8px; }
+	.side-user { margin-left: auto; }
+	.side-nav { order: 3; flex: 1 1 100%; gap: 4px; padding-bottom: 2px; scrollbar-width: none; }
+	.side-nav::-webkit-scrollbar { display: none; }
+	.side-nav a { flex: none; padding: 9px 12px; }
+}

@@ -1,0 +1,56 @@
+/* CafeDash v2 — design tokens. Dark by default. */
+:root {
+	color-scheme: dark;
+
+	/* surfaces */
+	--bg: #07070b;
+	--bg-2: #0d0d14;
+	--glass: rgba(255, 255, 255, 0.045);
+	--glass-strong: rgba(255, 255, 255, 0.08);
+	--glass-border: rgba(255, 255, 255, 0.09);
+	--glass-border-hi: rgba(255, 255, 255, 0.18);
+	--overlay: rgba(4, 4, 8, 0.66);
+
+	/* text */
+	--text: #f4f2ee;
+	--text-2: #a9a6b2;
+	--text-3: #6d6a78;
+
+	/* brand: crema amber → violet */
+	--amber: #f5a524;
+	--amber-2: #ffcb6b;
+	--violet: #8b5cf6;
+	--cyan: #22d3ee;
+	--grad: linear-gradient(120deg, #ffcb6b 0%, #f5a524 35%, #c46cf2 70%, #8b5cf6 100%);
+	--grad-soft: linear-gradient(120deg, rgba(245, 165, 36, .18), rgba(139, 92, 246, .18));
+
+	/* status */
+	--ok: #34d399;
+	--warn: #fbbf24;
+	--bad: #f87171;
+	--info: #60a5fa;
+	--muted: #8b8996;
+
+	/* roles */
+	--role-super: #f5a524;
+	--role-manager: #a78bfa;
+	--role-kitchen: #22d3ee;
+	--role-courier: #34d399;
+
+	/* shape + motion */
+	--r-sm: 10px;
+	--r: 16px;
+	--r-lg: 24px;
+	--r-xl: 32px;
+	--blur: 22px;
+	--shadow: 0 20px 60px -20px rgba(0, 0, 0, .7);
+	--glow: 0 0 0 1px rgba(245, 165, 36, .35), 0 8px 40px -8px rgba(245, 165, 36, .45);
+	--ease: cubic-bezier(.2, .8, .2, 1);
+
+	--font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	--font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+	--mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+
+	--nav-h: 72px;
+	--gutter: clamp(16px, 4vw, 48px);
+}

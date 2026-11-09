@@ -1,0 +1,28 @@
+/* CafeDash · components/surfaces.css */
+
+/* ---------- glass ---------- */
+.glass {
+	background: var(--glass);
+	border: 1px solid var(--glass-border);
+	backdrop-filter: blur(var(--blur)) saturate(140%);
+	-webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
+	border-radius: var(--r-lg);
+	box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.card { position: relative; padding: 24px; isolation: isolate; }
+.card-glow::after { /* cursor-following glow, driven by --mx/--my from core.js */
+	content: ""; position: absolute; inset: -1px; border-radius: inherit; z-index: -1; pointer-events: none; opacity: 0;
+	background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(245,165,36,.16), transparent 45%);
+	transition: opacity .3s var(--ease);
+}
+.card-glow:hover::after { opacity: 1; }
+.card-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.card-title h2, .card-title h3 { font-size: 18px; }
+.eyebrow { font: 600 11px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--amber); }
+
+/* ---------- stats ---------- */
+.stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 24px; }
+.stat { padding: 18px 20px; }
+.stat small { display: block; color: var(--text-2); font-size: 13px; }
+.stat strong { display: block; margin-top: 6px; font: 600 28px/1 var(--font-display); letter-spacing: -0.02em; }
+.stat .stat-bar { margin-top: 12px; height: 3px; border-radius: 9px; background: var(--c, var(--amber)); width: 36px; box-shadow: 0 0 12px var(--c, var(--amber)); }
