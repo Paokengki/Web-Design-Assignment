@@ -79,4 +79,4 @@ layout_start(['title' => 'Sign in', 'nav' => 'none', 'body_class' => 'auth', 'st
 		</div>
 	</div>
 </div>
-<?php layout_end();
+<?php layout_end(['pages/mascots.js']);
