@@ -95,4 +95,4 @@ layout_start(['title' => 'Create account', 'nav' => 'none', 'body_class' => 'aut
 		</div>
 	</div>
 </div>
-<?php layout_end();
+<?php layout_end(['pages/mascots.js']);
