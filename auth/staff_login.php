@@ -66,7 +66,8 @@ layout_start(['title' => 'Staff sign in', 'nav' => 'none', 'body_class' => 'auth
 				</label>
 				<button class="btn btn-primary btn-lg btn-block" type="submit" data-magnetic>Sign in</button>
 			</form>
+			<p class="auth-note">Forgot your password? Ask a Super Admin to reset it for you.</p>
 		</div>
 	</div>
 </div>
-<?php layout_end();
+<?php layout_end(['pages/mascots.js']);

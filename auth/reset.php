@@ -56,4 +56,4 @@ layout_start(['title' => 'New password', 'nav' => 'none', 'body_class' => 'auth'
 		</div>
 	</div>
 </div>
-<?php layout_end();
+<?php layout_end(['pages/mascots.js']);
