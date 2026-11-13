@@ -49,6 +49,10 @@
 			err.fields = json.data && json.data.fields;
 			throw err;
 		}
+		// Attach the server message to the returned data if it's an object.
+		if (json.data && typeof json.data === 'object' && !Array.isArray(json.data)) {
+			json.data._message = json.error || '';
+		}
 		return json.data;
 	};
 

@@ -54,10 +54,19 @@
 		const editing = !!a;
 		form.elements.action.value = editing ? 'update' : 'create';
 		document.getElementById('address-title').textContent = editing ? 'Edit address' : 'Add address';
+		// Clear GPS fields and status when opening the form.
+		form.elements.Latitude.value = '';
+		form.elements.Longitude.value = '';
+		const gpsStatus = document.getElementById('gps-status');
+		if (gpsStatus) gpsStatus.textContent = '';
 		if (editing) {
 			// migrated rows used "-" placeholders; show them as empty so the user fills them in
 			const clean = Object.fromEntries(Object.entries(a).map(([k, v]) => [k, v === '-' ? '' : v]));
 			CD.fillForm(form, clean);
+			// If existing coordinates are present, show their status.
+			if (a.Latitude && a.Longitude) {
+				if (gpsStatus) gpsStatus.textContent = 'Map location saved.';
+			}
 		} else {
 			form.elements.Address_ID.value = '';
 			form.elements.State.value = 'Kuala Lumpur';
@@ -107,13 +116,46 @@
 		}
 	});
 
+	/* ---------------------------------------------- GPS "Use My Location" */
+	const gpsBtn = document.getElementById('gps-btn');
+	if (gpsBtn) {
+		gpsBtn.addEventListener('click', () => {
+			const gpsStatus = document.getElementById('gps-status');
+			if (!navigator.geolocation) {
+				if (gpsStatus) gpsStatus.textContent = 'Geolocation not supported by your browser.';
+				return;
+			}
+			if (gpsStatus) gpsStatus.textContent = 'Requesting location...';
+			gpsBtn.disabled = true;
+			navigator.geolocation.getCurrentPosition(
+				(pos) => {
+					form.elements.Latitude.value = pos.coords.latitude.toFixed(7);
+					form.elements.Longitude.value = pos.coords.longitude.toFixed(7);
+					if (gpsStatus) gpsStatus.textContent = 'Location captured.';
+					gpsBtn.disabled = false;
+				},
+				(err) => {
+					const msgs = {
+						1: 'Permission denied. Enable location in your browser settings.',
+						2: 'Location unavailable.',
+						3: 'Request timed out.',
+					};
+					if (gpsStatus) gpsStatus.textContent = msgs[err.code] || 'GPS error.';
+					gpsBtn.disabled = false;
+				},
+				{ enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+			);
+		});
+	}
+
 	CD.ajaxForm(form, ADDR_API, {
 		onSuccess: (list) => {
 			const wasEdit = form.elements.action.value === 'update';
-			addresses = list;
+			addresses = Array.isArray(list) ? list : (list?.addresses || []);
 			modal.close('address-modal');
 			render(true);
-			toast(wasEdit ? 'Address updated' : 'Address added');
+			const msg = (list && list._message) || (wasEdit ? 'Address updated' : 'Address added');
+			toast(msg);
 		},
 	});
 

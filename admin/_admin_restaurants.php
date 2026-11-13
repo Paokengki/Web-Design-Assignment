@@ -40,6 +40,8 @@ if ($edit_id) {
             <input type="email" name="res_email" placeholder="Email" required style="padding: 8px; border-radius: 5px; border: none;">
             <input type="text" name="res_phone" placeholder="Phone Number" required style="padding: 8px; border-radius: 5px; border: none;">
             <textarea name="res_address" placeholder="Full Address" required style="grid-column: span 2; padding: 8px; border-radius: 5px; border: none;"></textarea>
+            <input type="text" name="res_latitude" placeholder="Latitude (e.g., 3.0733)" step="0.0000001" style="padding: 8px; border-radius: 5px; border: none;">
+            <input type="text" name="res_longitude" placeholder="Longitude (e.g., 101.5830)" step="0.0000001" style="padding: 8px; border-radius: 5px; border: none;">
             <button type="submit" name="add_restaurant" style="background: var(--darkBrown); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; grid-column: span 2;">
                 Add Restaurant
             </button>
@@ -128,6 +130,11 @@ if ($edit_id) {
                         <input type="email" name="res_email" value="<?php echo htmlspecialchars($res['Email']); ?>" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
                         <input type="text" name="res_phone" value="<?php echo htmlspecialchars($res['Contain_number']); ?>" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
                         <textarea name="res_address" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px;"><?php echo htmlspecialchars($res['Address']); ?></textarea>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" name="res_latitude" value="<?php echo $res['Latitude'] !== null ? htmlspecialchars($res['Latitude']) : ''; ?>" placeholder="Latitude (e.g., 3.0733)" step="0.0000001" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; flex: 1;">
+                            <input type="text" name="res_longitude" value="<?php echo $res['Longitude'] !== null ? htmlspecialchars($res['Longitude']) : ''; ?>" placeholder="Longitude (e.g., 101.5830)" step="0.0000001" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; flex: 1;">
+                        </div>
+                        <small style="color: #666; font-size: 12px;">Map coordinates are needed for the delivery tracking map. Find them via Google Maps (right-click → coordinates) or OpenStreetMap.</small>
                         <button type="submit" name="update_restaurant" style="background: var(--primaryColor); color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold;">Update Restaurant Info</button>
                     </div>
                 </form>

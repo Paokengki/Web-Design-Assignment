@@ -3,3 +3,30 @@ config/mail_config.php
 config/stripe.php
 config/mail.config.php
 .claude/
+
+# Environment variables
+.env
+.env.*
+
+# Local backups
+/backups/
+
+# WorkBuddy personal memory
+/.workbuddy-ai/
+
+# Composer executable
+/composer.phar
+
+# Environment variables
+.env
+
+.env.*
+
+# Local backups
+/backups/
+
+# WorkBuddy personal memory
+/.workbuddy-ai/
+
+# Composer executable
+/composer.phar

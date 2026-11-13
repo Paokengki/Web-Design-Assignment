@@ -64,7 +64,7 @@ switch ($action) {
 
 	case 'save_cafe':
 		$id = (int) input('Restaurant_ID');
-		$d = ['Name' => input('Name'), 'Restaurant_type' => input('Restaurant_type'), 'Email' => input('Email'), 'Contain_number' => input('Contain_number'), 'Address' => input('Address'), 'Rating' => input('Rating')];
+		$d = ['Name' => input('Name'), 'Restaurant_type' => input('Restaurant_type'), 'Email' => input('Email'), 'Contain_number' => input('Contain_number'), 'Address' => input('Address'), 'Rating' => input('Rating'), 'Latitude' => input('Latitude'), 'Longitude' => input('Longitude')];
 		$e = [];
 		if ($d['Name'] === '' || mb_strlen($d['Name']) > 120) $e['Name'] = 'Enter the café name.';
 		if (!in_array($d['Restaurant_type'], CAFE_TYPES, true)) $e['Restaurant_type'] = 'Pick a type.';
@@ -72,6 +72,12 @@ switch ($action) {
 		if (!preg_match('/^[0-9+\-\s]{9,20}$/', $d['Contain_number'])) $e['Contain_number'] = 'Enter a valid phone number.';
 		if ($d['Address'] === '') $e['Address'] = 'Enter the address.';
 		if ($d['Rating'] !== '' && (!is_numeric($d['Rating']) || $d['Rating'] < 0 || $d['Rating'] > 5)) $e['Rating'] = '0 to 5.';
+		// Validate coordinates if provided
+		$latVal = $d['Latitude'] !== '' ? $d['Latitude'] : null;
+		$lngVal = $d['Longitude'] !== '' ? $d['Longitude'] : null;
+		$lat = ($latVal !== null && is_numeric($latVal) && $latVal >= -90 && $latVal <= 90) ? round((float)$latVal, 7) : null;
+		$lng = ($lngVal !== null && is_numeric($lngVal) && $lngVal >= -180 && $lngVal <= 180) ? round((float)$lngVal, 7) : null;
+		if (($latVal !== null && $lat === null) || ($lngVal !== null && $lng === null)) $e['Latitude'] = 'Enter valid coordinates (lat: -90 to 90, lng: -180 to 180).';
 		if (!isset($e['Name']) && q_one('SELECT 1 FROM Restaurant WHERE Name = ? AND Restaurant_ID <> ?', [$d['Name'], $id])) $e['Name'] = 'Another café has this name.';
 		if (!$id && empty($_FILES['image']['name'])) $e['image'] = 'Add a photo of the café.';
 		if ($e) json_out(false, ['fields' => $e], 'Please check the highlighted fields.', 422);
@@ -81,11 +87,11 @@ switch ($action) {
 		if ($id) {
 			$old = cafe_row($id);
 			rename_cafe_dir($old['Name'], $d['Name']);
-			q('UPDATE Restaurant SET Name = ?, Restaurant_type = ?, Email = ?, Contain_number = ?, Address = ?, Rating = ? WHERE Restaurant_ID = ?',
-				[$d['Name'], $d['Restaurant_type'], $d['Email'], $d['Contain_number'], $d['Address'], $rating, $id]);
+			q('UPDATE Restaurant SET Name = ?, Restaurant_type = ?, Email = ?, Contain_number = ?, Address = ?, Rating = ?, Latitude = ?, Longitude = ? WHERE Restaurant_ID = ?',
+				[$d['Name'], $d['Restaurant_type'], $d['Email'], $d['Contain_number'], $d['Address'], $rating, $lat, $lng, $id]);
 		} else {
-			q('INSERT INTO Restaurant (Name, Restaurant_type, Email, Contain_number, Address, Rating) VALUES (?, ?, ?, ?, ?, ?)',
-				[$d['Name'], $d['Restaurant_type'], $d['Email'], $d['Contain_number'], $d['Address'], $rating]);
+			q('INSERT INTO Restaurant (Name, Restaurant_type, Email, Contain_number, Address, Rating, Latitude, Longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+				[$d['Name'], $d['Restaurant_type'], $d['Email'], $d['Contain_number'], $d['Address'], $rating, $lat, $lng]);
 			$id = (int) db()->insert_id;
 		}
 		place_image($img, cafe_dir($d['Name']) . '/shop.jpg');

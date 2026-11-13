@@ -2,6 +2,8 @@
 /** Order confirmation — replaces payment_cart/Payment_success.php. */
 require __DIR__ . '/../app/layout/master.php';
 require __DIR__ . '/../app/loyalty.php';
+// Tracking: create a tracking row for this confirmed payment (idempotent, payment-gated).
+require_once __DIR__ . '/../tracking/bootstrap.php';
 
 $user = require_customer();
 $id = (int) ($_GET['id'] ?? 0);
@@ -10,6 +12,8 @@ if (!$order) redirect('customer/orders.php');
 $items = q_all('SELECT * FROM Payment_Item WHERE Payment_ID = ?', [$id]);
 $spent = (float) q_one("SELECT COALESCE(SUM(Payment_amount), 0) s FROM Payment WHERE User_ID = ? AND Payment_status = 'SUCCEEDED'", [(int) $user['User_ID']])['s'];
 $loyalty = loyalty_for($spent);
+// Ensure the tracking record exists (only if payment succeeded).
+track_ensure_for_payment($id);
 
 layout_start(['title' => 'Order confirmed', 'nav' => 'shop', 'styles' => ['pages/shop.css']]);
 ?>
@@ -37,7 +41,8 @@ layout_start(['title' => 'Order confirmed', 'nav' => 'shop', 'styles' => ['pages
 		<div class="total"><dt>Paid</dt><dd><?= money($order['Payment_amount']) ?></dd></div>
 	</dl>
 	<div class="success-actions">
-		<a class="btn btn-primary" href="<?= e(url('customer/home.php')) ?>">Order something else</a>
+		<a class="btn btn-primary" href="<?= e(url('tracking/customer/track.php?id=' . $id)) ?>">Track your order</a>
+		<a class="btn btn-glass" href="<?= e(url('customer/home.php')) ?>">Order something else</a>
 		<a class="btn btn-glass" href="<?= e(url('customer/dashboard.php')) ?>">My dashboard</a>
 	</div>
 </section>

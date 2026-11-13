@@ -46,6 +46,9 @@ layout_start(['title' => 'Cafés & menu', 'nav' => 'admin', 'active' => 'restaur
 				<label class="field"><span>Phone</span><input class="input" type="tel" name="Contain_number" required><span class="field-error"></span></label>
 				<label class="field span-2"><span>Address</span><textarea class="textarea" name="Address" rows="2" required></textarea><span class="field-error"></span></label>
 				<label class="field"><span>Rating <em class="tiny">(0–5)</em></span><input class="input" type="number" name="Rating" min="0" max="5" step="0.1"><span class="field-error"></span></label>
+				<label class="field"><span>Latitude <em class="tiny">(map)</em></span><input class="input" type="text" name="Latitude" placeholder="e.g. 3.0733" step="0.0000001"><span class="field-error"></span></label>
+				<label class="field"><span>Longitude <em class="tiny">(map)</em></span><input class="input" type="text" name="Longitude" placeholder="e.g. 101.5830" step="0.0000001"><span class="field-error"></span></label>
+				<p class="tiny span-2" style="margin-bottom:.5rem;color:var(--muted)">Map coordinates are needed for the delivery tracking map. Find them via Google Maps (right-click → coordinates) or OpenStreetMap.</p>
 			</div>
 			<div class="form-actions">
 				<button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
