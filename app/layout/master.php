@@ -153,6 +153,7 @@ function admin_nav_items(): array
 		'restaurants' => ['Cafés & menu', 'admin/restaurants.php', 'store', ADMIN_ROLES],
 		'members'     => ['Members', 'admin/members.php', 'users', ADMIN_ROLES],
 		'feedback'    => ['Feedback', 'admin/feedback.php', 'inbox', ADMIN_ROLES],
+		'tracking'    => ['Live Orders', 'tracking/manager/deliveries.php', 'truck', ADMIN_ROLES],
 		'staff'       => ['Staff & roles', 'admin/staff.php', 'shield', ['Super Admin']],
 	];
 }
@@ -252,7 +253,7 @@ function render_footer(): void
 	<footer class="footer">
 		<div class="brand"><?= logo_mark() ?><span><?= APP_NAME ?></span></div>
 		<p>Every craving, one tap. Kuala Lumpur · <?= date('Y') ?></p>
-		<nav aria-label="Footer"><a href="<?= e(url('customer/home.php')) ?>">Cafés</a><a href="<?= e(url('customer/feedback.php')) ?>">Feedback</a><a href="<?= e(url('auth/staff_login.php')) ?>">Staff sign in</a></nav>
+		<nav aria-label="Footer"><a href="<?= e(url('customer/home.php')) ?>">Cafés</a><a href="<?= e(url('customer/feedback.php')) ?>">Feedback</a><a href="<?= e(url('auth/staff_login.php')) ?>">Staff sign in</a><a href="<?= e(url('tracking/kitchen/login.php')) ?>">Kitchen</a><a href="<?= e(url('tracking/courier/login.php')) ?>">Courier</a></nav>
 	</footer>
 	<?php
 }

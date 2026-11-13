@@ -68,6 +68,11 @@ layout_start(['title' => 'Orders', 'nav' => 'shop', 'active' => 'orders', 'style
 						<div class="total"><dt>Total</dt><dd><?= money($o['Payment_amount']) ?></dd></div>
 					</dl>
 					<p class="tiny">Paid by <?= e($o['Payment_type'] ?: 'card') ?> via <?= e(ucfirst(strtolower($o['Provider']))) ?><?= $o['Paid_at'] ? ' · ' . e(date('d M Y, g:ia', strtotime($o['Paid_at']))) : '' ?></p>
+				<?php if ($o['Payment_status'] === 'SUCCEEDED'): ?>
+				<div style="margin-top:10px;">
+					<a class="btn btn-sm btn-primary" href="<?= e(url('tracking/customer/track.php?id=' . (int) $o['Payment_ID'])) ?>">Track order</a>
+				</div>
+				<?php endif; ?>
 				</div>
 			</details>
 		<?php endforeach; ?>

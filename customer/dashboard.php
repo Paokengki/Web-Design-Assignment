@@ -144,6 +144,8 @@ layout_start(['title' => 'Dashboard', 'nav' => 'shop', 'active' => 'dashboard', 
 		<form id="address-form" novalidate>
 			<input type="hidden" name="action" value="create">
 			<input type="hidden" name="Address_ID" value="">
+			<input type="hidden" name="Latitude" value="">
+			<input type="hidden" name="Longitude" value="">
 			<div class="form-grid">
 				<label class="field"><span>Label</span>
 					<select class="select" name="Label"><option>Home</option><option>Work</option><option>Campus</option><option>Other</option></select>
@@ -161,6 +163,19 @@ layout_start(['title' => 'Dashboard', 'nav' => 'shop', 'active' => 'dashboard', 
 						<?php endforeach; ?>
 					</select><span class="field-error"></span></label>
 				<label class="check span-2"><input type="checkbox" name="Is_default" value="1"> Make this my default address</label>
+				<div class="span-2" style="border-top:1px solid var(--border,rgba(255,255,255,.08));padding-top:12px;margin-top:4px;">
+					<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+						<button type="button" class="btn btn-sm btn-glass" id="gps-btn">
+							<svg viewBox="0 0 24 24" width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M12 2a8 8 0 0 0-8 8c0 5.4 7.05 11.5 7.35 11.76a1 1 0 0 0 1.3 0C12.95 21.5 20 15.4 20 10a8 8 0 0 0-8-8Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+							Use My Location
+						</button>
+						<span class="tiny" id="gps-status" style="opacity:.6;"></span>
+					</div>
+					<label class="check" style="font-size:12px;opacity:.7;">
+						<input type="checkbox" name="GeocodeConsent" value="1">
+						Allow automatic address-to-map conversion via OpenStreetMap Nominatim. Your address text is sent to their free geocoding service to find your map location.
+					</label>
+				</div>
 			</div>
 			<div class="form-actions">
 				<button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>

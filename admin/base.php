@@ -177,8 +177,12 @@ if (isset($_POST['update_restaurant'])) {
         }
     }
 
-    $stmt = $conn->prepare("UPDATE Restaurant SET Name = ?, Restaurant_type = ?, Email = ?, Contain_number = ?, Address = ? WHERE Restaurant_ID = ?");
-    $stmt->bind_param("sssssi", $name, $type, $email, $phone, $address, $resId);
+    $stmt = $conn->prepare("UPDATE Restaurant SET Name = ?, Restaurant_type = ?, Email = ?, Contain_number = ?, Address = ?, Latitude = ?, Longitude = ? WHERE Restaurant_ID = ?");
+    $latVal = trim($_POST['res_latitude'] ?? '');
+    $lngVal = trim($_POST['res_longitude'] ?? '');
+    $lat = ($latVal !== '' && is_numeric($latVal) && $latVal >= -90 && $latVal <= 90) ? (float)$latVal : null;
+    $lng = ($lngVal !== '' && is_numeric($lngVal) && $lngVal >= -180 && $lngVal <= 180) ? (float)$lngVal : null;
+    $stmt->bind_param("sssssddi", $name, $type, $email, $phone, $address, $lat, $lng, $resId);
     if ($stmt->execute()) {
         if (empty($_SESSION['msg'])) {
             $_SESSION['msg'] = $uploadSuccess ? "Restaurant updated successfully!" : "Restaurant updated, but image upload failed.";
@@ -315,8 +319,12 @@ if (isset($_POST['add_restaurant'])) {
 
     ensureRestaurantFolder($name);
 
-    $stmt = $conn->prepare("INSERT INTO Restaurant (Name, Address, Restaurant_type, Email, Contain_number) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $name, $address, $type, $email, $phone);
+    $stmt = $conn->prepare("INSERT INTO Restaurant (Name, Address, Restaurant_type, Email, Contain_number, Latitude, Longitude) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $latVal = trim($_POST['res_latitude'] ?? '');
+    $lngVal = trim($_POST['res_longitude'] ?? '');
+    $lat = ($latVal !== '' && is_numeric($latVal) && $latVal >= -90 && $latVal <= 90) ? (float)$latVal : null;
+    $lng = ($lngVal !== '' && is_numeric($lngVal) && $lngVal >= -180 && $lngVal <= 180) ? (float)$lngVal : null;
+    $stmt->bind_param("sssssdd", $name, $address, $type, $email, $phone, $lat, $lng);
     
     if ($stmt->execute()) {
         $_SESSION['msg'] = "Restaurant added successfully!";
