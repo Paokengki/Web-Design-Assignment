@@ -1,8 +1,18 @@
 <?php
 require __DIR__ . '/../app/layout/master.php';
 
+/** Where each staff role works after signing in. */
+function staff_home(string $role): string
+{
+	return match ($role) {
+		'Kitchen Staff' => 'tracking/kitchen/orders.php',   // kitchen order board (order tracking)
+		'Courier'       => 'tracking/courier/deliveries.php', // courier deliveries (order tracking)
+		default         => 'admin/overview.php',            // Managers + Super Admins
+	};
+}
+
 $staff = current_staff();
-if ($staff && in_array($staff['Role'], ADMIN_ROLES, true)) redirect('admin/overview.php');
+if ($staff) redirect(staff_home($staff['Role'])); // already signed in
 
 $error = '';
 $email = '';
@@ -28,14 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$error = 'Wrong email or password.';
 		} elseif ($row['Status'] !== 'Active') {
 			$error = 'This staff account is ' . strtolower($row['Status']) . '.';
-		} elseif (!in_array($row['Role'], ADMIN_ROLES, true)) {
-			$error = 'The control panel is for Managers and Super Admins. Your role: ' . $row['Role'] . '.';
 		} else {
+			// One sign-in for every staff role; each lands on its own workspace.
 			unset($_SESSION['staff_attempts']);
 			session_regenerate_id(true);
 			$_SESSION['staff_id'] = (int) $row['Staff_ID'];
 			q('UPDATE Staff SET Last_login_at = NOW() WHERE Staff_ID = ?', [(int) $row['Staff_ID']]);
-			redirect('admin/overview.php');
+			redirect(staff_home($row['Role']));
 		}
 	}
 }
@@ -50,8 +59,8 @@ layout_start(['title' => 'Staff sign in', 'nav' => 'none', 'body_class' => 'auth
 				<a href="<?= e(url('auth/login.php')) ?>">Member</a>
 				<a class="is-active" href="<?= e(url('auth/staff_login.php')) ?>">Staff</a>
 			</div>
-			<h1 data-reveal>Control panel</h1>
-			<p data-reveal>Managers and Super Admins only.</p>
+			<h1 data-reveal>Staff sign in</h1>
+			<p data-reveal>Managers, kitchen staff and couriers — you’ll land on your own workspace.</p>
 			<?php if ($error): ?><div class="flash flash-error" role="alert"><?= e($error) ?></div><?php endif; ?>
 			<form method="post" action="" novalidate data-reveal>
 				<?= csrf_field() ?>

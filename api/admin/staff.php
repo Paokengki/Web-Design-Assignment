@@ -11,7 +11,10 @@ require __DIR__ . '/../../app/bootstrap.php';
 $action = api_start();
 $me = require_staff(['Super Admin']);
 
-const STAFF_COLUMNS = 'Staff_ID, Name, Email, Phone, Role, Status, Plate_number, Last_login_at, Created_at, Updated_at';
+// Cafe_name: the café a Kitchen Staff member works at (order tracking shows them only that café's orders).
+const STAFF_COLUMNS = 'Staff_ID, Name, Email, Phone, Role, Status, Plate_number, Assigned_Restaurant_ID,
+	(SELECT r.Name FROM Restaurant r WHERE r.Restaurant_ID = Staff.Assigned_Restaurant_ID) AS Cafe_name,
+	Last_login_at, Created_at, Updated_at';
 const STAFF_STATUSES = ['Active', 'Suspended', 'Deactivated'];
 const PER_PAGE = 8;
 
@@ -38,18 +41,23 @@ function staff_input(?int $ignoreId = null): array
 		'Email'        => strtolower(input('Email')),
 		'Phone'        => input('Phone'),
 		'Plate_number' => strtoupper(input('Plate_number')),
+		'Cafe'         => input('Assigned_Restaurant_ID'),
 	];
 	$e = [];
 	if ($d['Name'] === '' || mb_strlen($d['Name']) > 255) $e['Name'] = 'Enter a name.';
 	if (!filter_var($d['Email'], FILTER_VALIDATE_EMAIL)) $e['Email'] = 'Enter a valid work email.';
 	if ($d['Phone'] !== '' && !preg_match('/^[0-9+\-\s]{9,20}$/', $d['Phone'])) $e['Phone'] = 'Enter a valid phone number.';
 	if (mb_strlen($d['Plate_number']) > 50) $e['Plate_number'] = 'Too long.';
+	if ($d['Cafe'] !== '' && (!ctype_digit($d['Cafe']) || !q_one('SELECT 1 FROM Restaurant WHERE Restaurant_ID = ?', [(int) $d['Cafe']]))) {
+		$e['Assigned_Restaurant_ID'] = 'Pick a café from the list.';
+	}
 	if (!isset($e['Email']) && q_one('SELECT 1 FROM Staff WHERE Email = ? AND Staff_ID <> ?', [$d['Email'], $ignoreId ?? 0])) {
 		$e['Email'] = 'Another staff member uses this email.';
 	}
 	if ($e) json_out(false, ['fields' => $e], 'Please check the highlighted fields.', 422);
 	$d['Phone'] = $d['Phone'] ?: null;
 	$d['Plate_number'] = $d['Plate_number'] ?: null;
+	$d['Cafe'] = $d['Cafe'] === '' ? null : (int) $d['Cafe'];
 	return $d;
 }
 
@@ -122,23 +130,29 @@ switch ($action) {
 		} elseif ($p = password_problem($password)) {
 			json_out(false, ['fields' => ['Password' => $p]], $p, 422);
 		}
-		q('INSERT INTO Staff (Name, Email, Phone, Plate_number, Role, Password) VALUES (?, ?, ?, ?, ?, ?)', [
-			$d['Name'], $d['Email'], $d['Phone'], $role === 'Courier' ? $d['Plate_number'] : null, $role, password_hash($password, PASSWORD_DEFAULT),
+		q('INSERT INTO Staff (Name, Email, Phone, Plate_number, Assigned_Restaurant_ID, Role, Password) VALUES (?, ?, ?, ?, ?, ?, ?)', [
+			$d['Name'], $d['Email'], $d['Phone'], $role === 'Courier' ? $d['Plate_number'] : null,
+			$role === 'Kitchen Staff' ? $d['Cafe'] : null, // only kitchen staff work at a café
+			$role, password_hash($password, PASSWORD_DEFAULT),
 		]);
 		json_out(true, ['row' => staff_row((int) db()->insert_id), 'temp_password' => $generated ? $password : null]);
 
 	case 'update':
 		$t = editable_target($me);
 		$d = staff_input((int) $t['Staff_ID']);
-		q('UPDATE Staff SET Name = ?, Email = ?, Phone = ?, Plate_number = ? WHERE Staff_ID = ?', [
-			$d['Name'], $d['Email'], $d['Phone'], $t['Role'] === 'Courier' ? $d['Plate_number'] : null, (int) $t['Staff_ID'],
+		q('UPDATE Staff SET Name = ?, Email = ?, Phone = ?, Plate_number = ?, Assigned_Restaurant_ID = ? WHERE Staff_ID = ?', [
+			$d['Name'], $d['Email'], $d['Phone'], $t['Role'] === 'Courier' ? $d['Plate_number'] : null,
+			$t['Role'] === 'Kitchen Staff' ? $d['Cafe'] : null,
+			(int) $t['Staff_ID'],
 		]);
 		json_out(true, ['row' => staff_row((int) $t['Staff_ID'])]);
 
 	case 'set_role':
 		$t = editable_target($me);
 		$role = role_input();
-		q('UPDATE Staff SET Role = ?, Plate_number = IF(? = \'Courier\', Plate_number, NULL) WHERE Staff_ID = ?', [$role, $role, (int) $t['Staff_ID']]);
+		// Leaving a role clears what only that role uses: plate (Courier), café (Kitchen Staff).
+		q('UPDATE Staff SET Role = ?, Plate_number = IF(? = \'Courier\', Plate_number, NULL),
+			Assigned_Restaurant_ID = IF(? = \'Kitchen Staff\', Assigned_Restaurant_ID, NULL) WHERE Staff_ID = ?', [$role, $role, $role, (int) $t['Staff_ID']]);
 		json_out(true, ['row' => staff_row((int) $t['Staff_ID'])]);
 
 	case 'set_status':

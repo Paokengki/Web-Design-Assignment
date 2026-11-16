@@ -1,4 +1,5 @@
-/* Checkout: live order summary, clickable voucher cards, hand-off to Stripe Checkout. */
+/* Checkout: delivery address (change without leaving), live order summary, clickable voucher cards,
+ * hand-off to Stripe Checkout (or straight to the receipt when a voucher makes the order free). */
 (function () {
 	'use strict';
 	const { api, esc, icon, toast } = CD;
@@ -29,6 +30,8 @@
 			<div class="total"><dt>Total</dt><dd>${money(s.total)}</dd></div>`;
 		document.getElementById('pay-amount').textContent = money(s.total);
 		document.getElementById('earn-points').textContent = Math.floor(s.total);
+		total = s.total;
+		updatePayState();
 	}
 
 	/* ---------------- voucher cards ---------------- */
@@ -102,19 +105,121 @@
 		lastSubtotal = ev.detail.subtotal;
 	});
 
+	/* ---------------- delivery address ---------------- */
+	const ADDR_API = 'api/customer/addresses.php';
+	const hasStripe = payBtn.dataset.stripe === '1';
+	const currentEl = document.getElementById('address-current');
+	const optionsEl = document.getElementById('address-options');
+	const pickEl = document.getElementById('address-pick');
+	const addrForm = document.getElementById('address-form');
+	let addresses = JSON.parse(document.getElementById('address-initial').textContent || '[]');
+	let total = 0;
+	let chosenId = null;
+
+	const clean = (v) => (v && v !== '-' ? v : ''); // old migrated rows used "-" placeholders
+	const addrText = (a) => [clean(a.Line1), clean(a.Line2), [clean(a.Postcode), clean(a.City)].filter(Boolean).join(' '), clean(a.State)].filter(Boolean).map(esc).join(', ');
+
+	function renderCurrent() {
+		const a = addresses[0];
+		document.querySelector('#address-change span').textContent = a ? 'Change' : 'Add address';
+		currentEl.innerHTML = a
+			? `<p class="address-line">${icon('pin')}<span><strong>${esc(a.Label)} · ${esc(a.Recipient)}</strong><br><span class="muted">${addrText(a)} · ${esc(a.Phone)}</span></span></p>`
+			: `<div class="flash">No delivery address yet — add one to place your order.</div>`;
+		updatePayState();
+	}
+
+	function renderOptions() {
+		chosenId = addresses[0] ? String(addresses[0].Address_ID) : null;
+		optionsEl.innerHTML = addresses
+			.map(
+				(a) => `
+			<label class="address-option">
+				<input type="radio" name="pick" value="${a.Address_ID}" ${String(a.Address_ID) === chosenId ? 'checked' : ''}>
+				<span class="address-option-body">
+					<strong>${esc(a.Label)} · ${esc(a.Recipient)} ${+a.Is_default ? '<span class="pill pill-amber">Current</span>' : ''}</strong>
+					<small>${addrText(a)} · ${esc(a.Phone)}</small>
+				</span>
+			</label>`
+			)
+			.join('');
+	}
+
+	function showForm(on) {
+		pickEl.hidden = on;
+		addrForm.hidden = !on;
+		if (on) {
+			CD.clearErrors(addrForm);
+			addrForm.querySelector('[name=Line1]').focus();
+		}
+	}
+
+	document.getElementById('address-change').addEventListener('click', () => {
+		renderOptions();
+		showForm(addresses.length === 0); // nothing saved yet: go straight to the form
+		CD.modal.open('address-modal');
+	});
+	optionsEl.addEventListener('change', (ev) => (chosenId = ev.target.value));
+	document.getElementById('address-new').addEventListener('click', () => showForm(true));
+	document.getElementById('address-back').addEventListener('click', () => (addresses.length ? showForm(false) : CD.modal.close('address-modal')));
+
+	// Pick a saved address: it becomes the default, which is where this order (and its tracking) goes.
+	document.getElementById('address-use').addEventListener('click', async (ev) => {
+		const btn = ev.currentTarget;
+		if (!chosenId) return;
+		if (addresses[0] && String(addresses[0].Address_ID) === chosenId) return CD.modal.close('address-modal');
+		CD.busy(btn, true);
+		try {
+			addresses = await api(ADDR_API, { action: 'set_default', Address_ID: chosenId });
+			renderCurrent();
+			CD.modal.close('address-modal');
+			toast(`Delivering to ${addresses[0].Label}`);
+		} catch (err) {
+			toast(err.message, 'error');
+		} finally {
+			CD.busy(btn, false);
+		}
+	});
+
+	// Add a new address: saved as the default and used for this order.
+	CD.ajaxForm(addrForm, ADDR_API, {
+		onSuccess: (list) => {
+			addresses = list;
+			renderCurrent();
+			CD.modal.close('address-modal');
+			addrForm.reset();
+			toast('Address saved — delivering there');
+		},
+	});
+
+	/* ---------------- pay button: label + whether it can be pressed ---------------- */
+	function updatePayState() {
+		const free = total <= 0;
+		const hint = document.getElementById('pay-hint');
+		let why = '';
+		if (!addresses.length) why = 'Add a delivery address to continue.';
+		else if (!free && !hasStripe) why = 'Card payments aren’t set up on this server.';
+		payBtn.disabled = !!why;
+		hint.hidden = !why;
+		hint.textContent = why;
+		document.getElementById('pay-label').textContent = free ? 'Place free order' : 'Pay';
+		document.getElementById('pay-amount').hidden = free;
+	}
+
+	renderCurrent();
+
 	const initial = JSON.parse(document.getElementById('cart-initial').textContent);
 	lastSubtotal = initial.subtotal;
 	renderSummary(initial);
 	loadVouchers();
 
-	/* ---------------- pay: go to Stripe's hosted page ---------------- */
+	/* ---------------- pay: go to Stripe's hosted page (or the receipt, for a free order) ---------------- */
 	payBtn.addEventListener('click', async () => {
 		const errEl = document.getElementById('pay-error');
 		if (errEl) errEl.textContent = '';
 		CD.busy(payBtn, true);
 		try {
 			const { url } = await api('api/shop/checkout.php', { action: 'session' });
-			location.href = url; // Stripe Checkout; it returns to customer/checkout_return.php
+			location.href = url; // Stripe Checkout (returns to customer/checkout_return.php), or the receipt when free
 		} catch (err) {
 			if (errEl) errEl.textContent = err.message;
 			toast(err.message, 'error');

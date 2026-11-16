@@ -4,17 +4,21 @@ The new UI is complete and **does not use any old file**. The old pages are stil
 
 ## 1. Database (already applied to `cafedash_db`)
 
-Run in order on any other machine. Both are additive and safe to re-run.
+Run in order on any other machine. All are additive and safe to re-run.
 
 ```
 C:\xampp\mysql\bin\mysql.exe -uroot cafedash_db < SQL/migration_v2.sql
 C:\xampp\mysql\bin\mysql.exe -uroot cafedash_db < SQL/migration_v3.sql
+C:\xampp\mysql\bin\mysql.exe -uroot cafedash_db < SQL/migration_v4_tracking.sql
+C:\xampp\mysql\bin\mysql.exe -uroot cafedash_db < SQL/migration_v5_rewards.sql
 ```
 
 | File | Adds |
 |---|---|
 | `migration_v2.sql` | `User.Created_at`, `User.Deleted_at`, `User_Address`, `Staff`, `Promotion`, `Promotion_Redemption` |
 | `migration_v3.sql` | `Payment.Discount_amount`, `Payment.Promo_ID`, `contact_us.Is_read`, `contact_us.User_ID` |
+| `migration_v4_tracking.sql` | Order tracking tables (Zerry). Never import `rollback_v4_tracking.sql`. |
+| `migration_v5_rewards.sql` | `Promotion.Points_cost`, `Promotion.Per_user_limit`, `User_Voucher` (points rewards) + 5 demo rewards |
 
 Not dropped yet, because old pages still use them: tables `Admin`, `Driver`; column `User.Address`.
 

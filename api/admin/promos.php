@@ -2,6 +2,8 @@
 /**
  * Module 2 — Promotional vouchers (AJAX). Managers and Super Admins.
  * POST action = list | create | update | toggle | delete
+ * Vouchers with Points_cost > 0 are loyalty rewards (members redeem them with points).
+ * Release schedule = Starts_at: send release=now, or release=schedule with a Starts_at date/time.
  */
 require __DIR__ . '/../../app/bootstrap.php';
 
@@ -23,7 +25,7 @@ function promo_by_id(int $id): array
 	return $row;
 }
 
-function promo_input(?int $ignoreId = null): array
+function promo_input(?int $ignoreId = null, ?array $existing = null): array
 {
 	$d = [
 		'Code'             => strtoupper(input('Code')),
@@ -32,6 +34,8 @@ function promo_input(?int $ignoreId = null): array
 		'Discount_percent' => input('Discount_percent'),
 		'Max_redemptions'  => input('Max_redemptions'),
 		'Min_spend'        => input('Min_spend', '0'),
+		'Points_cost'      => input('Points_cost', '0'),
+		'Per_user_limit'   => input('Per_user_limit', '1'),
 		'Starts_at'        => input('Starts_at'),
 		'Expires_at'       => input('Expires_at'),
 	];
@@ -44,11 +48,22 @@ function promo_input(?int $ignoreId = null): array
 	if ($d['Min_spend'] === '') $d['Min_spend'] = '0';
 	if (!is_numeric($d['Min_spend']) || $d['Min_spend'] < 0) $e['Min_spend'] = 'Zero or more.';
 
+	// Loyalty reward settings: 0 points = free code for everyone; above 0 = members redeem it with points.
+	if ($d['Points_cost'] === '') $d['Points_cost'] = '0';
+	if (!ctype_digit($d['Points_cost']) || (int) $d['Points_cost'] > 1000000) $e['Points_cost'] = 'Whole number from 0 to 1,000,000.';
+	if ($d['Per_user_limit'] === '') $d['Per_user_limit'] = '1';
+	if (!ctype_digit($d['Per_user_limit']) || (int) $d['Per_user_limit'] < 1 || (int) $d['Per_user_limit'] > 100) $e['Per_user_limit'] = 'Between 1 and 100.';
+
+	// Release schedule: "now" releases immediately; "schedule" uses the chosen date and time.
+	if (input('release', 'schedule') === 'now') {
+		$alreadyOut = $existing && strtotime($existing['Starts_at']) <= time();
+		$d['Starts_at'] = $alreadyOut ? date('Y-m-d\TH:i', strtotime($existing['Starts_at'])) : date('Y-m-d\TH:i');
+	}
 	$start = DateTime::createFromFormat('Y-m-d\TH:i', $d['Starts_at']);
 	$end = DateTime::createFromFormat('Y-m-d\TH:i', $d['Expires_at']);
-	if (!$start) $e['Starts_at'] = 'Pick a start date and time.';
+	if (!$start) $e['Starts_at'] = 'Pick a release date and time.';
 	if (!$end) $e['Expires_at'] = 'Pick an expiry date and time.';
-	if ($start && $end && $end <= $start) $e['Expires_at'] = 'Must be after the start.';
+	if ($start && $end && $end <= $start) $e['Expires_at'] = 'Must be after the release.';
 
 	if (!isset($e['Code'])) {
 		$clash = q_one('SELECT Promo_ID FROM Promotion WHERE Code = ? AND Promo_ID <> ?', [$d['Code'], $ignoreId ?? 0]);
@@ -59,6 +74,8 @@ function promo_input(?int $ignoreId = null): array
 	$d['Discount_percent'] = round((float) $d['Discount_percent'], 2);
 	$d['Min_spend'] = round((float) $d['Min_spend'], 2);
 	$d['Max_redemptions'] = $d['Max_redemptions'] === '' ? null : (int) $d['Max_redemptions'];
+	$d['Points_cost'] = (int) $d['Points_cost'];
+	$d['Per_user_limit'] = (int) $d['Per_user_limit'];
 	$d['Description'] = $d['Description'] === '' ? null : $d['Description'];
 	$d['Starts_at'] = $start->format('Y-m-d H:i:00');
 	$d['Expires_at'] = $end->format('Y-m-d H:i:00');
@@ -78,20 +95,24 @@ switch ($action) {
 
 	case 'create':
 		$d = promo_input();
-		q('INSERT INTO Promotion (Code, Title, Description, Discount_percent, Max_redemptions, Min_spend, Starts_at, Expires_at, Created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-			$d['Code'], $d['Title'], $d['Description'], $d['Discount_percent'], $d['Max_redemptions'], $d['Min_spend'], $d['Starts_at'], $d['Expires_at'], (int) $staff['Staff_ID'],
+		q('INSERT INTO Promotion (Code, Title, Description, Discount_percent, Max_redemptions, Min_spend, Points_cost, Per_user_limit, Starts_at, Expires_at, Created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+			$d['Code'], $d['Title'], $d['Description'], $d['Discount_percent'], $d['Max_redemptions'], $d['Min_spend'], $d['Points_cost'], $d['Per_user_limit'], $d['Starts_at'], $d['Expires_at'], (int) $staff['Staff_ID'],
 		]);
 		json_out(true, promo_by_id((int) db()->insert_id));
 
 	case 'update':
 		$id = (int) input('Promo_ID');
 		$existing = promo_by_id($id);
-		$d = promo_input($id);
+		$d = promo_input($id, $existing);
 		if ($d['Max_redemptions'] !== null && $d['Max_redemptions'] < (int) $existing['Redemption_count']) {
 			json_out(false, ['fields' => ['Max_redemptions' => 'Already redeemed ' . $existing['Redemption_count'] . ' times.']], 'Limit is below current redemptions.', 422);
 		}
-		q('UPDATE Promotion SET Code = ?, Title = ?, Description = ?, Discount_percent = ?, Max_redemptions = ?, Min_spend = ?, Starts_at = ?, Expires_at = ? WHERE Promo_ID = ?', [
-			$d['Code'], $d['Title'], $d['Description'], $d['Discount_percent'], $d['Max_redemptions'], $d['Min_spend'], $d['Starts_at'], $d['Expires_at'], $id,
+		$held = (int) q_one('SELECT COUNT(*) c FROM User_Voucher WHERE Promo_ID = ?', [$id])['c'];
+		if ($held && $d['Points_cost'] === 0) {
+			json_out(false, ['fields' => ['Points_cost' => $held . ' redeemed with points — keep a points cost.']], 'Members already redeemed this reward with points.', 422);
+		}
+		q('UPDATE Promotion SET Code = ?, Title = ?, Description = ?, Discount_percent = ?, Max_redemptions = ?, Min_spend = ?, Points_cost = ?, Per_user_limit = ?, Starts_at = ?, Expires_at = ? WHERE Promo_ID = ?', [
+			$d['Code'], $d['Title'], $d['Description'], $d['Discount_percent'], $d['Max_redemptions'], $d['Min_spend'], $d['Points_cost'], $d['Per_user_limit'], $d['Starts_at'], $d['Expires_at'], $id,
 		]);
 		json_out(true, promo_by_id($id));
 
@@ -105,6 +126,9 @@ switch ($action) {
 	case 'delete':
 		$id = (int) input('Promo_ID');
 		promo_by_id($id);
+		// Members who spent points on this voucher must keep it: pause it instead of deleting.
+		$held = (int) q_one('SELECT COUNT(*) c FROM User_Voucher WHERE Promo_ID = ?', [$id])['c'];
+		if ($held) json_out(false, null, 'Members have redeemed this ' . $held . ' time' . ($held === 1 ? '' : 's') . ' with points, so it can’t be deleted. Deactivate it instead.', 409);
 		q('DELETE FROM Promotion WHERE Promo_ID = ?', [$id]);
 		json_out(true, ['Promo_ID' => $id]);
 

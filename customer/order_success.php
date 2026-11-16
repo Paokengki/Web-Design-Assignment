@@ -1,7 +1,7 @@
 <?php
 /** Order confirmation — replaces payment_cart/Payment_success.php. */
 require __DIR__ . '/../app/layout/master.php';
-require __DIR__ . '/../app/loyalty.php';
+require_once __DIR__ . '/../app/loyalty.php';
 // Tracking: create a tracking row for this confirmed payment (idempotent, payment-gated).
 require_once __DIR__ . '/../tracking/bootstrap.php';
 
@@ -20,7 +20,7 @@ layout_start(['title' => 'Order confirmed', 'nav' => 'shop', 'styles' => ['pages
 <section class="success glass" data-reveal>
 	<div class="success-mark" aria-hidden="true"><?= icon('check') ?></div>
 	<span class="eyebrow">Order #<?= (int) $order['Payment_ID'] ?></span>
-	<h1>Payment received.</h1>
+	<h1><?= (float) $order['Payment_amount'] > 0 ? 'Payment received.' : 'Order placed.' ?></h1>
 	<p class="muted">Your order is with the kitchen. A receipt is in your <a class="grad-text" href="<?= e(url('customer/orders.php')) ?>"><b>orders</b></a>.</p>
 
 	<div class="success-points">

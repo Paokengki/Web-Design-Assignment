@@ -38,6 +38,9 @@
 				<small>${esc(r.Email || 'no email')}${r.Plate_number ? ' · ' + esc(r.Plate_number) : ''}</small></div>
 			</div></td>
 			<td><span class="pill ${ROLE_CLASS[r.Role]}">${esc(r.Role)}</span></td>
+			<td>${r.Role !== 'Kitchen Staff' ? '<span class="tiny">—</span>'
+				: r.Cafe_name ? esc(r.Cafe_name)
+				: '<span class="pill pill-warn" title="Kitchen staff only see orders from their café. Edit to assign one.">Not assigned</span>'}</td>
 			<td><span class="pill ${STATUS_CLASS[r.Status]}"><span class="dot"></span>${esc(r.Status)}</span></td>
 			<td class="num">${esc(r.Phone || '—')}</td>
 			<td class="num">${fmt(r.Created_at)}</td>
@@ -53,7 +56,7 @@
 	function render(animate) {
 		tbody.innerHTML = state.rows.length
 			? state.rows.map(rowHtml).join('')
-			: '<tr><td colspan="7"><div class="empty">No staff match these filters.</div></td></tr>';
+			: '<tr><td colspan="8"><div class="empty">No staff match these filters.</div></td></tr>';
 		if (animate) CD.stagger(tbody.children);
 	}
 
@@ -114,9 +117,12 @@
 	});
 
 	/* ---------------------------------------------- add / edit form */
+	// Show the fields a role uses: vehicle plate for couriers, café for kitchen staff.
 	function syncCourierField() {
 		const isCourier = form.elements.action.value === 'create' ? form.elements.Role.value === 'Courier' : form.dataset.role === 'Courier';
 		form.querySelector('[data-courier-only]').hidden = !isCourier;
+		const role = form.elements.action.value === 'create' ? form.elements.Role.value : form.dataset.role;
+		form.querySelector('[data-kitchen-only]').hidden = role !== 'Kitchen Staff';
 	}
 	form.elements.Role.addEventListener('change', syncCourierField);
 
@@ -182,7 +188,7 @@
 			...ASSIGNABLE.filter((role) => role !== r.Role).map((role) => ({
 				label: `Make ${role}`,
 				icon: 'user',
-				onClick: () => run(r, { action: 'set_role', Role: role }, (row) => `${row.Name} is now ${row.Role}`),
+				onClick: () => run(r, { action: 'set_role', Role: role }, (row) => `${row.Name} is now ${row.Role}` + (row.Role === 'Kitchen Staff' && !row.Cafe_name ? ' — click Edit details to assign a café' : '')),
 			})),
 			{ sep: true },
 			{

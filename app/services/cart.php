@@ -120,7 +120,8 @@ function cart_summary(?int $userId = null): array
 	if (!empty($_SESSION['promo_code']) && $lines) {
 		$check = promo_check($_SESSION['promo_code'], $subtotal, $userId);
 		if (is_array($check)) {
-			$promo = ['id' => (int) $check['Promo_ID'], 'code' => $check['Code'], 'percent' => (float) $check['Discount_percent'], 'title' => $check['Title']];
+			$promo = ['id' => (int) $check['Promo_ID'], 'code' => $check['Code'], 'percent' => (float) $check['Discount_percent'], 'title' => $check['Title'],
+				'reward' => promo_is_reward($check)]; // reward = bought with points (spent via User_Voucher)
 			$discount = round($subtotal * $promo['percent'] / 100, 2);
 		} else {
 			$promoError = $check;
