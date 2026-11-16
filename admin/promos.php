@@ -66,7 +66,7 @@ layout_start(['title' => 'Promotions', 'nav' => 'admin', 'active' => 'promos']);
 	<div class="modal-backdrop"></div>
 	<div class="modal-panel wide" role="dialog" aria-modal="true" aria-labelledby="promo-title">
 		<div class="modal-head">
-			<div><h2 id="promo-title">New promotion</h2><p>Customers type the code at checkout.</p></div>
+			<div><h2 id="promo-title">New voucher</h2><p>Free codes show for everyone at checkout. Reward vouchers are redeemed with loyalty points.</p></div>
 			<button class="icon-btn" data-close-modal aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 		</div>
 		<form id="promo-form" novalidate>
@@ -85,13 +85,33 @@ layout_start(['title' => 'Promotions', 'nav' => 'admin', 'active' => 'promos']);
 				<label class="field"><span>Discount %</span><input class="input" name="Discount_percent" type="number" min="1" max="100" step="0.5" required><span class="field-error"></span></label>
 				<label class="field"><span>Max redemptions <em class="tiny">(empty = unlimited)</em></span><input class="input" name="Max_redemptions" type="number" min="1" step="1"><span class="field-error"></span></label>
 				<label class="field"><span>Minimum spend (RM)</span><input class="input" name="Min_spend" type="number" min="0" step="0.01" value="0"><span class="field-error"></span></label>
-				<div></div>
-				<label class="field"><span>Starts</span><input class="input" name="Starts_at" type="datetime-local" required><span class="field-error"></span></label>
-				<label class="field"><span>Expires</span><input class="input" name="Expires_at" type="datetime-local" required><span class="field-error"></span></label>
+				<label class="field"><span>Per member limit <em class="tiny">(times one member can redeem)</em></span><input class="input" name="Per_user_limit" type="number" min="1" max="100" step="1" value="1"><span class="field-error"></span></label>
+
+				<fieldset class="field span-2 reward-box">
+					<legend class="field-label">Loyalty points</legend>
+					<div class="reward-row">
+						<label class="field"><span>Points cost <em class="tiny">(0 = free code for everyone)</em></span>
+							<input class="input" name="Points_cost" type="number" min="0" max="1000000" step="10" value="0"><span class="field-error"></span></label>
+						<div class="reward-hint">
+							<span class="pill" id="promo-kind">Free code</span>
+							<p class="tiny">Suggested for this discount: <b id="points-suggest">0</b> pts <button type="button" class="btn btn-ghost btn-sm" id="points-use">Use</button></p>
+						</div>
+					</div>
+				</fieldset>
+
+				<fieldset class="field span-2">
+					<legend class="field-label">Release</legend>
+					<div class="seg release-seg">
+						<label><input type="radio" name="release" value="now" checked><span>Release now</span></label>
+						<label><input type="radio" name="release" value="schedule"><span>Schedule for later</span></label>
+					</div>
+				</fieldset>
+				<label class="field" id="starts-field" hidden><span>Release date &amp; time</span><input class="input" name="Starts_at" type="datetime-local"><span class="field-error"></span></label>
+				<label class="field" id="expires-field"><span>Expires</span><input class="input" name="Expires_at" type="datetime-local" required><span class="field-error"></span></label>
 			</div>
 			<div class="form-actions">
 				<button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
-				<button type="submit" class="btn btn-primary">Save promotion</button>
+				<button type="submit" class="btn btn-primary">Save voucher</button>
 			</div>
 		</form>
 	</div>

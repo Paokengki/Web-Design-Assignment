@@ -62,6 +62,11 @@
 			<button class="icon-btn danger" data-act="delete" title="Delete" aria-label="Delete ${esc(p.Code)}">${icon('trash')}</button>`;
 	}
 
+	// Reward (costs points) or free code?
+	const kindPill = (p) => (+p.Points_cost > 0
+		? `<span class="pill pill-amber" title="Members redeem this with points, up to ${+p.Per_user_limit}x each">${icon('star')}${(+p.Points_cost).toLocaleString()} pts</span>`
+		: '<span class="pill pill-muted">Free code</span>');
+
 	/* ---------------------------------------------- render */
 	function card(p) {
 		const u = usage(p);
@@ -72,7 +77,7 @@
 				<button class="promo-code" data-act="copy" title="Copy code">${esc(p.Code)}</button>
 				<div class="promo-discount">${pct(p.Discount_percent)}<small>% off</small></div>
 			</div>
-			<h4>${esc(p.Title)} ${paused ? '<span class="pill pill-warn">Paused</span>' : ''}</h4>
+			<h4>${esc(p.Title)} ${kindPill(p)} ${paused ? '<span class="pill pill-warn">Paused</span>' : ''}</h4>
 			<p>${esc(p.Description || '')}${+p.Min_spend > 0 ? ` · min RM${(+p.Min_spend).toFixed(0)}` : ''}</p>
 			<div class="usage">
 				<div class="usage-meta"><span>Redeemed</span><span class="mono">${u.text}</span></div>
@@ -92,7 +97,7 @@
 		return `
 		<tr data-id="${p.Promo_ID}">
 			<td><button class="promo-code" data-act="copy" title="Copy code">${esc(p.Code)}</button></td>
-			<td><strong>${esc(p.Title)}</strong><br><small class="tiny">${esc(p.Description || '')}</small></td>
+			<td><strong>${esc(p.Title)}</strong> ${kindPill(p)}<br><small class="tiny">${esc(p.Description || '')}</small></td>
 			<td class="num"><strong>${pct(p.Discount_percent)}%</strong>${+p.Min_spend > 0 ? `<br><small class="tiny">min RM${(+p.Min_spend).toFixed(0)}</small>` : ''}</td>
 			<td class="num" style="min-width:140px"><span class="mono tiny">${u.text}</span><div class="usage-bar" style="--c:${s.color};margin-top:6px"><i style="width:${u.max ? u.ratio : 100}%;${u.max ? '' : 'opacity:.25'}"></i></div></td>
 			<td><small>${fmtDate(p.Starts_at)} → ${fmtDate(p.Expires_at)}</small><br><small class="tiny">${relative(p)}</small></td>
@@ -178,10 +183,15 @@
 		form.reset();
 		const editing = !!p;
 		form.elements.action.value = editing ? 'update' : 'create';
-		document.getElementById('promo-title').textContent = editing ? `Edit ${p.Code}` : 'New promotion';
+		document.getElementById('promo-title').textContent = editing ? `Edit ${p.Code}` : 'New voucher';
 		if (editing) {
 			CD.fillForm(form, { ...p, Starts_at: toInput(p.Starts_at), Expires_at: toInput(p.Expires_at), Discount_percent: pct(p.Discount_percent), Min_spend: (+p.Min_spend).toFixed(2) });
+			// already released: "Release now" keeps its original release time; not yet released: show the schedule
+			setRelease(toDate(p.Starts_at) > new Date() ? 'schedule' : 'now');
 		} else {
+			setRelease('now');
+			form.elements.Points_cost.value = '0';
+			form.elements.Per_user_limit.value = '1';
 			const start = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
 			const end = new Date(start.getTime() + 14 * 86400000);
 			form.elements.Promo_ID.value = '';
@@ -189,8 +199,36 @@
 			form.elements.Expires_at.value = end.toISOString().slice(0, 16);
 			form.elements.Min_spend.value = '0';
 		}
+		syncReward();
 		modal.open('promo-modal');
 	}
+
+	/* release: now or scheduled */
+	function setRelease(mode) {
+		form.querySelector(`[name=release][value=${mode}]`).checked = true;
+		document.getElementById('starts-field').hidden = mode !== 'schedule';
+		form.elements.Starts_at.required = mode === 'schedule';
+	}
+	form.querySelectorAll('[name=release]').forEach((r) => r.addEventListener('change', () => setRelease(r.value)));
+
+	/* points: higher discounts should cost more, so the suggested price grows faster than the discount */
+	const suggestPoints = (pctOff) => Math.max(10, Math.round((Math.pow(pctOff, 1.25) * 2.8) / 10) * 10);
+	function syncReward() {
+		const cost = +form.elements.Points_cost.value || 0;
+		const off = +form.elements.Discount_percent.value || 0;
+		const kind = document.getElementById('promo-kind');
+		kind.textContent = cost > 0 ? `Reward · ${cost.toLocaleString()} pts` : 'Free code';
+		kind.className = 'pill ' + (cost > 0 ? 'pill-amber' : 'pill-muted');
+		document.getElementById('points-suggest').textContent = off > 0 ? suggestPoints(off).toLocaleString() : '—';
+	}
+	form.elements.Points_cost.addEventListener('input', syncReward);
+	form.elements.Discount_percent.addEventListener('input', syncReward);
+	document.getElementById('points-use').addEventListener('click', () => {
+		const off = +form.elements.Discount_percent.value || 0;
+		if (!off) return CD.toast('Enter the discount % first.', 'info');
+		form.elements.Points_cost.value = suggestPoints(off);
+		syncReward();
+	});
 
 	CD.ajaxForm(form, API, {
 		onSuccess: (p) => {

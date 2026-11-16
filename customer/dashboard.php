@@ -1,14 +1,16 @@
 <?php
 /** Module 1 — Customer Profile & Loyalty dashboard. */
 require __DIR__ . '/../app/layout/master.php';
-require __DIR__ . '/../app/loyalty.php';
+require_once __DIR__ . '/../app/loyalty.php';
+require_once __DIR__ . '/../app/services/promo.php';
 
 $user = require_customer();
 $uid = (int) $user['User_ID'];
 
 $totals = q_one("SELECT COUNT(*) AS orders, COALESCE(SUM(Payment_amount), 0) AS spent
 	FROM Payment WHERE User_ID = ? AND Payment_status = 'SUCCEEDED'", [$uid]);
-$loyalty = loyalty_for((float) $totals['spent']);
+$loyalty = loyalty_summary($uid); // tier from lifetime points + spendable balance
+$rewardData = ['points' => $loyalty, 'rewards' => rewards_catalog($uid), 'vouchers' => rewards_owned($uid)];
 
 $recent = q_all("SELECT p.Payment_ID, p.Payment_amount, p.Payment_status, p.Created_at, r.Name AS cafe
 	FROM Payment p LEFT JOIN Restaurant r ON r.Restaurant_ID = p.Restaurant_ID
@@ -50,14 +52,15 @@ layout_start(['title' => 'Dashboard', 'nav' => 'shop', 'active' => 'dashboard', 
 
 			<div class="points" data-loyalty='<?= e(json_encode($loyalty)) ?>'>
 				<div class="points-head">
-					<small class="muted">Loyalty points</small>
+					<small class="muted">Points to spend</small>
 					<span class="tier tier-<?= e($loyalty['tier']) ?>"><?= e($loyalty['tier']) ?></span>
 				</div>
-				<div class="points-value" data-count="<?= (int) $loyalty['points'] ?>">0</div>
+				<div class="points-value" id="points-balance" data-count="<?= (int) $loyalty['balance'] ?>">0</div>
+				<small class="tiny points-split">Earned <b id="points-earned"><?= number_format($loyalty['earned']) ?></b> · Spent on rewards <b id="points-spent"><?= number_format($loyalty['spent']) ?></b></small>
 				<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= (int) $loyalty['progress'] ?>"><i></i></div>
 				<small class="tiny">
 					<?php if ($loyalty['next']): ?>
-						<?= number_format($loyalty['to_next']) ?> pts to <?= e($loyalty['next']) ?>
+						<?= number_format($loyalty['to_next']) ?> pts to <?= e($loyalty['next']) ?> <span title="Tiers use every point you have ever earned, so spending points never lowers your tier.">(lifetime)</span>
 					<?php else: ?>
 						Top tier reached — thank you!
 					<?php endif; ?>
@@ -85,8 +88,25 @@ layout_start(['title' => 'Dashboard', 'nav' => 'shop', 'active' => 'dashboard', 
 		</section>
 	</div>
 
-	<!-- ============ RIGHT: addresses, orders, danger zone ============ -->
+	<!-- ============ RIGHT: rewards, addresses, orders, danger zone ============ -->
 	<div class="dash-col">
+		<section class="glass card rewards-card" id="rewards" data-reveal>
+			<div class="card-title">
+				<div>
+					<h3><?= icon('star') ?>Rewards</h3>
+					<p class="tiny">Spend your points on vouchers, then use them at checkout.</p>
+				</div>
+				<span class="points-chip" title="Points you can spend"><b id="rewards-balance"><?= number_format($loyalty['balance']) ?></b> pts</span>
+			</div>
+			<div class="seg rewards-tabs" role="tablist" aria-label="Rewards">
+				<button type="button" class="is-active" role="tab" aria-selected="true" data-rewards-tab="shop">Redeem</button>
+				<button type="button" role="tab" aria-selected="false" data-rewards-tab="mine">My vouchers <span class="tab-count" id="rewards-mine-count"></span></button>
+			</div>
+			<div class="reward-grid" id="reward-shop" role="tabpanel"></div>
+			<div class="reward-grid" id="reward-mine" role="tabpanel" hidden></div>
+			<script type="application/json" id="reward-data"><?= json_encode($rewardData, JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+		</section>
+
 		<section class="glass card" data-reveal>
 			<div class="card-title">
 				<div><h3>Delivery addresses</h3><p class="tiny">Your default address is used at checkout.</p></div>
@@ -229,4 +249,4 @@ layout_start(['title' => 'Dashboard', 'nav' => 'shop', 'active' => 'dashboard', 
 	</div>
 </div>
 
-<?php layout_end(['pages/dashboard.js']);
+<?php layout_end(['pages/dashboard.js', 'pages/rewards.js']);

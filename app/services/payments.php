@@ -53,7 +53,7 @@ function payment_create_session(array $user): string
 	$uid = (int) $user['User_ID'];
 	$sum = cart_summary($uid);
 	if (!$sum['items']) throw new InvalidArgumentException('Your cart is empty.');
-	if ($sum['total'] < 2) throw new InvalidArgumentException('Card payments need a total of at least RM2.00.');
+	if ($sum['total'] < 2) throw new InvalidArgumentException('Card payments need a total of at least RM2.00. Add another item to continue.');
 	if (!q_one('SELECT 1 FROM User_Address WHERE User_ID = ?', [$uid])) throw new InvalidArgumentException('Add a delivery address before paying.');
 
 	$lines = [];
@@ -132,8 +132,30 @@ function payment_finalize_session(array $user, string $sessionId): int
 	return $paymentId;
 }
 
-/** Write Payment + Payment_Item (+ voucher redemption) in one transaction. */
-function record_paid_order(int $uid, array $sum, string $intentId, int $chargedSen, string $currency): int
+/**
+ * A 100% voucher makes the total RM0.00. Stripe cannot charge zero, so the order is placed directly:
+ * no card, Provider = VOUCHER. Everything else (items, voucher use, tracking, receipt) works as usual.
+ */
+function payment_place_free_order(array $user): int
+{
+	$uid = (int) $user['User_ID'];
+	$sum = cart_summary($uid);
+	if (!$sum['items']) throw new InvalidArgumentException('Your cart is empty.');
+	if ($sum['total'] > 0 || !$sum['promo']) throw new InvalidArgumentException('This order needs a card payment.');
+	if (!q_one('SELECT 1 FROM User_Address WHERE User_ID = ?', [$uid])) throw new InvalidArgumentException('Add a delivery address before ordering.');
+
+	$paymentId = record_paid_order($uid, $sum, 'free_' . bin2hex(random_bytes(12)), 0, 'MYR', 'voucher', 'VOUCHER', true);
+	$_SESSION['last_payment_id'] = $paymentId;
+	cart_clear();
+	return $paymentId;
+}
+
+/**
+ * Write Payment + Payment_Item (+ voucher use) in one transaction.
+ * $strictVoucher: fail if a points voucher was already spent elsewhere (used for RM0 orders, where
+ * nothing has been charged yet; for card payments the money is already taken, so we always record).
+ */
+function record_paid_order(int $uid, array $sum, string $intentId, int $chargedSen, string $currency, string $type = 'card', string $provider = 'STRIPE', bool $strictVoucher = false): int
 {
 	$cafes = array_unique(array_column($sum['items'], 'restaurantId'));
 	$restaurantId = count($cafes) === 1 ? (int) reset($cafes) : null;
@@ -142,8 +164,8 @@ function record_paid_order(int $uid, array $sum, string $intentId, int $chargedS
 	try {
 		q('INSERT INTO Payment (User_ID, Restaurant_ID, Payment_type, Payment_amount, Subtotal_amount, SST_amount, Discount_amount, Promo_ID, Currency, Payment_status, Provider, Provider_payment_id, Paid_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())', [
-			$uid, $restaurantId, 'card', round($chargedSen / 100, 2), $sum['subtotal'], $sum['sst'], $sum['discount'], $sum['promo']['id'] ?? null,
-			strtoupper($currency), 'SUCCEEDED', 'STRIPE', $intentId,
+			$uid, $restaurantId, $type, round($chargedSen / 100, 2), $sum['subtotal'], $sum['sst'], $sum['discount'], $sum['promo']['id'] ?? null,
+			strtoupper($currency), 'SUCCEEDED', $provider, $intentId,
 		]);
 		$paymentId = (int) db()->insert_id;
 
@@ -157,7 +179,14 @@ function record_paid_order(int $uid, array $sum, string $intentId, int $chargedS
 
 		if ($sum['promo']) {
 			q('INSERT INTO Promotion_Redemption (Promo_ID, User_ID, Payment_ID, Discount_amount) VALUES (?, ?, ?, ?)', [$sum['promo']['id'], $uid, $paymentId, $sum['discount']]);
-			q('UPDATE Promotion SET Redemption_count = Redemption_count + 1 WHERE Promo_ID = ?', [$sum['promo']['id']]);
+			if (!empty($sum['promo']['reward'])) {
+				// Points voucher: spend the member's oldest unused one (stock was already counted when they redeemed it).
+				$uv = q_one('SELECT User_Voucher_ID FROM User_Voucher WHERE User_ID = ? AND Promo_ID = ? AND Used_at IS NULL ORDER BY Redeemed_at LIMIT 1 FOR UPDATE', [$uid, $sum['promo']['id']]);
+				if ($uv) q('UPDATE User_Voucher SET Used_at = NOW(), Used_payment_id = ? WHERE User_Voucher_ID = ?', [$paymentId, (int) $uv['User_Voucher_ID']]);
+				elseif ($strictVoucher) throw new InvalidArgumentException('That voucher has already been used.');
+			} else {
+				q('UPDATE Promotion SET Redemption_count = Redemption_count + 1 WHERE Promo_ID = ?', [$sum['promo']['id']]);
+			}
 		}
 		db()->commit();
 		return $paymentId;

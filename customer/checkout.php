@@ -13,7 +13,9 @@ if (!$sum['items']) {
 	flash('info', 'Your cart is empty — add something first.');
 	redirect('customer/home.php');
 }
-$address = q_one('SELECT * FROM User_Address WHERE User_ID = ? ORDER BY Is_default DESC, Created_at DESC LIMIT 1', [(int) $user['User_ID']]);
+// All saved addresses; the default one is where this order goes (order tracking reads the default too).
+$addresses = q_all('SELECT Address_ID, Label, Recipient, Phone, Line1, Line2, City, Postcode, State, Is_default FROM User_Address WHERE User_ID = ? ORDER BY Is_default DESC, Created_at DESC', [(int) $user['User_ID']]);
+$address = $addresses[0] ?? null;
 $stripe = stripe_config();
 if (isset($_GET['cancelled'])) flash('info', 'Payment cancelled — nothing was charged. Your cart is still here.');
 
@@ -27,13 +29,11 @@ layout_start(['title' => 'Checkout', 'nav' => 'shop', 'styles' => ['pages/shop.c
 <div class="checkout-grid">
 	<div class="dash-col">
 		<section class="glass card" data-reveal>
-			<div class="card-title"><h3>Deliver to</h3><a class="btn btn-sm btn-ghost" href="<?= e(url('customer/dashboard.php')) ?>">Manage</a></div>
-			<?php if ($address): ?>
-				<p class="address-line"><?= icon('pin') ?><span><strong><?= e($address['Label']) ?> · <?= e($address['Recipient']) ?></strong><br>
-				<span class="muted"><?= e($address['Line1']) ?><?= $address['Line2'] ? ', ' . e($address['Line2']) : '' ?>, <?= e($address['Postcode']) ?> <?= e($address['City']) ?> · <?= e($address['Phone']) ?></span></span></p>
-			<?php else: ?>
-				<div class="flash">No delivery address yet. <a class="grad-text" href="<?= e(url('customer/dashboard.php')) ?>"><b>Add one in your dashboard</b></a> before paying.</div>
-			<?php endif; ?>
+			<div class="card-title">
+				<h3>Deliver to</h3>
+				<button type="button" class="btn btn-sm btn-glass" id="address-change"><?= icon('edit') ?><span><?= $address ? 'Change' : 'Add address' ?></span></button>
+			</div>
+			<div id="address-current" aria-live="polite"></div>
 		</section>
 
 		<section class="glass card" data-reveal>
@@ -53,9 +53,6 @@ layout_start(['title' => 'Checkout', 'nav' => 'shop', 'styles' => ['pages/shop.c
 					</div>
 				</div>
 				<p class="field-error" id="pay-error" role="alert"></p>
-				<?php if (str_starts_with($stripe['publishable_key'], 'pk_test_')): ?>
-					<p class="test-note"><span class="pill pill-warn">Test mode</span> Use card <span class="mono">4242 4242 4242 4242</span>, any future date, any CVC. No real money moves.</p>
-				<?php endif; ?>
 			<?php endif; ?>
 		</section>
 	</div>
@@ -75,11 +72,72 @@ layout_start(['title' => 'Checkout', 'nav' => 'shop', 'styles' => ['pages/shop.c
 		</section>
 
 		<dl class="totals" id="summary-totals"></dl>
-		<button class="btn btn-primary btn-lg btn-block" id="pay-btn" <?= (!$stripe || !$address) ? 'disabled' : '' ?> data-magnetic>
-			<?= icon('lock') ?>Pay <span id="pay-amount"><?= money($sum['total']) ?></span>
+		<button class="btn btn-primary btn-lg btn-block" id="pay-btn" data-stripe="<?= $stripe ? '1' : '0' ?>" <?= !$address ? 'disabled' : '' ?> data-magnetic>
+			<?= icon('lock') ?><span id="pay-label">Pay</span> <span id="pay-amount"><?= money($sum['total']) ?></span>
 		</button>
+		<p class="tiny center" id="pay-hint" hidden></p>
 		<p class="tiny center">You’ll earn about <b id="earn-points"><?= (int) floor($sum['total']) ?></b> loyalty points.</p>
 	</aside>
 </div>
 <script type="application/json" id="cart-initial"><?= json_encode($sum, JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+<script type="application/json" id="address-initial"><?= json_encode($addresses, JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+
+<!-- Change delivery address: pick a saved one or add a new one, without leaving checkout -->
+<div class="modal" id="address-modal">
+	<div class="modal-backdrop"></div>
+	<div class="modal-panel wide" role="dialog" aria-modal="true" aria-labelledby="address-modal-title">
+		<div class="modal-head">
+			<div><h2 id="address-modal-title">Delivery address</h2><p>Your cart stays exactly as it is.</p></div>
+			<button class="icon-btn" data-close-modal aria-label="Close"><?= icon('x') ?></button>
+		</div>
+
+		<div id="address-pick">
+			<div class="address-options" id="address-options" role="radiogroup" aria-label="Saved addresses"></div>
+			<button type="button" class="address-add-row" id="address-new"><?= icon('plus') ?>Add a new address</button>
+			<div class="form-actions">
+				<button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+				<button type="button" class="btn btn-primary" id="address-use">Deliver here</button>
+			</div>
+		</div>
+
+		<form id="address-form" novalidate hidden>
+			<input type="hidden" name="action" value="create">
+			<input type="hidden" name="Is_default" value="1">
+			<div class="form-grid">
+				<label class="field"><span>Label</span>
+					<select class="select" name="Label"><option>Home</option><option>Work</option><option>Campus</option><option>Other</option></select>
+					<span class="field-error"></span></label>
+				<label class="field"><span>Recipient name</span><input class="input" name="Recipient" required autocomplete="name" value="<?= e($user['User_Name']) ?>"><span class="field-error"></span></label>
+				<label class="field"><span>Phone</span><input class="input" name="Phone" type="tel" required autocomplete="tel" value="<?= e($user['Contain_number'] ?? '') ?>"><span class="field-error"></span></label>
+				<label class="field"><span>Postcode</span><input class="input" name="Postcode" required inputmode="numeric" maxlength="5" autocomplete="postal-code"><span class="field-error"></span></label>
+				<label class="field span-2"><span>Address line 1</span><input class="input" name="Line1" required autocomplete="address-line1"><span class="field-error"></span></label>
+				<label class="field span-2"><span>Address line 2 <em class="tiny">(optional)</em></span><input class="input" name="Line2" autocomplete="address-line2"><span class="field-error"></span></label>
+				<label class="field"><span>City</span><input class="input" name="City" required autocomplete="address-level2"><span class="field-error"></span></label>
+				<label class="field"><span>State</span>
+					<select class="select" name="State" required>
+						<option>Kuala Lumpur</option>
+						<option>Selangor</option>
+						<option>Putrajaya</option>
+						<option>Johor</option>
+						<option>Kedah</option>
+						<option>Kelantan</option>
+						<option>Labuan</option>
+						<option>Melaka</option>
+						<option>Negeri Sembilan</option>
+						<option>Pahang</option>
+						<option>Penang</option>
+						<option>Perak</option>
+						<option>Perlis</option>
+						<option>Sabah</option>
+						<option>Sarawak</option>
+						<option>Terengganu</option>
+					</select><span class="field-error"></span></label>
+			</div>
+			<div class="form-actions">
+				<button type="button" class="btn btn-ghost" id="address-back">Back</button>
+				<button type="submit" class="btn btn-primary">Save &amp; deliver here</button>
+			</div>
+		</form>
+	</div>
+</div>
 <?php layout_end(['pages/checkout.js']);

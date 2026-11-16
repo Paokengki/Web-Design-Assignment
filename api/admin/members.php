@@ -6,7 +6,7 @@
  * Nothing is ever hard-deleted, so order history stays intact.
  */
 require __DIR__ . '/../../app/bootstrap.php';
-require __DIR__ . '/../../app/loyalty.php';
+require_once __DIR__ . '/../../app/loyalty.php';
 
 $action = api_start();
 require_staff(ADMIN_ROLES);

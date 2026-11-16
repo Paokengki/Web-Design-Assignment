@@ -28,7 +28,7 @@
 .nav-none .main { padding-top: 40px; }
 .auth .main, .landing .main { padding: 0; max-width: none; }
 
-@media (max-width: 760px) {
+@media (max-width: 767px) {
 	.topnav-links { display: none; }
 	.topnav { padding-left: 12px; }
 	.brand > span { font-size: 16px; }
@@ -88,10 +88,15 @@
 }
 .topnav.is-light .icon-btn { color: #4a443d; }
 .nav-avatar .avatar { border-color: var(--glass-border-hi); }
-.nav-toggle { display: none; }
-@media (max-width: 760px) {
+/* Hamburger: mobile only. `.topnav .nav-toggle` (two classes) is needed because buttons.css loads later
+   and its `.icon-btn { display: inline-grid }` would otherwise win and show the button on desktop. */
+.topnav .nav-toggle { display: none; }
+@media (min-width: 768px) {
+	.topnav .topnav-links { display: flex; } /* desktop: links always visible, even if the mobile menu was left open */
+}
+@media (max-width: 767px) {
 	.hide-sm { display: none !important; }
-	.nav-toggle { display: inline-grid; }
+	.topnav .nav-toggle { display: inline-grid; }
 	.topnav { flex-wrap: wrap; height: auto; min-height: 60px; border-radius: 24px; padding-top: 10px; padding-bottom: 10px; }
 	.topnav.is-open .topnav-links { display: grid; width: 100%; order: 3; padding: 8px 0 4px; gap: 2px; }
 	.topnav.is-open .topnav-links a { padding: 12px 14px; }

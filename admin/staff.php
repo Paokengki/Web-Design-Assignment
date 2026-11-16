@@ -2,6 +2,7 @@
 /** Module 3 — Admin User & Staff Management. Super Admin only. */
 require __DIR__ . '/../app/layout/master.php';
 $me = require_staff(['Super Admin']);
+$cafes = q_all('SELECT Restaurant_ID, Name FROM Restaurant ORDER BY Name'); // for assigning kitchen staff
 
 layout_start(['title' => 'Staff', 'nav' => 'admin', 'active' => 'staff']);
 ?>
@@ -62,10 +63,10 @@ layout_start(['title' => 'Staff', 'nav' => 'admin', 'active' => 'staff']);
 	<div class="table-scroll">
 		<table class="table" id="staff-table">
 			<thead><tr>
-				<th>Staff member</th><th>Role</th><th>Status</th><th>Phone</th><th>Created</th><th>Last sign-in</th><th><span class="sr-only">Actions</span></th>
+				<th>Staff member</th><th>Role</th><th>Café</th><th>Status</th><th>Phone</th><th>Created</th><th>Last sign-in</th><th><span class="sr-only">Actions</span></th>
 			</tr></thead>
 			<tbody>
-				<?php for ($i = 0; $i < 4; $i++): ?><tr><td colspan="7"><div class="skeleton" style="height:28px"></div></td></tr><?php endfor; ?>
+				<?php for ($i = 0; $i < 4; $i++): ?><tr><td colspan="8"><div class="skeleton" style="height:28px"></div></td></tr><?php endfor; ?>
 			</tbody>
 		</table>
 	</div>
@@ -96,6 +97,12 @@ layout_start(['title' => 'Staff', 'nav' => 'admin', 'active' => 'staff']);
 				<label class="field" data-create-only><span>Role</span>
 					<select class="select" name="Role">
 						<?php foreach (ASSIGNABLE_ROLES as $r): ?><option><?= e($r) ?></option><?php endforeach; ?>
+					</select><span class="field-error"></span>
+				</label>
+				<label class="field" data-kitchen-only><span>Café <em class="tiny">(they see only this café's orders)</em></span>
+					<select class="select" name="Assigned_Restaurant_ID">
+						<option value="">Not assigned yet</option>
+						<?php foreach ($cafes as $c): ?><option value="<?= (int) $c['Restaurant_ID'] ?>"><?= e($c['Name']) ?></option><?php endforeach; ?>
 					</select><span class="field-error"></span>
 				</label>
 				<label class="field" data-courier-only><span>Vehicle plate</span><input class="input" name="Plate_number" style="text-transform:uppercase" placeholder="WXY 1234"><span class="field-error"></span></label>

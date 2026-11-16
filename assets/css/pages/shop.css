@@ -177,3 +177,18 @@ code { font: 12px var(--mono); padding: 2px 6px; border-radius: 6px; background:
 .hp { position: absolute; left: -9999px; }
 .sent { display: grid; gap: 14px; justify-items: center; text-align: center; padding: 40px 0; }
 @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+/* ---------- checkout: change delivery address ---------- */
+.card-title .btn .ico { width: 15px; height: 15px; }
+.address-options { display: grid; gap: 10px; max-height: 50vh; overflow-y: auto; padding: 2px; }
+.address-option { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border); background: rgba(255,255,255,.03); cursor: pointer; transition: border-color .2s, background .2s; }
+.address-option:hover { border-color: var(--glass-border-hi); }
+.address-option:has(input:checked) { border-color: rgba(245,165,36,.6); background: rgba(245,165,36,.07); box-shadow: inset 0 0 0 1px rgba(245,165,36,.25); }
+.address-option input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--amber); flex: none; }
+.address-option-body { display: grid; gap: 3px; min-width: 0; }
+.address-option-body strong { font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.address-option-body small { font-size: 13px; color: var(--text-2); }
+.address-add-row { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; padding: 12px; border-radius: 14px; border: 1px dashed var(--glass-border-hi); background: transparent; color: var(--text-2); font: 600 14px var(--font); cursor: pointer; }
+.address-add-row:hover { color: var(--amber-2); border-color: rgba(245,165,36,.6); }
+.address-add-row .ico { width: 16px; height: 16px; }
+#pay-hint { color: var(--warn); }

@@ -43,7 +43,7 @@ function layout_start(array $o = []): void
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
 	<?php foreach (array_merge(CORE_CSS, $nav === 'shop' ? ['components/cart.css'] : [], $o['styles'] ?? []) as $css): ?>
-	<link rel="stylesheet" href="<?= e(asset('assets/css/' . $css)) ?>">
+	<link rel="stylesheet" href="<?= e(asset(layout_asset_path('css', $css))) ?>">
 	<?php endforeach; ?>
 </head>
 <body class="<?= e($body) ?> nav-<?= e($nav) ?>">
@@ -82,11 +82,23 @@ function layout_end(array $scripts = []): void
 	<script src="<?= e(asset('assets/vendor/gsap.min.js')) ?>"></script>
 	<script src="<?= e(asset('assets/vendor/ScrollTrigger.min.js')) ?>"></script>
 	<?php foreach ($js as $file): ?>
-	<script src="<?= e(asset('assets/js/' . $file)) ?>"></script>
+	<script src="<?= e(asset(layout_asset_path('js', $file))) ?>"></script>
 	<?php endforeach; ?>
 </body>
 </html>
 <?php
+}
+
+/**
+ * Where a page's extra CSS/JS file lives.
+ * Short names ('pages/staff.js') live under assets/js or assets/css.
+ * A full path from the project root ('tracking/assets/js/kitchen-orders.js', used by the order-tracking
+ * module) is used as given when that file exists.
+ */
+function layout_asset_path(string $kind, string $file): string
+{
+	$file = ltrim($file, '/');
+	return is_file(dirname(__DIR__, 2) . '/' . $file) ? $file : "assets/$kind/$file";
 }
 
 /* ------------------------------------------------------------------ pieces */
