@@ -1,0 +1,34 @@
+/* Feedback & Ratings — shared by customer/reviews.php and admin/reviews.php */
+.stars { color: var(--amber, #f5a623); letter-spacing: 2px; white-space: nowrap; }
+.stars .off { opacity: .28; }
+
+/* clickable 1-5 star input (DOM order 5..1 + row-reverse so hovering fills the stars to the left) */
+.star-input { display: inline-flex; flex-direction: row-reverse; gap: 4px; }
+.star-input input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.star-input label { font-size: 2.2rem; line-height: 1; cursor: pointer; color: var(--muted, #8a8a8a); transition: color .15s, transform .15s; }
+.star-input label:hover,
+.star-input label:hover ~ label,
+.star-input input:checked ~ label { color: var(--amber, #f5a623); }
+.star-input label:hover { transform: scale(1.15); }
+.star-input input:focus-visible + label { outline: 2px solid var(--amber, #f5a623); outline-offset: 3px; border-radius: 6px; }
+
+/* customer page */
+.rv-tabs { margin-bottom: 18px; }
+.rv-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.rv-card { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.rv-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.rv-head h3 { margin: 0; font-size: 1.05rem; }
+.rv-meta { font-size: .82rem; color: var(--muted, #8a8a8a); }
+.rv-comment { white-space: pre-wrap; word-break: break-word; margin: 0; }
+.rv-reply { border-left: 3px solid var(--amber, #f5a623); padding: 8px 12px; border-radius: 0 8px 8px 0; background: rgba(245, 166, 35, .08); }
+.rv-reply strong { display: block; font-size: .78rem; margin-bottom: 2px; }
+.rv-note { font-size: .82rem; padding: 8px 12px; border-radius: 8px; background: rgba(255, 180, 60, .12); }
+.rv-actions { display: flex; gap: 8px; align-items: center; margin-top: auto; flex-wrap: wrap; }
+
+/* admin table */
+.rv-text { max-width: 380px; }
+.rv-clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+.rv-reply-line { margin-top: 6px; font-size: .82rem; color: var(--muted, #8a8a8a); }
+tr.is-hidden-row td { opacity: .5; }
+.rv-preview { padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, .05); margin-bottom: 14px; }
+.rv-preview p { margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; }

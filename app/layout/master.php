@@ -126,7 +126,7 @@ function render_top_nav(string $active): void
 {
 	$user = current_user();
 	$links = $user
-		? ['cafes' => ['Cafés', 'customer/home.php'], 'orders' => ['Orders', 'customer/orders.php'], 'dashboard' => ['Dashboard', 'customer/dashboard.php'], 'feedback' => ['Feedback', 'customer/feedback.php']]
+		? ['cafes' => ['Cafés', 'customer/home.php'], 'orders' => ['Orders', 'customer/orders.php'], 'dashboard' => ['Dashboard', 'customer/dashboard.php'], 'reviews' => ['My reviews', 'customer/reviews.php'], 'feedback' => ['Feedback', 'customer/feedback.php']]
 		: ['cafes' => ['Cafés', 'customer/home.php'], 'rewards' => ['Rewards', 'index.php#rewards'], 'feedback' => ['Feedback', 'customer/feedback.php']];
 	?>
 	<header class="topnav" data-nav>
@@ -141,6 +141,7 @@ function render_top_nav(string $active): void
 				<?= icon('bag') ?><span class="cart-count" data-cart-count hidden>0</span>
 			</button>
 			<?php if ($user): ?>
+				<a class="btn btn-ghost btn-sm hide-sm" href="<?= e(url('customer/register_cafe.php')) ?>">List your café</a>
 				<a class="nav-avatar" href="<?= e(url('customer/dashboard.php')) ?>" title="Dashboard"><?= avatar_html($user, 'avatar-sm') ?></a>
 				<form method="post" action="<?= e(url('auth/logout.php')) ?>" class="hide-sm">
 					<?= csrf_field() ?>
@@ -163,8 +164,10 @@ function admin_nav_items(): array
 		'overview'    => ['Overview', 'admin/overview.php', 'chart', ADMIN_ROLES],
 		'promos'      => ['Promotions', 'admin/promos.php', 'tag', ADMIN_ROLES],
 		'restaurants' => ['Cafés & menu', 'admin/restaurants.php', 'store', ADMIN_ROLES],
+		'applications' => ['Café applications', 'admin/applications.php', 'inbox', ADMIN_ROLES],
 		'members'     => ['Members', 'admin/members.php', 'users', ADMIN_ROLES],
 		'feedback'    => ['Feedback', 'admin/feedback.php', 'inbox', ADMIN_ROLES],
+		'reviews'     => ['Reviews & ratings', 'admin/reviews.php', 'chart', ADMIN_ROLES],
 		'tracking'    => ['Live Orders', 'tracking/manager/deliveries.php', 'truck', ADMIN_ROLES],
 		'kitchen'     => ['Kitchen orders', 'tracking/kitchen/orders.php', 'receipt', ['Kitchen Staff']],
 		'courier'     => ['My deliveries', 'tracking/courier/deliveries.php', 'truck', ['Courier']],
@@ -180,6 +183,10 @@ function render_admin_sidebar(string $active): void
 	try {
 		$unread = (int) (q_one('SELECT COUNT(*) c FROM contact_us WHERE Is_read = 0')['c'] ?? 0);
 	} catch (Throwable $e) { /* column added by migration_v3 */ }
+	$pendingApps = 0;
+	try {
+		$pendingApps = (int) (q_one("SELECT COUNT(*) c FROM Restaurant_Application WHERE Status = 'Pending'")['c'] ?? 0);
+	} catch (Throwable $e) { /* table added by migration_v6 */ }
 	?>
 	<aside class="sidebar glass">
 		<a class="brand" href="<?= e(url(match ($staff['Role'] ?? '') { 'Kitchen Staff' => 'tracking/kitchen/orders.php', 'Courier' => 'tracking/courier/deliveries.php', default => 'admin/overview.php' })) ?>"><?= logo_mark() ?><span><?= APP_NAME ?><small>Control</small></span></a>
@@ -189,6 +196,7 @@ function render_admin_sidebar(string $active): void
 				<a class="<?= $active === $key ? 'is-active' : '' ?>" href="<?= e(url($href)) ?>"<?= $active === $key ? ' aria-current="page"' : '' ?>>
 					<?= icon($icon) ?><span><?= e($label) ?></span>
 					<?php if ($key === 'feedback' && $unread): ?><b class="side-badge" data-unread><?= $unread ?></b><?php endif; ?>
+					<?php if ($key === 'applications' && $pendingApps): ?><b class="side-badge"><?= $pendingApps ?></b><?php endif; ?>
 				</a>
 			<?php endforeach; ?>
 		</nav>
@@ -268,7 +276,7 @@ function render_footer(): void
 	<footer class="footer">
 		<div class="brand"><?= logo_mark() ?><span><?= APP_NAME ?></span></div>
 		<p>Every craving, one tap. Kuala Lumpur · <?= date('Y') ?></p>
-		<nav aria-label="Footer"><a href="<?= e(url('customer/home.php')) ?>">Cafés</a><a href="<?= e(url('customer/feedback.php')) ?>">Feedback</a><a href="<?= e(url('auth/staff_login.php')) ?>">Staff sign in</a><a href="<?= e(url('tracking/kitchen/login.php')) ?>">Kitchen</a><a href="<?= e(url('tracking/courier/login.php')) ?>">Courier</a></nav>
+		<nav aria-label="Footer"><a href="<?= e(url('customer/home.php')) ?>">Cafés</a><a href="<?= e(url('customer/feedback.php')) ?>">Feedback</a><a href="<?= e(url('customer/register_cafe.php')) ?>">Register your café</a><a href="<?= e(url('auth/staff_login.php')) ?>">Staff sign in</a><a href="<?= e(url('tracking/kitchen/login.php')) ?>">Kitchen</a><a href="<?= e(url('tracking/courier/login.php')) ?>">Courier</a></nav>
 	</footer>
 	<?php
 }

@@ -3,6 +3,12 @@
 require __DIR__ . '/../app/layout/master.php';
 $staff = require_staff(ADMIN_ROLES);
 
+// Café registrations waiting for review (table added by migration_v6)
+$pendingApps = 0;
+try {
+	$pendingApps = (int) (q_one("SELECT COUNT(*) c FROM Restaurant_Application WHERE Status = 'Pending'")['c'] ?? 0);
+} catch (Throwable $e) { /* migration_v6 not run yet */ }
+
 layout_start(['title' => 'Overview', 'nav' => 'admin', 'active' => 'overview', 'styles' => ['pages/admin.css']]);
 ?>
 <div class="page-head" data-reveal>
@@ -24,6 +30,7 @@ layout_start(['title' => 'Overview', 'nav' => 'admin', 'active' => 'overview', '
 	<div class="glass stat card-glow" style="--c:var(--cyan)" data-reveal><small>Members</small><strong data-kpi="members">–</strong><span class="tiny" data-kpi-note="buyers"></span></div>
 	<div class="glass stat card-glow" style="--c:var(--ok)" data-reveal><small>Live promo codes</small><strong data-kpi="active_promos">–</strong><a class="tiny" href="<?= e(url('admin/promos.php')) ?>">Manage →</a></div>
 	<div class="glass stat card-glow" style="--c:var(--warn)" data-reveal><small>Unread feedback</small><strong data-kpi="unread">–</strong><a class="tiny" href="<?= e(url('admin/feedback.php')) ?>">Open inbox →</a></div>
+	<div class="glass stat card-glow" style="--c:var(--amber)" data-reveal><small>Pending applications</small><strong><?= $pendingApps ?></strong><a class="tiny" href="<?= e(url('admin/applications.php')) ?>">Review →</a></div>
 </div>
 
 <div class="overview-grid">
