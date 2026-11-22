@@ -38,7 +38,7 @@ layout_start([
 	</div>
 </div>
 
-<div class="inbox" id="inbox" data-admin="<?= $isAdmin ? '1' : '0' ?>">
+<div class="inbox" id="inbox" data-as="staff" data-admin="<?= $isAdmin ? '1' : '0' ?>">
 	<div class="inbox-list glass">
 		<?php if ($isAdmin): ?>
 		<div class="inbox-filter order-chat-tabs" role="tablist" style="margin-top:0">

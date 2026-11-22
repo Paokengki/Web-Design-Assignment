@@ -3,11 +3,14 @@
  * Private order chats (AJAX). See app/services/chat.php.
  *
  * Customer (as=customer):
+ *   action = unread   → unread count for the navbar badge
+ *   action = threads / messages (thread_id, since) / send (thread_id, body) → inbox (customer/messages.php)
  *   action = order    (payment_id, since_restaurant, since_driver, since_admin)
  *                     → the order's three conversations with messages newer than each "since" id
  *   action = send     (payment_id, party, body)
  *
  * Staff (as=staff):
+ *   action = unread   → customer messages waiting in chats this staff member answers (navbar badge)
  *   action = threads  → inbox: every conversation this staff member may see, newest first
  *   action = messages (thread_id, since)
  *   action = send     (thread_id, body)
@@ -42,6 +45,61 @@ const CHAT_PARTY_LABELS = ['restaurant' => 'Restaurant', 'driver' => 'Driver', '
 /* ------------------------------------------------------------------ customer */
 if ($as === 'customer') {
 	$user = require_customer();
+	$uid = (int) $user['User_ID'];
+
+	// Inbox (customer/messages.php) + navbar badge: work across all of the customer's orders.
+	$own = function () use ($uid): array {
+		$t = q_one('SELECT * FROM Chat_Thread WHERE Thread_ID = ? AND User_ID = ?', [(int) input('thread_id'), $uid]);
+		if (!$t) json_out(false, null, 'Conversation not found.', 404);
+		return $t;
+	};
+	switch ($action) {
+		case 'unread':
+			json_out(true, ['count' => (int) q_one("SELECT COUNT(*) n FROM Chat_Message m JOIN Chat_Thread t ON t.Thread_ID = m.Thread_ID
+				WHERE t.User_ID = ? AND m.Sender <> 'customer' AND m.Message_ID > COALESCE(t.Customer_read_id, 0)", [$uid])['n']]);
+
+		case 'threads':
+			$rows = q_all("SELECT t.*, r.Name AS Cafe, s.Name AS Driver, ot.Order_status,
+					(SELECT m.Body FROM Chat_Message m WHERE m.Thread_ID = t.Thread_ID ORDER BY m.Message_ID DESC LIMIT 1) AS Last_body,
+					(SELECT m.Sender FROM Chat_Message m WHERE m.Thread_ID = t.Thread_ID ORDER BY m.Message_ID DESC LIMIT 1) AS Last_sender
+				FROM Chat_Thread t
+				LEFT JOIN Restaurant r ON r.Restaurant_ID = t.Restaurant_ID
+				LEFT JOIN Staff s ON s.Staff_ID = t.Driver_ID
+				LEFT JOIN Order_Tracking ot ON ot.Payment_ID = t.Payment_ID
+				WHERE t.User_ID = ? AND EXISTS (SELECT 1 FROM Chat_Message m WHERE m.Thread_ID = t.Thread_ID)
+				ORDER BY t.Last_message_at DESC LIMIT 100", [$uid]);
+			json_out(true, ['threads' => array_map(fn($t) => [
+				'id'          => (int) $t['Thread_ID'],
+				'payment_id'  => (int) $t['Payment_ID'],
+				'party'       => $t['Party'],
+				'customer'    => $t['Party'] === 'restaurant' ? ($t['Cafe'] ?? 'Restaurant') : ($t['Party'] === 'driver' ? ($t['Driver'] ?? 'Your driver') : 'CafeDash support'),
+				'with'        => $t['Party'] === 'restaurant' ? ($t['Cafe'] ?? 'Restaurant') : ($t['Party'] === 'driver' ? ($t['Driver'] ?? 'Driver') : 'Support'),
+				'status'      => $t['Order_status'],
+				'last'        => $t['Last_body'],
+				'last_sender' => $t['Last_sender'],
+				'at'          => $t['Last_message_at'] ? date('c', strtotime($t['Last_message_at'])) : null,
+				'unread'      => chat_unread($t, 'customer'),
+				'can_reply'   => true,
+			], $rows)]);
+
+		case 'messages':
+			$t = $own();
+			$msgs = chat_messages((int) $t['Thread_ID'], (int) input('since', '0'));
+			chat_mark_read($t, 'customer', $msgs);
+			json_out(true, ['messages' => $msgs, 'can_reply' => true]);
+	}
+	if ($action === 'send' && input('thread_id') !== '') {
+		$t = $own();
+		try {
+			$id = chat_post((int) $t['Thread_ID'], 'customer', input('body'));
+		} catch (InvalidArgumentException $e) {
+			json_out(false, null, $e->getMessage(), 422);
+		}
+		q('UPDATE Chat_Thread SET Customer_read_id = ? WHERE Thread_ID = ?', [$id, (int) $t['Thread_ID']]);
+		json_out(true, ['id' => $id]);
+	}
+
+	// One order's chats (Track Order page)
 	$pid = (int) input('payment_id');
 	$order = q_one('SELECT Payment_ID FROM Payment WHERE Payment_ID = ? AND User_ID = ?', [$pid, (int) $user['User_ID']]);
 	if (!$order) json_out(false, null, 'Order not found.', 404);
@@ -107,6 +165,17 @@ function staff_thread(array $staff): array
 }
 
 switch ($action) {
+	case 'unread':
+		// navbar badge: customer messages waiting in chats this staff member answers
+		[$where, $args] = match (true) {
+			in_array($staff['Role'], ADMIN_ROLES, true) => ["t.Party = 'admin'", []],
+			$staff['Role'] === 'Kitchen Staff' => ["t.Party = 'restaurant' AND t.Restaurant_ID = ?", [(int) $staff['Assigned_Restaurant_ID']]],
+			$staff['Role'] === 'Courier' => ["t.Party = 'driver' AND t.Driver_ID = ?", [(int) $staff['Staff_ID']]],
+			default => ['0 = 1', []],
+		};
+		json_out(true, ['count' => (int) q_one("SELECT COUNT(*) n FROM Chat_Message m JOIN Chat_Thread t ON t.Thread_ID = m.Thread_ID
+			WHERE $where AND m.Sender = 'customer' AND m.Message_ID > COALESCE(t.Staff_read_id, 0)", $args)['n']]);
+
 	case 'threads':
 		$where = '1 = 1';
 		$args = [];
