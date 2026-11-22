@@ -176,7 +176,7 @@
 	}, true);
 
 	/* ------------------------------------------------ confirm dialog */
-	CD.confirm = ({ title, body = '', confirmText = 'Confirm', danger = false, input = null }) =>
+	CD.confirm = ({ title, body = '', confirmText = 'Confirm', cancelText = 'Cancel', danger = false, input = null }) =>
 		new Promise((resolve) => {
 			const m = document.createElement('div');
 			m.className = 'modal modal-confirm';
@@ -187,7 +187,7 @@
 					<div class="modal-head"><div><h2 id="cf-title">${CD.esc(title)}</h2>${body ? `<p id="cf-body">${body}</p>` : ''}</div></div>
 					${input ? `<label class="field"><span>${CD.esc(input.label)}</span><input class="input" type="${input.type || 'text'}" autocomplete="${input.autocomplete || 'off'}"></label>` : ''}
 					<div class="form-actions">
-						<button type="button" class="btn btn-ghost" data-act="no">Cancel</button>
+						<button type="button" class="btn btn-ghost" data-act="no">${CD.esc(cancelText)}</button>
 						<button type="button" class="btn ${danger ? 'btn-danger' : 'btn-primary'}" data-act="yes">${CD.esc(confirmText)}</button>
 					</div>
 				</div>`;

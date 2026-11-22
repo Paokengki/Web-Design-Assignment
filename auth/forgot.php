@@ -1,7 +1,7 @@
 <?php
 /** Forgot password — replaces login/member_login/_forgot.php. Emails a one-hour, single-use link. */
 require __DIR__ . '/../app/layout/master.php';
-require __DIR__ . '/../app/services/mailer.php';
+require __DIR__ . '/../app/services/cafe_mailer.php'; // shared PHPMailer helper (replaced app/services/mailer.php)
 
 $sent = false;
 $devLink = null;
@@ -28,7 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$link = $scheme . '://' . $_SERVER['HTTP_HOST'] . url('auth/reset.php?token=' . $token);
 			$html = '<p>Hi ' . e($user['User_Name']) . ',</p><p>Someone asked to reset your CafeDash password. If that was you, use this link within the next hour:</p>'
 				. '<p><a href="' . e($link) . '">' . e($link) . '</a></p><p>If it wasn’t you, ignore this email — your password stays the same.</p>';
-			if (!send_mail($user['Email'], 'Reset your CafeDash password', $html) && !mail_ready() && is_local_dev()) {
+			$sentOk = cafe_send_mail($user['Email'], $user['User_Name'], 'Reset your CafeDash password', $html);
+			$isLocal = in_array(strtolower(explode(':', $_SERVER['HTTP_HOST'] ?? '')[0]), ['localhost', '127.0.0.1', '[::1]'], true);
+			if (!$sentOk && !cafe_mail_config() && $isLocal) {
 				$devLink = $link; // email not configured: show the link on localhost only
 			}
 		}

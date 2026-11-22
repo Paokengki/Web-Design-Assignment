@@ -169,6 +169,9 @@ function admin_nav_items(): array
 		'feedback'    => ['Feedback', 'admin/feedback.php', 'inbox', ADMIN_ROLES],
 		'reviews'     => ['Reviews & ratings', 'admin/reviews.php', 'chart', ADMIN_ROLES],
 		'tracking'    => ['Live Orders', 'tracking/manager/deliveries.php', 'truck', ADMIN_ROLES],
+		'kitchen'     => ['Kitchen orders', 'tracking/kitchen/orders.php', 'receipt', ['Kitchen Staff']],
+		'courier'     => ['My deliveries', 'tracking/courier/deliveries.php', 'truck', ['Courier']],
+		'messages'    => ['Messages', 'tracking/messages.php', 'chat', STAFF_ROLES],
 		'staff'       => ['Staff & roles', 'admin/staff.php', 'shield', ['Super Admin']],
 	];
 }
@@ -186,7 +189,7 @@ function render_admin_sidebar(string $active): void
 	} catch (Throwable $e) { /* table added by migration_v6 */ }
 	?>
 	<aside class="sidebar glass">
-		<a class="brand" href="<?= e(url('admin/overview.php')) ?>"><?= logo_mark() ?><span><?= APP_NAME ?><small>Control</small></span></a>
+		<a class="brand" href="<?= e(url(match ($staff['Role'] ?? '') { 'Kitchen Staff' => 'tracking/kitchen/orders.php', 'Courier' => 'tracking/courier/deliveries.php', default => 'admin/overview.php' })) ?>"><?= logo_mark() ?><span><?= APP_NAME ?><small>Control</small></span></a>
 		<nav class="side-nav" aria-label="Control panel">
 			<?php foreach (admin_nav_items() as $key => [$label, $href, $icon, $roles]):
 				if (!in_array($staff['Role'] ?? '', $roles, true)) continue; ?>

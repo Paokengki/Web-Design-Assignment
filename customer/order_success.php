@@ -10,8 +10,9 @@ $id = (int) ($_GET['id'] ?? 0);
 $order = q_one('SELECT p.*, r.Name AS cafe FROM Payment p LEFT JOIN Restaurant r ON r.Restaurant_ID = p.Restaurant_ID WHERE p.Payment_ID = ? AND p.User_ID = ?', [$id, (int) $user['User_ID']]);
 if (!$order) redirect('customer/orders.php');
 $items = q_all('SELECT * FROM Payment_Item WHERE Payment_ID = ?', [$id]);
-$spent = (float) q_one("SELECT COALESCE(SUM(Payment_amount), 0) s FROM Payment WHERE User_ID = ? AND Payment_status = 'SUCCEEDED'", [(int) $user['User_ID']])['s'];
-$loyalty = loyalty_for($spent);
+$loyalty = loyalty_summary((int) $user['User_ID']); // points already earned (completed orders)
+$orderPoints = points_for_amount((float) $order['Payment_amount']);
+$pointsLater = $order['Points_rule'] === 'on_complete' && $order['Completed_at'] === null; // credited on Complete Order
 // Ensure the tracking record exists (only if payment succeeded).
 track_ensure_for_payment($id);
 
@@ -21,12 +22,13 @@ layout_start(['title' => 'Order confirmed', 'nav' => 'shop', 'styles' => ['pages
 	<div class="success-mark" aria-hidden="true"><?= icon('check') ?></div>
 	<span class="eyebrow">Order #<?= (int) $order['Payment_ID'] ?></span>
 	<h1><?= (float) $order['Payment_amount'] > 0 ? 'Payment received.' : 'Order placed.' ?></h1>
-	<p class="muted">Your order is with the kitchen. A receipt is in your <a class="grad-text" href="<?= e(url('customer/orders.php')) ?>"><b>orders</b></a>.</p>
+	<p class="muted">Your order is waiting for the café to accept it — you can still cancel for a few seconds on the tracking page. A receipt is in your <a class="grad-text" href="<?= e(url('customer/orders.php')) ?>"><b>orders</b></a>.</p>
 
 	<div class="success-points">
-		<span class="tiny">Points earned</span>
-		<strong data-count="<?= (int) floor((float) $order['Payment_amount']) ?>" data-prefix="+">0</strong>
-		<span class="tier tier-<?= e($loyalty['tier']) ?>"><?= e($loyalty['tier']) ?> · <?= number_format($loyalty['points']) ?> pts</span>
+		<span class="tiny"><?= $pointsLater ? 'Points to collect' : 'Points earned' ?></span>
+		<strong data-count="<?= $orderPoints ?>" data-prefix="+">0</strong>
+		<span class="tier tier-<?= e($loyalty['tier']) ?>"><?= e($loyalty['tier']) ?> · <?= number_format($loyalty['balance']) ?> pts</span>
+		<?php if ($pointsLater && $orderPoints > 0): ?><small class="tiny">Earn <?= $orderPoints ?> point<?= $orderPoints === 1 ? '' : 's' ?> when you tap <b>Complete Order</b> after delivery.</small><?php endif; ?>
 	</div>
 
 	<div class="summary-lines">

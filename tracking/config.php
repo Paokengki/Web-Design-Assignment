@@ -294,3 +294,24 @@ function track_can_advance_parent(string $newParentStatus, array $childStatuses)
 	// and checked against the parent's current status, not child states.
 	return true;
 }
+
+// ============================================================================
+// DEMO MODE — orders move through the lifecycle on a timer (tracking/demo.php).
+// While on, the kitchen / manager / courier pages only watch; set to false to
+// go back to moving orders by hand on those pages.
+// ============================================================================
+const DEMO_MODE = true;
+
+// Seconds an order stays in each status before the demo moves it on.
+// Pending = the "Accept Order" window, when the customer can still cancel.
+const DEMO_STATUS_SECONDS = [
+	TRACK_STATUS_PENDING          => 10,
+	TRACK_STATUS_ACCEPTED         => 5,
+	TRACK_STATUS_PREPARING        => 5,
+	TRACK_STATUS_READY            => 5,
+	TRACK_STATUS_ASSIGNED         => 5,
+	TRACK_STATUS_OUT_FOR_DELIVERY => 5,
+];
+
+// Statuses in which a driver is busy (not free for a new order).
+const TRACK_DRIVER_BUSY_STATUSES = [TRACK_STATUS_ASSIGNED, TRACK_STATUS_OUT_FOR_DELIVERY];
