@@ -7,7 +7,10 @@
  *   - Two-segment route: traveled (restaurant→courier) + remaining (courier→destination)
  *   - Courier trail showing path history
  *   - Permanent marker labels (tooltips)
- *   - Courier position updates via AJAX polling (5s interval)
+ *   - Courier position updates via AJAX polling (5s interval; 1s in demo mode)
+ *   - Demo mode: the full café → customer road route is drawn once and the driver
+ *     glides along it (no routing request per position)
+ *   - Cancel order (while Pending) / Complete Order (once Delivered) bar
  *   - Status timeline auto-refresh
  *   - ETA countdown
  *   - Falls back to text-only if map fails to load
@@ -26,6 +29,7 @@
 	if (!paymentId) return;
 
 	const POLL_INTERVAL = 5000; // 5 seconds
+	const DEMO_POLL_INTERVAL = 1000; // demo lifecycle moves every 5–10 s
 
 	// Route cache: key = "lat1,lng1,lat2,lng2", value = array of [lat,lng] waypoints
 	// Prevents re-fetching the same OSRM route on every 5s poll.
@@ -188,10 +192,84 @@
 		return null;
 	}
 
+	/* ── Demo mode map ─────────────────────────────────────────
+	 * One road route café → customer, fetched once. The driver's place on it comes from
+	 * demo.progress (0–1) and is animated smoothly between polls.
+	 */
+	let demoRoute = null;     // [[lat,lng], ...]
+	let demoCum = null;       // cumulative distance at each route point
+	let demoDoneLine = null;  // part of the route already driven
+	let demoState = null;
+	let demoFrameId = null;
+
+	function pointAlongRoute(p) {
+		const total = demoCum[demoCum.length - 1];
+		const target = Math.max(0, Math.min(1, p)) * total;
+		let i = 0;
+		while (i < demoCum.length - 2 && demoCum[i + 1] < target) i++;
+		const seg = demoCum[i + 1] - demoCum[i] || 1;
+		const f = Math.max(0, Math.min(1, (target - demoCum[i]) / seg));
+		const a = demoRoute[i], b = demoRoute[i + 1] || a;
+		return { idx: i, pos: [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f] };
+	}
+
+	function demoFrame(now) {
+		demoFrameId = null;
+		if (!demoState || !demoRoute || !map) return;
+		let p = demoState.base;
+		const moving = demoState.status === 'Out for Delivery';
+		if (moving) p = Math.min(1, demoState.base + (now - demoState.at) / 1000 / demoState.len);
+		const { idx, pos } = pointAlongRoute(p);
+		courierMarker = updateMarker(courierMarker, pos[0], pos[1], 'C', demoState.name, 'courier-marker', '#f97316');
+		if (demoDoneLine) demoDoneLine.setLatLngs(demoRoute.slice(0, idx + 1).concat([pos]));
+		if (moving && p < 1) demoFrameId = requestAnimationFrame(demoFrame);
+	}
+
+	async function updateMapDemo(data) {
+		const r = data.restaurant || {}, d = data.destination || {};
+		const rl = r.latitude, rg = r.longitude, dl = d.latitude, dg = d.longitude;
+		if (!map) initMap(rl ?? dl ?? 3.0733, rg ?? dg ?? 101.5830);
+		if (!map) return;
+		if (rl != null) restaurantMarker = updateMarker(restaurantMarker, rl, rg, 'R', r.name || 'Restaurant', 'rest-marker', '#14b8a6');
+		if (dl != null) destMarker = updateMarker(destMarker, dl, dg, 'D', 'Your location', 'dest-marker', '#ef4444');
+		if (rl == null || dl == null) return;
+
+		if (!demoRoute) {
+			demoRoute = (await fetchRoadRoute(rl, rg, dl, dg)) || [[rl, rg], [dl, dg]];
+			const k = Math.cos(rl * Math.PI / 180);
+			demoCum = [0];
+			for (let i = 1; i < demoRoute.length; i++) {
+				const dy = demoRoute[i][0] - demoRoute[i - 1][0], dx = (demoRoute[i][1] - demoRoute[i - 1][1]) * k;
+				demoCum.push(demoCum[i - 1] + Math.hypot(dx, dy));
+			}
+			const line = L.polyline(demoRoute, { color: '#3b82f6', weight: 5, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+			demoDoneLine = L.polyline([], { color: '#14b8a6', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+			map.fitBounds(line.getBounds(), { padding: [50, 50], maxZoom: 16 });
+			boundsFitOnce = true;
+		}
+
+		const s = data.order_status;
+		const onRoad = data.courier && (s === 'Assigned' || s === 'Out for Delivery' || s === 'Delivered');
+		if (!onRoad) {
+			demoState = null;
+			if (courierMarker) { map.removeLayer(courierMarker); courierMarker = null; }
+			return;
+		}
+		demoState = {
+			status: s,
+			base: s === 'Delivered' ? 1 : (s === 'Out for Delivery' ? (data.demo.progress || 0) : 0),
+			len: data.demo.length || 5,
+			at: performance.now(),
+			name: data.courier.name || 'Driver',
+		};
+		if (!demoFrameId) demoFrameId = requestAnimationFrame(demoFrame);
+	}
+
 	/**
 	 * Update the map with restaurant, destination, and courier positions.
 	 */
 	async function updateMap(data) {
+		if (data.demo && data.demo.enabled) return updateMapDemo(data);
 		const restLat = data.restaurant?.latitude;
 		const restLng = data.restaurant?.longitude;
 		const destLat = data.destination?.latitude;
@@ -371,6 +449,7 @@
 			+ '<small>' + (data.courier.phone || '') + (data.courier.plate_number ? ' \u00b7 ' + data.courier.plate_number : '') + '</small>'
 			+ '</div>'
 			+ '<div class="track-courier-actions">'
+			+ '<button type="button" class="btn btn-sm btn-glass" data-chat-open="driver">Message</button>'
 			+ (data.courier.phone ? '<a href="tel:' + data.courier.phone + '" class="btn btn-sm btn-glass">Call</a>' : '')
 			+ '</div>';
 	}
@@ -378,10 +457,23 @@
 	/**
 	 * Render the ETA.
 	 */
+	const DEMO_STEP_TEXT = {
+		'Pending': 'Waiting for the café to accept',
+		'Accepted': 'Café accepted — kitchen starting',
+		'Preparing': 'Your food is being prepared',
+		'Ready for Pickup': 'Ready — finding a driver',
+		'Assigned': 'Driver heading to the café',
+		'Out for Delivery': 'Driver on the way to you',
+	};
+
 	function renderEta(data) {
 		if (!elEta) return;
 		const est = data.estimated_minutes;
-		if (est != null && est > 0) {
+		const demo = data.demo;
+		if (demo && demo.enabled && DEMO_STEP_TEXT[data.order_status]) {
+			const left = demo.remaining != null ? Math.ceil(demo.remaining) : null;
+			elEta.innerHTML = '<strong>' + (left != null ? left + 's' : '\u2026') + '</strong><div><small>' + DEMO_STEP_TEXT[data.order_status] + '</small><br><small>Demo timing</small></div>';
+		} else if (est != null && est > 0) {
 			elEta.innerHTML = '<strong>' + est + '</strong><div><small>min estimated</small><br><small>remaining</small></div>';
 		} else if (data.order_status === 'Delivered') {
 			elEta.innerHTML = '<strong>\u2713</strong><div><small>Delivered</small></div>';
@@ -401,6 +493,85 @@
 			+ '<span class="dot"></span>'
 			+ (data.order_status_label || data.order_status)
 			+ '</span>';
+	}
+
+	/**
+	 * Cancel (while the café has not accepted yet) / Complete Order (once delivered).
+	 */
+	const elActions = document.getElementById('track-actions');
+	let actionsHtml = '';
+	let actionBusy = false;
+	const esc = (v) => (CD.esc ? CD.esc(v) : String(v ?? ''));
+
+	function renderActions(data) {
+		if (!elActions) return;
+		const pts = data.points || 0;
+		const ptsText = pts + ' point' + (pts === 1 ? '' : 's');
+		let tone = '', title = '', sub = '', button = '';
+
+		if (data.order_status === 'Cancelled') {
+			tone = 'is-bad';
+			title = 'Order cancelled';
+			sub = data.refund && data.refund.amount > 0
+				? money(data.refund.amount) + ' refunded to your card — it usually shows in 5–10 working days.'
+				: (data.provider === 'VOUCHER' ? 'Your voucher is back in your account.' : 'Nothing was charged.');
+		} else if (data.can_cancel) {
+			const left = data.demo && data.demo.enabled && data.demo.remaining != null ? Math.ceil(data.demo.remaining) : null;
+			title = 'Changed your mind?';
+			sub = left != null
+				? 'You can cancel for ' + left + ' more second' + (left === 1 ? '' : 's') + ', until the café accepts.' + (data.amount > 0 ? ' You get a full refund.' : '')
+				: 'You can cancel until the café accepts your order.';
+			button = '<button type="button" class="btn btn-danger" data-act="cancel">Cancel order' + (left != null ? ' (' + left + 's)' : '') + '</button>';
+		} else if (data.completed) {
+			tone = 'is-ok';
+			title = 'Order completed';
+			sub = data.points_rule === 'on_complete' && pts > 0 ? '+' + ptsText + ' added to your balance. Thanks for ordering!' : 'Thanks for ordering with CafeDash!';
+		} else if (data.can_complete) {
+			tone = 'is-ok';
+			title = 'Your order has arrived';
+			sub = pts > 0 ? 'Tap Complete Order to collect +' + ptsText + '.' : 'Tap Complete Order to finish.';
+			button = '<button type="button" class="btn btn-primary" data-act="complete">Complete order' + (pts > 0 ? ' · +' + pts + ' pts' : '') + '</button>';
+		} else {
+			title = 'Complete Order unlocks once delivered';
+			sub = pts > 0 ? 'Confirm you have your food to earn ' + ptsText + '.' : 'Confirm you have your food to finish the order.';
+			button = '<button type="button" class="btn btn-primary" disabled title="Available once delivered">Complete order</button>';
+		}
+
+		const html = '<div class="track-actions-text ' + tone + '"><strong>' + esc(title) + '</strong><small>' + esc(sub) + '</small></div>' + button;
+		if (html === actionsHtml) return; // keep focus / hover state
+		actionsHtml = html;
+		elActions.innerHTML = html;
+	}
+
+	if (elActions) {
+		elActions.addEventListener('click', async (ev) => {
+			const btn = ev.target.closest('[data-act]');
+			if (!btn || btn.disabled || actionBusy || !lastData) return;
+			const act = btn.dataset.act;
+			if (act === 'cancel') {
+				const ok = await CD.confirm({
+					title: 'Cancel this order?',
+					body: lastData.amount > 0 ? money(lastData.amount) + ' will be refunded to your card.' : 'Your voucher will be returned to your account.',
+					confirmText: 'Yes, cancel order',
+					cancelText: 'Keep order',
+					danger: true,
+				});
+				if (!ok) return;
+			}
+			actionBusy = true;
+			btn.disabled = true;
+			try {
+				const res = await CD.api('tracking/api/order_actions.php', { action: act, payment_id: paymentId });
+				CD.toast(res.message || 'Done.', 'success');
+			} catch (err) {
+				CD.toast(err.message, 'error');
+			} finally {
+				actionBusy = false;
+				actionsHtml = '';
+				await fetchTracking();
+				schedulePoll();
+			}
+		});
 	}
 
 	/**
@@ -431,6 +602,8 @@
 			renderTimeline(lastData);
 			renderItems(lastData);
 			renderCourier(lastData);
+			renderActions(lastData);
+			document.dispatchEvent(new CustomEvent('cd:tracking', { detail: lastData }));
 			await updateMap(lastData);
 		} catch (err) {
 			console.error('Tracking poll error:', err);
@@ -438,28 +611,33 @@
 	}
 
 	/**
-	 * Start polling.
+	 * Polling: a setTimeout loop (never overlaps), 1 s in demo mode, paused while the tab is hidden,
+	 * stopped once the order is Delivered or Cancelled.
 	 */
-	function startPolling() {
-		fetchTracking();
-		pollTimer = setInterval(fetchTracking, POLL_INTERVAL);
+	const isTerminal = () => lastData && (lastData.order_status === 'Delivered' || lastData.order_status === 'Cancelled');
 
-		// Stop polling when the tab is hidden, restart when visible.
-		document.addEventListener('visibilitychange', () => {
+	function schedulePoll() {
+		if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+		if (document.hidden || isTerminal()) return;
+		const ms = lastData && lastData.demo && lastData.demo.enabled ? DEMO_POLL_INTERVAL : POLL_INTERVAL;
+		pollTimer = setTimeout(async () => {
+			pollTimer = null;
+			await fetchTracking();
+			schedulePoll();
+		}, ms);
+	}
+
+	async function startPolling() {
+		await fetchTracking();
+		schedulePoll();
+		document.addEventListener('visibilitychange', async () => {
 			if (document.hidden) {
-				if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-			} else if (!pollTimer) {
-				fetchTracking();
-				pollTimer = setInterval(fetchTracking, POLL_INTERVAL);
+				if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+			} else if (!pollTimer && !isTerminal()) {
+				await fetchTracking();
+				schedulePoll();
 			}
 		});
-
-		// Stop polling when order is terminal.
-		setInterval(() => {
-			if (lastData && (lastData.order_status === 'Delivered' || lastData.order_status === 'Cancelled')) {
-				if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-			}
-		}, POLL_INTERVAL);
 	}
 
 	// Initialize when DOM is ready.

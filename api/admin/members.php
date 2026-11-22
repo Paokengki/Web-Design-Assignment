@@ -16,6 +16,7 @@ const MEMBER_SELECT = "SELECT u.User_ID, u.User_Name, u.Email, u.Contain_number,
 	CASE WHEN u.Deleted_at IS NOT NULL THEN 'Deactivated' WHEN u.Suspend = 1 THEN 'Suspended' ELSE 'Active' END AS status,
 	(SELECT COUNT(*) FROM Payment p WHERE p.User_ID = u.User_ID AND p.Payment_status = 'SUCCEEDED') AS orders,
 	(SELECT COALESCE(SUM(Payment_amount), 0) FROM Payment p WHERE p.User_ID = u.User_ID AND p.Payment_status = 'SUCCEEDED') AS spent,
+	(SELECT COALESCE(SUM(Payment_amount), 0) FROM Payment p WHERE p.User_ID = u.User_ID AND " . POINTS_EARNED_SQL . ") AS earned,
 	(SELECT MAX(Created_at) FROM Payment p WHERE p.User_ID = u.User_ID) AS last_order
 	FROM User u";
 
@@ -28,7 +29,7 @@ function member_row(int $id): array
 
 function decorate(array $r): array
 {
-	$r['tier'] = loyalty_for((float) $r['spent'])['tier'];
+	$r['tier'] = loyalty_for((float) $r['earned'])['tier']; // tier follows earned points (completed orders)
 	$r['avatar'] = $r['Profile_Image'] ? url(preg_replace('#^(\.\./)+#', '', $r['Profile_Image'])) : null;
 	unset($r['Profile_Image']);
 	return $r;

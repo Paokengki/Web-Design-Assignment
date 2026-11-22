@@ -126,10 +126,25 @@ function payment_finalize_session(array $user, string $sessionId): int
 	}
 
 	$paymentId = record_paid_order($uid, $sum, $intentId, (int) $session->amount_total, (string) $session->currency);
+	start_order_tracking($paymentId);
 	unset($_SESSION['checkout_session']);
 	$_SESSION['last_payment_id'] = $paymentId;
 	cart_clear();
 	return $paymentId;
+}
+
+/**
+ * Start the order's tracking (and the demo timer) as soon as it is paid, so the 10-second
+ * cancel window counts from payment, not from whenever the receipt page happens to load.
+ */
+function start_order_tracking(int $paymentId): void
+{
+	try {
+		require_once dirname(__DIR__, 2) . '/tracking/bootstrap.php';
+		track_ensure_for_payment($paymentId);
+	} catch (Throwable $e) {
+		error_log('CafeDash: could not start tracking for order #' . $paymentId . ': ' . $e->getMessage());
+	}
 }
 
 /**
@@ -145,6 +160,7 @@ function payment_place_free_order(array $user): int
 	if (!q_one('SELECT 1 FROM User_Address WHERE User_ID = ?', [$uid])) throw new InvalidArgumentException('Add a delivery address before ordering.');
 
 	$paymentId = record_paid_order($uid, $sum, 'free_' . bin2hex(random_bytes(12)), 0, 'MYR', 'voucher', 'VOUCHER', true);
+	start_order_tracking($paymentId);
 	$_SESSION['last_payment_id'] = $paymentId;
 	cart_clear();
 	return $paymentId;

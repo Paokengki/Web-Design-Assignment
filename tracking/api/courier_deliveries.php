@@ -9,8 +9,10 @@
  */
 require_once __DIR__ . '/../../app/bootstrap.php';
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../demo.php';
 
 $action = api_start();
+track_demo_tick_all(); // demo mode: bring every open order up to date before showing it
 $staff = current_staff();
 
 if (!$staff) {

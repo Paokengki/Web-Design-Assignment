@@ -9,10 +9,13 @@
  * Returns: tracking row, status history, latest courier position, restaurant info,
  *          order items (filtered to this customer's full order).
  *
- * This endpoint READS ONLY from existing + tracking tables. It never writes to Payment.
+ * In demo mode it first advances the order on the demo timer (tracking/demo.php).
+ * It never writes to Payment.
  */
 require_once __DIR__ . '/../../app/bootstrap.php';
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../demo.php';
+require_once __DIR__ . '/../../app/loyalty.php';
 
 $action = api_start();
 $user = require_customer();
@@ -26,12 +29,15 @@ if ($paymentId <= 0) json_out(false, null, 'payment_id is required.', 422);
 $payment = q_one(
 	'SELECT Payment_ID, User_ID, Restaurant_ID, Payment_status, Payment_amount,
 	        Subtotal_amount, SST_amount, Discount_amount, Created_at, Paid_at,
-	        Provider, Payment_type
+	        Provider, Payment_type, Points_rule, Completed_at, Refund_amount, Refunded_at
 	 FROM Payment WHERE Payment_ID = ? AND User_ID = ?',
 	[$paymentId, (int) $user['User_ID']]
 );
 
 if (!$payment) json_out(false, null, 'Order not found.', 404);
+
+// Demo lifecycle: move the order on if its time in the current status is up.
+track_demo_tick($paymentId);
 
 // Get the tracking row.
 $tracking = q_one('SELECT * FROM Order_Tracking WHERE Payment_ID = ?', [$paymentId]);
@@ -47,11 +53,13 @@ if (!$tracking) {
 }
 
 // Get restaurant info with coordinates.
+// Multi-café orders: the first café prepares the hand-over and its driver delivers.
 $restaurant = null;
-if ($payment['Restaurant_ID']) {
+$cafeId = chat_order_cafe($paymentId);
+if ($cafeId) {
 	$restaurant = q_one(
 		'SELECT Restaurant_ID, Name, Address, Latitude, Longitude FROM Restaurant WHERE Restaurant_ID = ?',
-		[(int) $payment['Restaurant_ID']]
+		[$cafeId]
 	);
 }
 
@@ -171,4 +179,14 @@ json_out(true, [
 	'discount' => (float) $payment['Discount_amount'],
 	'paid_at' => $payment['Paid_at'],
 	'provider' => $payment['Provider'],
+
+	// demo timer, Cancel / Complete buttons, points
+	'demo'         => track_demo_info($tracking),
+	'can_cancel'   => $tracking['Order_status'] === TRACK_STATUS_PENDING && $payment['Payment_status'] === 'SUCCEEDED',
+	'can_complete' => $tracking['Order_status'] === TRACK_STATUS_DELIVERED && $payment['Completed_at'] === null && $payment['Payment_status'] === 'SUCCEEDED',
+	'completed'    => $payment['Completed_at'] !== null,
+	'completed_at' => $payment['Completed_at'],
+	'points'       => $payment['Payment_status'] === 'SUCCEEDED' ? points_for_amount((float) $payment['Payment_amount']) : 0,
+	'points_rule'  => $payment['Points_rule'],
+	'refund'       => $payment['Refunded_at'] ? ['amount' => (float) $payment['Refund_amount'], 'at' => $payment['Refunded_at']] : null,
 ]);

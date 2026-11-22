@@ -6,7 +6,9 @@
  *
  * Features:
  *   - Leaflet.js map with restaurant, destination, and courier markers
- *   - Real-time courier position via AJAX polling (5s)
+ *   - Real-time courier position via AJAX polling (5s; 1s in demo mode, driver animated along the route)
+ *   - Cancel order (while Pending) with Stripe refund; Complete Order (once Delivered) credits points
+ *   - Private chats with the restaurant, the driver and CafeDash support
  *   - Status timeline showing fulfillment progress
  *   - ETA countdown
  *   - Courier contact info (name, phone, plate)
@@ -14,7 +16,7 @@
  *
  * Auth: customer must be logged in and own the order.
  * Reads from Payment (READ ONLY) + Order_Tracking + Delivery_Location.
- * Never writes to Payment or Stripe data.
+ * Cancel / Complete go through tracking/api/order_actions.php.
  */
 require_once __DIR__ . '/../../app/bootstrap.php';
 require_once __DIR__ . '/../config.php';
@@ -41,11 +43,13 @@ if (!$payment) {
 // Get tracking info (may not exist if migration hasn't been run or order predates tracking).
 $tracking = q_one('SELECT * FROM Order_Tracking WHERE Payment_ID = ?', [$paymentId]);
 
+require_once __DIR__ . '/../../app/services/chat.php';
 $restaurant = null;
-if ($payment['Restaurant_ID']) {
+$cafeId = chat_order_cafe($paymentId); // multi-café orders: the first café handles the delivery
+if ($cafeId) {
 	$restaurant = q_one(
 		'SELECT Name, Address, Latitude, Longitude FROM Restaurant WHERE Restaurant_ID = ?',
-		[(int) $payment['Restaurant_ID']]
+		[$cafeId]
 	);
 }
 
@@ -108,6 +112,9 @@ layout_start([
 			</div>
 		</div>
 
+		<!-- Cancel (first 10 s) / Complete Order (once delivered) — filled by tracking-map.js -->
+		<div class="track-actions glass" id="track-actions" aria-live="polite"></div>
+
 		<!-- Map -->
 		<div class="track-map-wrap" data-reveal>
 			<div id="track-map"></div>
@@ -116,6 +123,27 @@ layout_start([
 
 		<!-- Courier info (hidden until courier is assigned) -->
 		<div class="track-courier-card" id="track-courier" style="display:none;"></div>
+
+		<!-- Private chats: restaurant / driver / CafeDash support -->
+		<section class="order-chat glass" id="order-chat" data-payment="<?= (int) $paymentId ?>" data-reveal>
+			<div class="order-chat-head">
+				<div>
+					<h3>Messages</h3>
+					<small>Private chats about this order</small>
+				</div>
+			</div>
+			<div class="order-chat-tabs" role="tablist">
+				<button type="button" role="tab" class="is-active" data-party="restaurant">Restaurant<span class="chat-badge" hidden></span></button>
+				<button type="button" role="tab" data-party="driver">Driver<span class="chat-badge" hidden></span></button>
+				<button type="button" role="tab" data-party="admin">Support<span class="chat-badge" hidden></span></button>
+			</div>
+			<div class="order-chat-sub" id="chat-sub"></div>
+			<div class="order-chat-log" id="chat-log" role="log" aria-live="polite"></div>
+			<form class="order-chat-form" id="chat-form" autocomplete="off">
+				<input type="text" name="body" maxlength="1000" placeholder="Write a message…" aria-label="Message">
+				<button class="btn btn-primary btn-sm" type="submit">Send</button>
+			</form>
+		</section>
 
 		<!-- Timeline -->
 		<div class="track-timeline glass" data-reveal>
@@ -133,9 +161,9 @@ layout_start([
 			</div>
 		</div>
 
-		<!-- Actions -->
+		<!-- Links -->
 		<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-			<a class="btn btn-primary" href="<?= e(url('customer/home.php')) ?>">Order again</a>
+			<a class="btn btn-glass" href="<?= e(url('customer/home.php')) ?>">Order again</a>
 			<a class="btn btn-glass" href="<?= e(url('customer/orders.php')) ?>">All orders</a>
 		</div>
 	<?php endif; ?>
@@ -145,8 +173,7 @@ layout_start([
 <!-- Leaflet.js -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 	integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin></script>
-<!-- Tracking map script -->
-<script src="<?= e(asset('tracking/assets/js/tracking-map.js')) ?>"></script>
 <?php endif; ?>
 
-<?php layout_end();
+<?php // page scripts load after the core (CD.api / CD.toast / CD.confirm)
+layout_end($tracking ? ['tracking/assets/js/tracking-map.js', 'tracking/assets/js/order-chat.js'] : []);

@@ -103,9 +103,9 @@ function track_ensure_for_payment(int $paymentId): ?array
 			// constraint would reject a duplicate, but INSERT IGNORE suppresses the error).
 			q(
 				'INSERT IGNORE INTO Order_Tracking
-					(Payment_ID, User_ID, Restaurant_ID, Order_status, Delivery_Address_ID,
+					(Payment_ID, User_ID, Restaurant_ID, Order_status, Status_changed_at, Delivery_Address_ID,
 					 Dest_Latitude, Dest_Longitude, Estimated_minutes, Tracking_PIN)
-				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+				 VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)',
 				[
 					$paymentId, $userId, $restaurantId,
 					TRACK_STATUS_PENDING,
