@@ -64,6 +64,10 @@
 	border: 1px solid var(--border, rgba(255,255,255,.08));
 	margin-bottom: 20px;
 	position: relative;
+	/* Leaflet gives its panes/controls z-index 400–1000. Isolating the wrapper keeps all of that
+	   inside the map, so the fixed navbar (z-index 200) always stays on top when scrolling. */
+	z-index: 1;
+	isolation: isolate;
 }
 #track-map { width: 100%; height: 380px; background: #1a1a2e; }
 .track-map-loading {

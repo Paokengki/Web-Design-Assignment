@@ -71,7 +71,9 @@
 	function markRead(party) {
 		if (!state[party].available || !state[party].unread) return;
 		state[party].unread = 0;
-		CD.api(API, { as: 'customer', action: 'read', payment_id: paymentId, party }).catch(() => {});
+		CD.api(API, { as: 'customer', action: 'read', payment_id: paymentId, party })
+			.then(() => document.dispatchEvent(new Event('cd:chat-read')))
+			.catch(() => {});
 	}
 
 	async function poll() {

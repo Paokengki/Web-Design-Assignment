@@ -20,7 +20,15 @@ const CORE_CSS = [
 	'components/surfaces.css', 'components/buttons.css', 'components/forms.css',
 	'components/feedback.css', 'components/overlays.css', 'components/data.css',
 ];
-const CORE_JS = ['core/api.js', 'core/ui.js', 'core/motion.js'];
+const CORE_JS = ['core/api.js', 'core/ui.js', 'core/motion.js', 'core/chat-badge.js'];
+
+/** Whose chats the navbar badge counts on this page: 'customer', 'staff' or null (signed out / auth pages). */
+function layout_chat_mode(string $nav): ?string
+{
+	if ($nav === 'shop' && current_user()) return 'customer';
+	if ($nav === 'admin' && current_staff()) return 'staff';
+	return null;
+}
 
 function layout_start(array $o = []): void
 {
@@ -46,7 +54,7 @@ function layout_start(array $o = []): void
 	<link rel="stylesheet" href="<?= e(asset(layout_asset_path('css', $css))) ?>">
 	<?php endforeach; ?>
 </head>
-<body class="<?= e($body) ?> nav-<?= e($nav) ?>">
+<body class="<?= e($body) ?> nav-<?= e($nav) ?>"<?= layout_chat_mode($nav) ? ' data-chat="' . layout_chat_mode($nav) . '"' : '' ?>>
 	<a class="skip-link" href="#main">Skip to content</a>
 	<div class="page-curtain" aria-hidden="true"></div>
 	<div class="ambient" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -137,6 +145,11 @@ function render_top_nav(string $active): void
 			<?php endforeach; ?>
 		</nav>
 		<div class="topnav-actions">
+			<?php if ($user): ?>
+				<a class="icon-btn chat-btn<?= $active === 'messages' ? ' is-active' : '' ?>" href="<?= e(url('customer/messages.php')) ?>" aria-label="Messages" title="Messages"<?= $active === 'messages' ? ' aria-current="page"' : '' ?>>
+					<?= icon('chat') ?><span class="cart-count" data-chat-count hidden>0</span>
+				</a>
+			<?php endif; ?>
 			<button class="icon-btn cart-btn" type="button" data-cart-open aria-label="Open cart">
 				<?= icon('bag') ?><span class="cart-count" data-cart-count hidden>0</span>
 			</button>
@@ -196,6 +209,7 @@ function render_admin_sidebar(string $active): void
 				<a class="<?= $active === $key ? 'is-active' : '' ?>" href="<?= e(url($href)) ?>"<?= $active === $key ? ' aria-current="page"' : '' ?>>
 					<?= icon($icon) ?><span><?= e($label) ?></span>
 					<?php if ($key === 'feedback' && $unread): ?><b class="side-badge" data-unread><?= $unread ?></b><?php endif; ?>
+					<?php if ($key === 'messages'): ?><b class="side-badge" data-chat-count hidden>0</b><?php endif; ?>
 					<?php if ($key === 'applications' && $pendingApps): ?><b class="side-badge"><?= $pendingApps ?></b><?php endif; ?>
 				</a>
 			<?php endforeach; ?>
